@@ -600,7 +600,7 @@ export default function LeadsPage() {
             {/* ===== RESPONSIVE NEW LEAD MODAL ===== */}
             {showModal && (
                 <div className="glass-overlay" onClick={() => setShowModal(false)}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
+                    <div className="glass-modal" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh' }}>
                         <div className="glass-modal-header">
                             <div>
                                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>✨ New Lead</h2>
@@ -743,7 +743,7 @@ export default function LeadsPage() {
             {/* RESPONSIVE LEAD DETAIL MODAL */}
             {selectedLead && (
                 <div className="glass-overlay" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
+                    <div className="glass-modal" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh' }}>
                         <div className="glass-modal-header">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                                 <div className="avatar avatar-md avatar-gradient-1" style={{ fontSize: '1.2rem', width: 44, height: 44 }}>{selectedLead.companyName?.[0]}</div>
