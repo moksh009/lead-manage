@@ -231,90 +231,12 @@ export default function ClientsPage() {
         }
     };
 
+    // Moved outside or keeping as separate component to avoid re-renders on every keystroke
+
     // ── Client Form Modal (shared for Add + Edit) ──────────────────────────────
     const formMonthlyFee = form.services.reduce((sum, s) => sum + (Number(s.price) || 0), 0);
 
-    function ClientFormModal({ isEdit }: { isEdit: boolean }) {
-        return (
-            <div className="modal-overlay" onClick={() => isEdit ? setEditClient(null) : setShowAddModal(false)}>
-                <div className="modal modal-lg" onClick={e => e.stopPropagation()} style={{ maxHeight: '88vh' }}>
-                    <div className="modal-header">
-                        <div>
-                            <div className="modal-title">{isEdit ? '✏️ Edit Client' : '➕ Add New Client'}</div>
-                            <div className="modal-subtitle">{isEdit ? `Editing ${editClient?.name}` : 'Set up client profile and services'}</div>
-                        </div>
-                        <button className="modal-close" onClick={() => isEdit ? setEditClient(null) : setShowAddModal(false)}>×</button>
-                    </div>
-                    <form onSubmit={isEdit ? handleEdit : handleAdd}>
-                        <div className="modal-body" style={{ overflowY: 'auto', maxHeight: 'calc(88vh - 140px)' }}>
-
-                            {/* Client Info */}
-                            <div style={{ marginBottom: 20 }}>
-                                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Client Info</div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Business Name *</label>
-                                        <input className="form-input" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Choice Salon" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Contact Person</label>
-                                        <input className="form-input" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} placeholder="Owner / Admin name" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Email</label>
-                                        <input className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="client@email.com" />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Phone</label>
-                                        <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 900 000 0000" />
-                                    </div>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                    <div className="form-group">
-                                        <label className="form-label">Joining Date</label>
-                                        <input className="form-input" type="date" value={form.joiningDate} onChange={e => setForm({ ...form, joiningDate: e.target.value })} />
-                                    </div>
-                                    <div className="form-group">
-                                        <label className="form-label">Status</label>
-                                        <select className="form-input" value={form.isActive ? 'active' : 'inactive'} onChange={e => setForm({ ...form, isActive: e.target.value === 'active' })}>
-                                            <option value="active">✅ Active</option>
-                                            <option value="inactive">❌ Inactive</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Services Catalog */}
-                            <div style={{ marginBottom: 20 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                    <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Services</div>
-                                    {formMonthlyFee > 0 && (
-                                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>
-                                            Total: ₹{formMonthlyFee.toLocaleString()}/mo
-                                        </div>
-                                    )}
-                                </div>
-                                <ServiceEditor services={form.services} onChange={s => setForm({ ...form, services: s })} />
-                            </div>
-
-                            {/* Notes */}
-                            <div className="form-group">
-                                <label className="form-label">Notes (optional)</label>
-                                <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any special terms, agreements, or context..." />
-                            </div>
-                        </div>
-
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => isEdit ? setEditClient(null) : setShowAddModal(false)}>Cancel</button>
-                            <button type="submit" className="btn btn-primary">
-                                {isEdit ? '✓ Save Changes' : '✓ Add Client'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        );
-    }
+    // usage below inside main component...
 
     return (
         <div className="animate-in">
@@ -509,10 +431,25 @@ export default function ClientsPage() {
             )}
 
             {/* ===== ADD CLIENT MODAL ===== */}
-            {showAddModal && <ClientFormModal isEdit={false} />}
+            {showAddModal && <ClientFormModal
+                isEdit={false}
+                form={form}
+                setForm={setForm}
+                onClose={() => setShowAddModal(false)}
+                onSubmit={handleAdd}
+                formMonthlyFee={formMonthlyFee}
+            />}
 
             {/* ===== EDIT CLIENT MODAL ===== */}
-            {editClient && <ClientFormModal isEdit={true} />}
+            {editClient && <ClientFormModal
+                isEdit={true}
+                form={form}
+                setForm={setForm}
+                onClose={() => setEditClient(null)}
+                onSubmit={handleEdit}
+                editClient={editClient}
+                formMonthlyFee={formMonthlyFee}
+            />}
 
             {/* ===== CLIENT DETAIL MODAL ===== */}
             {selectedClient && (
@@ -604,6 +541,105 @@ export default function ClientsPage() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+// ── Client Form Modal (Extracted to top-level to fix focus/render issue) ──────────────────────
+function ClientFormModal({
+    isEdit,
+    form,
+    setForm,
+    onClose,
+    onSubmit,
+    editClient,
+    formMonthlyFee
+}: {
+    isEdit: boolean;
+    form: any;
+    setForm: any;
+    onClose: () => void;
+    onSubmit: (e: React.FormEvent) => void;
+    editClient?: any;
+    formMonthlyFee: number;
+}) {
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal modal-lg" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+                <div className="modal-header">
+                    <div>
+                        <div className="modal-title">{isEdit ? '✏️ Edit Client' : '➕ Add New Client'}</div>
+                        <div className="modal-subtitle">{isEdit ? `Editing ${editClient?.name}` : 'Set up client profile and services'}</div>
+                    </div>
+                    <button className="modal-close" onClick={onClose}>×</button>
+                </div>
+                <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    <div className="modal-body" style={{ overflowY: 'auto' }}>
+
+                        {/* Client Info */}
+                        <div style={{ marginBottom: 20 }}>
+                            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Client Info</div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, marginBottom: 12 }}>
+                                <div className="form-group">
+                                    <label className="form-label">Business Name *</label>
+                                    <input className="form-input" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Choice Salon" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Contact Person</label>
+                                    <input className="form-input" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} placeholder="Owner / Admin name" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Email</label>
+                                    <input className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="client@email.com" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Phone</label>
+                                    <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 900 000 0000" />
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                <div className="form-group">
+                                    <label className="form-label">Joining Date</label>
+                                    <input className="form-input" type="date" value={form.joiningDate} onChange={e => setForm({ ...form, joiningDate: e.target.value })} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Status</label>
+                                    <select className="form-input" value={form.isActive ? 'active' : 'inactive'} onChange={e => setForm({ ...form, isActive: e.target.value === 'active' })}>
+                                        <option value="active">✅ Active</option>
+                                        <option value="inactive">❌ Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Services Catalog */}
+                        <div style={{ marginBottom: 20 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Services</div>
+                                {formMonthlyFee > 0 && (
+                                    <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>
+                                        Total: ₹{formMonthlyFee.toLocaleString()}/mo
+                                    </div>
+                                )}
+                            </div>
+                            <ServiceEditor services={form.services} onChange={s => setForm({ ...form, services: s })} />
+                        </div>
+
+                        {/* Notes */}
+                        <div className="form-group">
+                            <label className="form-label">Notes (optional)</label>
+                            <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any special terms, agreements, or context..." />
+                        </div>
+                    </div>
+
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
+                        <button type="submit" className="btn btn-primary">
+                            {isEdit ? '✓ Save Changes' : '✓ Add Client'}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }
