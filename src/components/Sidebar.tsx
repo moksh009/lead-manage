@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { useSidebar } from './SidebarContext';
 
 const navItems = [
@@ -16,50 +17,82 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const { collapsed, toggle, mobileOpen, setMobileOpen } = useSidebar() as any;
+    const { collapsed, toggle } = useSidebar();
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
-    const handleNavClick = () => {
-        // Close mobile drawer on nav item click
-        if (typeof setMobileOpen === 'function') setMobileOpen(false);
-    };
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth <= 768);
+        check();
+        window.addEventListener('resize', check);
+        return () => window.removeEventListener('resize', check);
+    }, []);
+
+    // Close drawer when route changes
+    useEffect(() => { setMobileOpen(false); }, [pathname]);
+
+    const closeMobile = () => setMobileOpen(false);
 
     return (
         <>
-            {/* ── Mobile top bar ── */}
+            {/* ── Mobile top bar (visible only on mobile via CSS display:flex) ── */}
             <header className="mobile-header">
                 <button
                     className="hamburger-btn"
-                    onClick={() => setMobileOpen(!mobileOpen)}
-                    aria-label="Open navigation"
+                    onClick={() => setMobileOpen(prev => !prev)}
+                    aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
                 >
-                    <span className="hamburger-line" />
-                    <span className="hamburger-line" />
-                    <span className="hamburger-line" />
+                    <span className="hamburger-line" style={mobileOpen ? { transform: 'translateY(7px) rotate(45deg)' } : {}} />
+                    <span className="hamburger-line" style={mobileOpen ? { opacity: 0, transform: 'scaleX(0)' } : {}} />
+                    <span className="hamburger-line" style={mobileOpen ? { transform: 'translateY(-7px) rotate(-45deg)' } : {}} />
                 </button>
                 <div className="mobile-header-logo">
-                    <div className="sidebar-logo-icon" style={{ width: 30, height: 30, borderRadius: 8, boxShadow: 'none' }}>
+                    <div style={{
+                        width: 30, height: 30, borderRadius: 8,
+                        background: 'var(--accent)', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        boxShadow: '0 3px 8px rgba(0,113,227,0.3)', flexShrink: 0
+                    }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                             <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.9" />
                             <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
                     </div>
-                    <span style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                        Top Edge AI
+                    <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                        TopEdge AI
                     </span>
                 </div>
             </header>
 
-            {/* ── Mobile overlay backdrop ── */}
-            {mobileOpen && (
+            {/* ── Overlay backdrop ── */}
+            {isMobile && mobileOpen && (
                 <div
-                    className="sidebar-overlay"
-                    onClick={() => setMobileOpen(false)}
-                    style={{ display: 'block' }}
+                    onClick={closeMobile}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.45)',
+                        zIndex: 299,
+                        backdropFilter: 'blur(3px)',
+                        WebkitBackdropFilter: 'blur(3px)',
+                    }}
                 />
             )}
 
             {/* ── Sidebar ── */}
-            <aside className={`sidebar${collapsed ? ' sidebar-collapsed' : ''}${mobileOpen ? ' sidebar-mobile-open' : ''}`}>
+            <aside
+                className={`sidebar${collapsed && !isMobile ? ' sidebar-collapsed' : ''}`}
+                style={
+                    isMobile
+                        ? {
+                            transform: mobileOpen ? 'translateX(0)' : 'translateX(-110%)',
+                            transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                            zIndex: 300,
+                            width: 'var(--sidebar-width)',
+                        }
+                        : {}
+                }
+            >
                 {/* Logo */}
                 <div className="sidebar-logo">
                     <div className="sidebar-logo-icon">
@@ -68,27 +101,39 @@ export default function Sidebar() {
                             <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                         </svg>
                     </div>
-                    {!collapsed && (
+                    {!(collapsed && !isMobile) && (
                         <div className="sidebar-logo-text-wrap">
                             <div className="sidebar-logo-text">Top Edge AI</div>
                             <div className="sidebar-logo-sub">Lead Management</div>
                         </div>
                     )}
-                    <button
-                        className="sidebar-collapse-btn"
-                        onClick={toggle}
-                        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ transition: 'transform 0.3s', transform: collapsed ? 'rotate(180deg)' : 'none' }}>
-                            <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </button>
+                    {!isMobile && (
+                        <button
+                            className="sidebar-collapse-btn"
+                            onClick={toggle}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        >
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                style={{ transition: 'transform 0.3s', transform: collapsed ? 'rotate(180deg)' : 'none' }}>
+                                <path d="M9 11L5 7L9 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </button>
+                    )}
+                    {isMobile && (
+                        <button
+                            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: 'var(--text-tertiary)', fontSize: 20, lineHeight: 1 }}
+                            onClick={closeMobile}
+                            aria-label="Close menu"
+                        >
+                            ×
+                        </button>
+                    )}
                 </div>
 
                 {/* Navigation */}
                 <nav className="sidebar-nav">
-                    {!collapsed && <div className="sidebar-section-title">Main Menu</div>}
+                    {!(collapsed && !isMobile) && <div className="sidebar-section-title">Main Menu</div>}
                     {navItems.map(({ href, icon, label }) => {
                         const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
                         return (
@@ -96,11 +141,11 @@ export default function Sidebar() {
                                 key={href}
                                 href={href}
                                 className={`nav-item ${isActive ? 'active' : ''}`}
-                                title={collapsed ? label : undefined}
-                                onClick={handleNavClick}
+                                title={collapsed && !isMobile ? label : undefined}
+                                onClick={closeMobile}
                             >
                                 <span className="nav-icon">{icon}</span>
-                                {!collapsed && <span style={{ flex: 1 }}>{label}</span>}
+                                {!(collapsed && !isMobile) && <span style={{ flex: 1 }}>{label}</span>}
                             </Link>
                         );
                     })}
@@ -109,7 +154,7 @@ export default function Sidebar() {
                 {/* Footer */}
                 <div className="sidebar-footer">
                     <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>T</div>
-                    {!collapsed && (
+                    {!(collapsed && !isMobile) && (
                         <div style={{ flex: 1, minWidth: 0 }}>
                             <div className="sidebar-user-name">Top Edge AI</div>
                             <div className="sidebar-user-role">Admin Panel</div>

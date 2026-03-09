@@ -5,7 +5,7 @@ import { SidebarProvider } from '@/components/SidebarContext';
 import MainContentWrapper from '@/components/MainContentWrapper';
 
 export const metadata: Metadata = {
-  title: 'Top Edge AI — Lead Management',
+  title: 'TopEdge AI — Lead Management',
   description: 'Premium Lead Management Software for Top Edge AI',
 };
 
