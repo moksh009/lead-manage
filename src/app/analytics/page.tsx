@@ -114,15 +114,15 @@ export default function AnalyticsPage() {
     };
 
     const leadTypeData = {
-        labels: ['Qualified', 'Soft Lead', 'UN-QUALIFIED', 'Pending'],
+        labels: ['Hot lead', 'Qualified', 'Soft lead', 'Unqualified Lead'],
         datasets: [{
             data: [
+                leads.filter(l => l.leadType === 'Hot lead').length,
                 leads.filter(l => l.leadType === 'Qualified').length,
-                leads.filter(l => l.leadType === 'Soft Lead').length,
-                leads.filter(l => l.leadType === 'UN-QUALIFIED').length,
-                leads.filter(l => l.leadType === 'Pending').length,
+                leads.filter(l => l.leadType === 'Soft lead').length,
+                leads.filter(l => l.leadType === 'Unqualified Lead').length,
             ],
-            backgroundColor: ['#30d158', '#0071e3', '#ff3b30', '#6e6e73'],
+            backgroundColor: ['#ff3b30', '#30d158', '#0071e3', '#ff9500'],
             borderColor: '#ffffff',
             borderWidth: 3,
             hoverOffset: 8,
@@ -223,10 +223,10 @@ export default function AnalyticsPage() {
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
                                 {[
+                                    { label: 'Hot lead 🔥', count: leads.filter(l => l.leadType === 'Hot lead').length, color: '#ff3b30' },
                                     { label: 'Qualified', count: leads.filter(l => l.leadType === 'Qualified').length, color: '#30d158' },
-                                    { label: 'Soft Lead', count: leads.filter(l => l.leadType === 'Soft Lead').length, color: '#0071e3' },
-                                    { label: 'Unqualified', count: leads.filter(l => l.leadType === 'UN-QUALIFIED').length, color: '#ff3b30' },
-                                    { label: 'Pending', count: leads.filter(l => l.leadType === 'Pending').length, color: '#6e6e73' },
+                                    { label: 'Soft lead', count: leads.filter(l => l.leadType === 'Soft lead').length, color: '#0071e3' },
+                                    { label: 'Unqualified', count: leads.filter(l => l.leadType === 'Unqualified Lead').length, color: '#ff9500' },
                                 ].map(s => (
                                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                         <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, flexShrink: 0 }} />

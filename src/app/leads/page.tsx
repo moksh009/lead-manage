@@ -1,12 +1,45 @@
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { format } from 'date-fns';
 
-type LeadType = 'Qualified' | 'Soft Lead' | 'UN-QUALIFIED' | 'Pending';
+type LeadType = 'Unqualified Lead' | 'Soft lead' | 'Qualified' | 'Hot lead';
 type Channel = 'dm' | 'email' | 'whatsapp' | 'call';
 
-const LEAD_TYPES: LeadType[] = ['Qualified', 'Soft Lead', 'UN-QUALIFIED', 'Pending'];
+const LEAD_TYPES: LeadType[] = ['Unqualified Lead', 'Soft lead', 'Qualified', 'Hot lead'];
+
+const LEAD_TYPE_OPTIONS = LEAD_TYPES.map(t => ({ value: t, label: t }));
+const PIPELINE_STAGE_OPTIONS = [
+    { label: 'To-do', options: [{ value: 'contacted', label: 'Contacted' }] },
+    {
+        label: 'In progress', options: [
+            { value: 'prepare report & send', label: 'Prepare report & send' },
+            { value: 'waiting for resp.', label: 'Waiting for resp.' },
+            { value: 'whatsapp', label: 'Whatsapp' },
+            { value: 'email', label: 'Email' },
+            { value: 'follow-up scheduled', label: 'Follow-up Scheduled' },
+            { value: 'interested', label: 'Interested' },
+            { value: 'upcoming google-meet', label: 'Upcoming Google-meet' },
+            { value: 'upcoming call', label: 'Upcoming Call' }
+        ]
+    },
+    {
+        label: 'Complete', options: [
+            { value: 'not interested', label: 'Not Interested' },
+            { value: 'closed won', label: 'Closed Won' },
+            { value: 'closed lost', label: 'Closed Lost' }
+        ]
+    },
+    {
+        label: 'Legacy', options: [
+            { value: 'new', label: 'New' },
+            { value: 'followup', label: 'Follow-up' },
+            { value: 'meeting', label: 'Meeting Set' },
+            { value: 'proposal', label: 'Proposal Sent' },
+            { value: 'closed', label: 'Client 🎉' }
+        ]
+    }
+];
 
 const CHANNELS: { key: Channel; label: string; icon: string; color: string }[] = [
     { key: 'dm', label: 'Instagram DM', icon: '📸', color: '#E1306C' },
@@ -15,9 +48,189 @@ const CHANNELS: { key: Channel; label: string; icon: string; color: string }[] =
     { key: 'call', label: 'Cold Call', icon: '📞', color: '#5856d6' },
 ];
 
+const InlineEditableInput = ({ value, type = "text", placeholder, field, leadId, onSuccess }: any) => {
+    return (
+        <input
+            type={type}
+            defaultValue={value}
+            onBlur={e => {
+                const newVal = e.target.value;
+                if (newVal !== value) {
+                    fetch(`/api/leads/${leadId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ [field]: newVal })
+                    });
+                    if (onSuccess) onSuccess(newVal);
+                }
+            }}
+            onClick={e => e.stopPropagation()}
+            placeholder={placeholder}
+            style={{
+                width: '100%',
+                background: 'transparent',
+                border: '1px solid transparent',
+                fontSize: 'inherit',
+                color: 'inherit',
+                fontWeight: 'inherit',
+                padding: '2px 4px',
+                borderRadius: 4,
+                outline: 'none',
+                transition: 'all 0.15s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.border = '1px solid var(--border)'}
+            onMouseLeave={e => e.currentTarget.style.border = '1px solid transparent'}
+            onFocus={e => { e.currentTarget.style.border = '1px solid var(--accent)'; e.currentTarget.style.background = 'var(--surface)'; }}
+        />
+    )
+};
+
+const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen]);
+
+    const getLabel = (val: string) => {
+        for (const opt of options) {
+            if (opt.options) {
+                const found = opt.options.find((o: any) => o.value === val);
+                if (found) return found.label;
+            } else if (opt.value === val) {
+                return opt.label;
+            }
+        }
+        return val;
+    };
+
+    return (
+        <div ref={dropdownRef} style={{ ...style, position: 'relative' }} onClick={e => e.stopPropagation()}>
+            <div
+                className="notion-select"
+                onClick={() => setIsOpen(!isOpen)}
+                style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: '100%', paddingRight: 6 }}
+            >
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                    {getLabel(value)}
+                </span>
+                <svg width="8" height="5" viewBox="0 0 8 5" fill="none" style={{ marginLeft: 6, flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                    <path d="M4 5L0 1L1 0L4 3L7 0L8 1L4 5Z" fill="currentColor" opacity="0.6" />
+                </svg>
+            </div>
+
+            {isOpen && (
+                <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 4px)',
+                    left: 0,
+                    minWidth: '100%',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                    zIndex: 9999,
+                    padding: 4,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    maxHeight: 250,
+                    overflowY: 'auto'
+                }}>
+                    {options.map((opt: any, i: number) => {
+                        const isGroup = opt.options !== undefined;
+                        if (isGroup) {
+                            return (
+                                <div key={i}>
+                                    <div style={{ padding: '6px 8px 4px', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+                                        {opt.label}
+                                    </div>
+                                    {opt.options.map((subOpt: any) => (
+                                        <div
+                                            key={subOpt.value}
+                                            onClick={() => { onChange(subOpt.value); setIsOpen(false); }}
+                                            style={{
+                                                padding: '6px 8px',
+                                                fontSize: '0.8125rem',
+                                                cursor: 'pointer',
+                                                borderRadius: 4,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                background: value === subOpt.value ? 'var(--surface-hover)' : 'transparent',
+                                                color: value === subOpt.value ? 'var(--text-primary)' : 'var(--text-secondary)'
+                                            }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = value === subOpt.value ? 'var(--surface-hover)' : 'transparent'}
+                                        >
+                                            <span style={{ whiteSpace: 'nowrap' }}>{subOpt.label}</span>
+                                            {value === subOpt.value && <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginLeft: 8 }}>✓</span>}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <div
+                                key={opt.value}
+                                onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                                style={{
+                                    padding: '6px 8px',
+                                    fontSize: '0.8125rem',
+                                    cursor: 'pointer',
+                                    borderRadius: 4,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    background: value === opt.value ? 'var(--surface-hover)' : 'transparent',
+                                    color: value === opt.value ? 'var(--text-primary)' : 'var(--text-secondary)'
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
+                                onMouseLeave={e => e.currentTarget.style.background = value === opt.value ? 'var(--surface-hover)' : 'transparent'}
+                            >
+                                <span style={{ whiteSpace: 'nowrap' }}>{opt.label}</span>
+                                {value === opt.value && <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginLeft: 8 }}>✓</span>}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const STATUS_CONFIG: Record<string, { color: string; bg: string; emoji: string }> = {
+    // New status list items based on user image
+    'Not Interested': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
+    'Closed Won': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },
+    'Closed Lost': { color: '#8e8e93', bg: 'rgba(142,142,147,0.1)', emoji: '🟤' },
+
+    'Contacted': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
+
+    'Prepare report & send': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
+    'Waiting for resp.': { color: '#a2845e', bg: 'rgba(162,132,94,0.1)', emoji: '🟤' },
+    'Whatsapp': { color: '#d97d54', bg: 'rgba(217,125,84,0.1)', emoji: '🟠' },
+    'Email': { color: '#d97d54', bg: 'rgba(217,125,84,0.1)', emoji: '🟠' },
+    'Follow-up Scheduled': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
+
+    'Interested': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
+    'Upcoming Google-meet': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
+    'Upcoming Call': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
+
+    // Legacy placeholders for compatibility (fallback handling)
     'Qualified': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },
-    'Soft Lead': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
+    'Hot lead': { color: '#ff2d55', bg: 'rgba(255,45,85,0.1)', emoji: '🔥' },
+    'Soft lead': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
+    'Unqualified Lead': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
+
+    // Fallbacks
     'UN-QUALIFIED': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
     'Pending': { color: '#ff9500', bg: 'rgba(255,149,0,0.1)', emoji: '🟡' },
 };
@@ -45,7 +258,7 @@ export default function LeadsPage() {
         prospectName: '',
         phoneNumber: '',
         link: '',
-        leadType: 'Pending' as LeadType,
+        leadType: 'Soft lead' as LeadType,
         channel: 'dm' as Channel,
         leadDate: new Date().toISOString().split('T')[0],
         followUpDate: '',
@@ -57,7 +270,7 @@ export default function LeadsPage() {
         prospectName: '',
         phoneNumber: '',
         link: '',
-        leadType: 'Pending' as LeadType,
+        leadType: 'Soft lead' as LeadType,
         channel: 'call' as Channel,
         leadDate: new Date().toISOString().split('T')[0],
         followUpDate: '',
@@ -121,7 +334,7 @@ export default function LeadsPage() {
                 })
             });
             setShowModal(false);
-            setForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Pending', channel: 'call', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
+            setForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'call', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
             fetchLeads();
         } catch (e) {
             console.error(e);
@@ -173,7 +386,7 @@ export default function LeadsPage() {
                 })
             });
             setIsInlineAdding(false);
-            setInlineForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Pending', channel: 'dm', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
+            setInlineForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'dm', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
             fetchLeads();
         } catch (e) {
             console.error(e);
@@ -195,10 +408,10 @@ export default function LeadsPage() {
 
     const counts = {
         All: leads.length,
-        Qualified: leads.filter(l => l.leadType === 'Qualified').length,
-        'Soft Lead': leads.filter(l => l.leadType === 'Soft Lead').length,
-        'UN-QUALIFIED': leads.filter(l => l.leadType === 'UN-QUALIFIED').length,
-        Pending: leads.filter(l => l.leadType === 'Pending').length,
+        'Qualified': leads.filter(l => l.leadType === 'Qualified').length,
+        'Soft lead': leads.filter(l => l.leadType === 'Soft lead' || l.leadType === 'Soft Lead' || l.leadType === 'Pending').length,
+        'Unqualified Lead': leads.filter(l => l.leadType === 'Unqualified Lead' || l.leadType === 'UN-QUALIFIED').length,
+        'Hot lead': leads.filter(l => l.leadType === 'Hot lead').length,
     };
 
     return (
@@ -313,6 +526,14 @@ export default function LeadsPage() {
                     .notion-input-wrap { padding: 12px 16px; }
                     .detail-grid { grid-template-columns: 1fr; }
                 }
+                .horizontal-scroll-container {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                    padding-bottom: 8px; /* Room for scrollbar */
+                }
+                .data-table {
+                    min-width: 1100px; /* Force table to be wider for scrolling */
+                }
             `}</style>
 
             <div className="page-header">
@@ -380,17 +601,20 @@ export default function LeadsPage() {
             </div>
 
             {activeTab === 'table' && (
-                <div className="card table-wrap">
+                <div className="card table-wrap horizontal-scroll-container">
                     <table className="data-table">
                         <thead>
                             <tr>
+                                <th>Added On</th>
+                                <th>Lead Date</th>
                                 <th>Company</th>
                                 <th>Channel</th>
                                 <th>Prospect</th>
-                                <th>Status</th>
+                                <th>Lead Type</th>
+                                <th>Pipeline Stage</th>
                                 <th>Follow-up</th>
                                 <th>Phone</th>
-                                <th>Notes</th>
+                                <th style={{ minWidth: 200 }}>Notes</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -411,59 +635,141 @@ export default function LeadsPage() {
                                 return (
                                     <tr key={lead._id} onClick={() => setSelectedLead(lead)} style={{ cursor: 'pointer' }}>
                                         <td>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                                                {format(new Date(lead.createdAt), 'MMM dd, yyyy • h:mm a')}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style={{ width: 110 }}>
+                                                <InlineEditableInput
+                                                    type="date"
+                                                    value={lead.leadDate ? new Date(lead.leadDate).toISOString().split('T')[0] : ''}
+                                                    field="leadDate"
+                                                    leadId={lead._id}
+                                                    onSuccess={(val: any) => {
+                                                        if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, leadDate: val });
+                                                    }}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                 <div className="avatar avatar-sm avatar-gradient-1">{lead.companyName?.[0] || '?'}</div>
-                                                <div>
-                                                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{lead.companyName}</div>
-                                                    {lead.link && <a href={lead.link} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.75rem', color: 'var(--accent)' }}>View ↗</a>}
+                                                <div style={{ flex: 1, minWidth: 120 }}>
+                                                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                                                        <InlineEditableInput
+                                                            value={lead.companyName}
+                                                            placeholder="Company Name"
+                                                            field="companyName"
+                                                            leadId={lead._id}
+                                                            onSuccess={(val: any) => { if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, companyName: val }) }}
+                                                        />
+                                                    </div>
+                                                    {lead.link && <a href={lead.link} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} style={{ fontSize: '0.75rem', color: 'var(--accent)', paddingLeft: 6 }}>View ↗</a>}
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}>
                                                 {CHANNELS.find(c => c.key === lead.channel)?.icon || ''} {CHANNELS.find(c => c.key === lead.channel)?.label || lead.channel || '-'}
                                             </span>
                                         </td>
                                         <td>
-                                            <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{lead.prospectName || '-'}</span>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                                <select
-                                                    className="filter-select"
-                                                    value={lead.leadType}
-                                                    style={{ padding: '5px 10px', fontSize: '0.75rem', minWidth: 'unset', background: sc.bg, color: sc.color, fontWeight: 700, border: `1px solid ${sc.color}40` }}
-                                                    onClick={e => e.stopPropagation()}
-                                                    onChange={e => handleUpdateStatus(lead._id, e.target.value as LeadType)}
-                                                >
-                                                    {LEAD_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                                </select>
-                                                <select
-                                                    className="filter-select"
-                                                    value={lead.pipelineStage || 'new'}
-                                                    style={{ padding: '4px 8px', fontSize: '0.7rem', minWidth: 'unset', background: 'var(--surface)', color: 'var(--text-secondary)', fontWeight: 600, border: '1px solid var(--border)' }}
-                                                    onClick={e => e.stopPropagation()}
-                                                    onChange={e => handleUpdatePipelineStage(lead._id, e.target.value)}
-                                                >
-                                                    <option value="new">New</option>
-                                                    <option value="contacted">Contacted</option>
-                                                    <option value="followup">Follow-up</option>
-                                                    <option value="meeting">Meeting Set</option>
-                                                    <option value="proposal">Proposal Sent</option>
-                                                    <option value="closed">Client 🎉</option>
-                                                </select>
+                                            <div style={{ minWidth: 100, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                                                <InlineEditableInput
+                                                    value={lead.prospectName || ''}
+                                                    placeholder="Prospect"
+                                                    field="prospectName"
+                                                    leadId={lead._id}
+                                                    onSuccess={(val: any) => { if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, prospectName: val }) }}
+                                                />
                                             </div>
                                         </td>
                                         <td>
-                                            {lead.followUpDate ? (
-                                                <span style={{ fontSize: '0.875rem', color: daysUntil !== null && daysUntil <= 1 ? 'var(--danger)' : daysUntil !== null && daysUntil <= 3 ? 'var(--warning)' : 'var(--text-secondary)', fontWeight: daysUntil !== null && daysUntil <= 3 ? 700 : 400 }}>
-                                                    {format(new Date(lead.followUpDate), 'MMM dd')}
-                                                    {daysUntil === 0 ? ' 🔴' : daysUntil === 1 ? ' ⚠️' : ''}
-                                                </span>
-                                            ) : <span style={{ color: 'var(--text-tertiary)' }}>—</span>}
+                                            <div style={{ width: 130 }}>
+                                                <CustomBadgeSelect
+                                                    value={lead.leadType}
+                                                    options={LEAD_TYPES.includes(lead.leadType as any) ? LEAD_TYPE_OPTIONS : [...LEAD_TYPE_OPTIONS, { value: lead.leadType, label: lead.leadType }]}
+                                                    onChange={(val: any) => handleUpdateStatus(lead._id, val as LeadType)}
+                                                    style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.color}40`, boxShadow: 'none' }}
+                                                />
+                                            </div>
                                         </td>
-                                        <td><span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{lead.phoneNumber || '—'}</span></td>
-                                        <td><span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', display: 'block', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</span></td>
+                                        <td>
+                                            <div style={{ width: 140 }}>
+                                                <CustomBadgeSelect
+                                                    value={lead.pipelineStage || 'new'}
+                                                    options={PIPELINE_STAGE_OPTIONS}
+                                                    onChange={(val: any) => handleUpdatePipelineStage(lead._id, val)}
+                                                    style={{ background: 'var(--surface-hover)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ width: 120 }}>
+                                                <InlineEditableInput
+                                                    type="date"
+                                                    value={lead.followUpDate ? new Date(lead.followUpDate).toISOString().split('T')[0] : ''}
+                                                    field="followUpDate"
+                                                    leadId={lead._id}
+                                                    placeholder="Set Add Follow-up"
+                                                    onSuccess={(val: any) => { if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, followUpDate: val }) }}
+                                                />
+                                                {lead.followUpDate && daysUntil !== null && (
+                                                    <span style={{ fontSize: '0.75rem', color: daysUntil <= 1 ? 'var(--danger)' : daysUntil <= 3 ? 'var(--warning)' : 'var(--text-tertiary)', fontWeight: daysUntil <= 3 ? 700 : 400, marginLeft: 6 }}>
+                                                        {daysUntil === 0 ? '(Today 🔴)' : daysUntil === 1 ? '(Tmrw ⚠️)' : `(${daysUntil}d)`}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ minWidth: 110, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                                <InlineEditableInput
+                                                    value={lead.phoneNumber || ''}
+                                                    placeholder="Phone"
+                                                    field="phoneNumber"
+                                                    leadId={lead._id}
+                                                    onSuccess={(val: any) => { if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, phoneNumber: val }) }}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style={{ position: 'relative', width: '100%', minWidth: 200 }}>
+                                                <textarea
+                                                    defaultValue={lead.notes || ''}
+                                                    onBlur={e => {
+                                                        const newVal = e.target.value;
+                                                        if (newVal !== lead.notes) {
+                                                            fetch(`/api/leads/${lead._id}`, {
+                                                                method: 'PATCH',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ notes: newVal })
+                                                            });
+                                                            if (selectedLead?._id === lead._id) setSelectedLead({ ...selectedLead, notes: newVal });
+                                                        }
+                                                    }}
+                                                    onClick={e => e.stopPropagation()}
+                                                    placeholder="Add note..."
+                                                    style={{
+                                                        width: '100%',
+                                                        background: 'transparent',
+                                                        border: '1px solid transparent',
+                                                        fontSize: '0.8125rem',
+                                                        color: 'var(--text-secondary)',
+                                                        resize: 'none',
+                                                        padding: '4px 8px',
+                                                        borderRadius: 6,
+                                                        lineHeight: 1.4,
+                                                        minHeight: 40,
+                                                        outline: 'none',
+                                                        transition: 'all 0.15s'
+                                                    }}
+                                                    onMouseEnter={e => e.currentTarget.style.border = '1px solid var(--border)'}
+                                                    onMouseLeave={e => e.currentTarget.style.border = '1px solid transparent'}
+                                                    onFocus={e => { e.currentTarget.style.border = '1px solid var(--accent)'; e.currentTarget.style.background = 'var(--surface)'; }}
+                                                />
+                                            </div>
+                                        </td>
                                         <td>
                                             <button className="btn btn-ghost btn-sm" onClick={e => { e.stopPropagation(); setSelectedLead(lead); }}>Details →</button>
                                         </td>
@@ -474,6 +780,18 @@ export default function LeadsPage() {
                             {/* Inline Add Row */}
                             {isInlineAdding && (
                                 <tr style={{ background: 'var(--surface-hover)' }}>
+                                    <td>
+                                        <span style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>Auto</span>
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="date"
+                                            className="form-input"
+                                            value={inlineForm.leadDate}
+                                            onChange={e => setInlineForm({ ...inlineForm, leadDate: e.target.value })}
+                                            style={{ padding: '6px 8px', fontSize: '0.875rem', width: 130 }}
+                                        />
+                                    </td>
                                     <td>
                                         <input
                                             className="form-input"
@@ -515,6 +833,9 @@ export default function LeadsPage() {
                                         >
                                             {LEAD_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
+                                    </td>
+                                    <td>
+                                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>New</div>
                                     </td>
                                     <td>
                                         <input
@@ -600,13 +921,15 @@ export default function LeadsPage() {
             {/* ===== RESPONSIVE NEW LEAD MODAL ===== */}
             {showModal && (
                 <div className="glass-overlay" onClick={() => setShowModal(false)}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh' }}>
+                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
                         <div className="glass-modal-header">
                             <div>
                                 <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>✨ New Lead</h2>
                                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>Click fields to edit — Company Name required</p>
                             </div>
-                            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+                            <button type="button" className="modal-close" onClick={() => setShowModal(false)}>
+                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                            </button>
                         </div>
 
                         <div className="glass-modal-body">
@@ -743,7 +1066,7 @@ export default function LeadsPage() {
             {/* RESPONSIVE LEAD DETAIL MODAL */}
             {selectedLead && (
                 <div className="glass-overlay" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh' }}>
+                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
                         <div className="glass-modal-header">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                                 <div className="avatar avatar-md avatar-gradient-1" style={{ fontSize: '1.2rem', width: 44, height: 44 }}>{selectedLead.companyName?.[0]}</div>
@@ -759,7 +1082,9 @@ export default function LeadsPage() {
                                     </div>
                                 )}
                             </div>
-                            <button className="modal-close" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>×</button>
+                            <button type="button" className="modal-close" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
+                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                            </button>
                         </div>
                         <div className="glass-modal-body">
 

@@ -3,8 +3,26 @@
 import { useEffect, useState } from 'react';
 
 const STAGES = [
+    // To-do
+    { id: 'contacted', label: 'Contacted', color: '#0071e3', emoji: '🔵' },
+
+    // In progress
+    { id: 'prepare report & send', label: 'Prepare report & send', color: '#af52de', emoji: '🟣' },
+    { id: 'waiting for resp.', label: 'Waiting for resp.', color: '#a2845e', emoji: '🟤' },
+    { id: 'whatsapp', label: 'Whatsapp', color: '#d97d54', emoji: '🟠' },
+    { id: 'email', label: 'Email', color: '#d97d54', emoji: '🟠' },
+    { id: 'follow-up scheduled', label: 'Follow-up Scheduled', color: '#af52de', emoji: '🟣' },
+    { id: 'interested', label: 'Interested', color: '#d4af37', emoji: '🟡' },
+    { id: 'upcoming google-meet', label: 'Upcoming Google-meet', color: '#d4af37', emoji: '🟡' },
+    { id: 'upcoming call', label: 'Upcoming Call', color: '#d4af37', emoji: '🟡' },
+
+    // Complete
+    { id: 'not interested', label: 'Not Interested', color: '#ff3b30', emoji: '🔴' },
+    { id: 'closed won', label: 'Closed Won', color: '#30d158', emoji: '🟢' },
+    { id: 'closed lost', label: 'Closed Lost', color: '#8e8e93', emoji: '🟤' },
+
+    // Legacy (keep for fallback)
     { id: 'new', label: 'New', color: '#6e6e73', emoji: '🆕' },
-    { id: 'contacted', label: 'Contacted', color: '#0071e3', emoji: '📞' },
     { id: 'followup', label: 'Follow-up', color: '#ff9500', emoji: '🔄' },
     { id: 'meeting', label: 'Meeting Set', color: '#5856d6', emoji: '📅' },
     { id: 'proposal', label: 'Proposal Sent', color: '#ff2d55', emoji: '📋' },
@@ -14,10 +32,10 @@ const STAGES = [
 // Map old leadType to a pipeline stage
 function getStage(lead: any) {
     if (lead.pipelineStage) return lead.pipelineStage;
-    if (lead.leadType === 'UN-QUALIFIED') return 'new';
-    if (lead.leadType === 'Pending') return 'contacted';
-    if (lead.leadType === 'Soft Lead') return 'followup';
-    if (lead.leadType === 'Qualified') return 'meeting';
+    if (lead.leadType === 'Unqualified Lead') return 'not interested';
+    if (lead.leadType === 'Soft lead') return 'follow-up scheduled';
+    if (lead.leadType === 'Qualified') return 'upcoming call';
+    if (lead.leadType === 'Hot lead') return 'interested';
     return 'new';
 }
 
@@ -95,8 +113,7 @@ export default function PipelinePage() {
                     ))}
                 </div>
             ) : (
-                <div className="kanban-board" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    <style>{`.kanban-board::-webkit-scrollbar { display: none; }`}</style>
+                <div className="kanban-board" style={{ overflowX: 'auto', paddingBottom: 16 }}>
                     {STAGES.map(stage => (
                         <div
                             key={stage.id}
@@ -121,7 +138,7 @@ export default function PipelinePage() {
 
                             <div className="kanban-cards">
                                 {!groupedLeads[stage.id]?.length ? (
-                                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.8125rem', border: '1.5px dashed var(--border)', borderRadius: 10 }}>
+                                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.8125rem', border: '1px dashed var(--border-medium)', borderRadius: 8, background: 'var(--bg)' }}>
                                         Drop leads here
                                     </div>
                                 ) : (

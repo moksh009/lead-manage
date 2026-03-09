@@ -373,7 +373,9 @@ export default function ClientsPage() {
                                 <div className="modal-title">💳 Record Payment</div>
                                 <div className="modal-subtitle">{billingClient.name}</div>
                             </div>
-                            <button className="modal-close" onClick={() => setBillingClient(null)}>×</button>
+                            <button type="button" className="modal-close" onClick={() => setBillingClient(null)}>
+                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                            </button>
                         </div>
                         <form onSubmit={handleRecordPayment}>
                             <div className="modal-body">
@@ -464,8 +466,10 @@ export default function ClientsPage() {
                                 </div>
                             </div>
                             <div style={{ display: 'flex', gap: 8 }}>
-                                <button className="btn btn-secondary btn-sm" onClick={() => openEdit(selectedClient)}>✏️ Edit</button>
-                                <button className="modal-close" onClick={() => setSelectedClient(null)}>×</button>
+                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(selectedClient)}>✏️ Edit</button>
+                                <button type="button" className="modal-close" onClick={() => setSelectedClient(null)}>
+                                    <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                                </button>
                             </div>
                         </div>
                         <div className="modal-body">
@@ -530,13 +534,6 @@ export default function ClientsPage() {
                                 </div>
                             )}
 
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                                <button className="btn btn-secondary" onClick={() => openEdit(selectedClient)}>✏️ Edit Client</button>
-                                <button className="btn btn-primary" style={{ background: 'var(--success)' }}
-                                    onClick={() => { setSelectedClient(null); setBillingClient(selectedClient); setBillingForm(f => ({ ...f, amount: String(selectedClient.monthlyFee || '') })); }}>
-                                    💳 Record Payment
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -565,16 +562,18 @@ function ClientFormModal({
 }) {
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal modal-lg" onClick={e => e.stopPropagation()} style={{ marginTop: '30px', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <div>
                         <div className="modal-title">{isEdit ? '✏️ Edit Client' : '➕ Add New Client'}</div>
                         <div className="modal-subtitle">{isEdit ? `Editing ${editClient?.name}` : 'Set up client profile and services'}</div>
                     </div>
-                    <button className="modal-close" onClick={onClose}>×</button>
+                    <button type="button" className="modal-close" onClick={onClose}>
+                        <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                    </button>
                 </div>
-                <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <div className="modal-body" style={{ overflowY: 'auto' }}>
+                <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
+                    <div className="modal-body">
 
                         {/* Client Info */}
                         <div style={{ marginBottom: 20 }}>

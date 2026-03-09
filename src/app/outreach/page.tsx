@@ -100,7 +100,7 @@ export default function OutreachPage() {
                         <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--success)', marginBottom: 4 }}>Replies, meetings & closed are auto-tracked</div>
                         <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                             When you add a lead in <strong>Cold Calling Leads</strong>, it auto-counts as a reply for the matching channel.<br />
-                            Mark a lead as <strong>Meeting Set</strong> → auto-increments meetings. Mark as <strong>Client 🎉</strong> → auto-counts as closed.
+                            Pipeline movement (Contacted, Soft lead, etc) tracks auto-conversions.
                         </div>
                     </div>
                 </div>

@@ -366,9 +366,11 @@ export default function TeamGoalsPage() {
                     <div className="modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
                             <div><div className="modal-title">Log Daily Goals</div><div className="modal-subtitle">Track your work day tasks</div></div>
-                            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+                            <button type="button" className="modal-close" onClick={() => setShowModal(false)}>
+                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
+                            </button>
                         </div>
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
                             <div className="modal-body">
                                 <div className="form-row cols-2 mb-4">
                                     <div className="form-group">

@@ -6,7 +6,7 @@ export interface ILead extends Document {
     link: string;
     phoneNumber: string;
     notes: string;
-    leadType: 'Qualified' | 'Soft Lead' | 'UN-QUALIFIED' | 'Pending';
+    leadType: 'Unqualified Lead' | 'Soft lead' | 'Qualified' | 'Hot lead';
     followUpDate?: Date;
     pipelineStage?: string;
     // Source channel — which outreach channel this lead came from
@@ -27,11 +27,11 @@ const LeadSchema: Schema = new Schema({
     notes: { type: String, default: '' },
     leadType: {
         type: String,
-        enum: ['Qualified', 'Soft Lead', 'UN-QUALIFIED', 'Pending'],
-        default: 'Pending'
+        enum: ['Unqualified Lead', 'Soft lead', 'Qualified', 'Hot lead', 'Qualified', 'Soft Lead', 'UN-QUALIFIED', 'Pending'], // Kept legacy enum options for existing DB documents
+        default: 'Soft lead'
     },
     followUpDate: { type: Date },
-    pipelineStage: { type: String, default: 'new' },
+    pipelineStage: { type: String, default: 'new' }, // Allows any string, or we enforce enum later. Leaving flexible for backward compatibility
     // Source tracking
     channel: {
         type: String,

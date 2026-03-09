@@ -28,23 +28,6 @@ export async function PATCH(
             return NextResponse.json({ success: false, error: 'Lead not found' }, { status: 404 });
         }
 
-        // --- Auto-sync LeadType to PipelineStage if leadType is updated explicitly ---
-        if (data.leadType && data.leadType !== existing.leadType) {
-            switch (data.leadType) {
-                case 'Qualified':
-                    data.pipelineStage = 'meeting'; // Qualified -> Meeting Set
-                    break;
-                case 'Pending':
-                    data.pipelineStage = 'new'; // Pending -> New Deals
-                    break;
-                case 'Soft Lead':
-                    data.pipelineStage = 'prospect'; // Soft Lead -> Prospect
-                    break;
-                case 'UN-QUALIFIED':
-                    data.pipelineStage = 'new'; // Defaults back to new / can be handled differently
-                    break;
-            }
-        }
 
         // If the payload specifies pipelineStage directly (from Kanban board), use it.
         // Otherwise use the potentially auto-synced one.

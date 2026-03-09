@@ -137,10 +137,10 @@ export default function DashboardPage() {
     .slice(0, 4);
 
   const leadTypeSummary = [
+    { label: 'Hot lead', count: leads.filter(l => l.leadType === 'Hot lead').length, color: 'danger' },
     { label: 'Qualified', count: leads.filter(l => l.leadType === 'Qualified').length, color: 'success' },
-    { label: 'Soft Lead', count: leads.filter(l => l.leadType === 'Soft Lead').length, color: 'info' },
-    { label: 'UN-QUALIFIED', count: leads.filter(l => l.leadType === 'UN-QUALIFIED').length, color: 'danger' },
-    { label: 'Pending', count: leads.filter(l => l.leadType === 'Pending').length, color: 'neutral' },
+    { label: 'Soft lead', count: leads.filter(l => l.leadType === 'Soft lead' || l.leadType === 'Soft Lead' || l.leadType === 'Pending').length, color: 'info' },
+    { label: 'Unqualified Lead', count: leads.filter(l => l.leadType === 'Unqualified Lead' || l.leadType === 'UN-QUALIFIED').length, color: 'neutral' },
   ];
 
   if (loading) {
@@ -322,7 +322,7 @@ export default function DashboardPage() {
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead.companyName}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.prospectName}</div>
                   </div>
-                  <span className={`badge badge-${lead.leadType === 'Qualified' ? 'success' : lead.leadType === 'Soft Lead' ? 'info' : lead.leadType === 'UN-QUALIFIED' ? 'danger' : 'neutral'}`}>{lead.leadType}</span>
+                  <span className={`badge badge-${lead.leadType === 'Qualified' ? 'success' : lead.leadType === 'Hot lead' ? 'danger' : lead.leadType === 'Soft lead' ? 'info' : 'neutral'}`}>{lead.leadType}</span>
                 </div>
               ))}
             </div>
