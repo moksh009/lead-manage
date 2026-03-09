@@ -103,14 +103,14 @@ export default function AnalyticsPage() {
         return 'contacted';
     }
 
-    const MEETING_STAGES = ['meeting booked', 'meeting'];
+    const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting'];
     const CLOSED_STAGES = ['closed won', 'closed', 'client'];
 
     const totalLeads = leads.length;
     const meetingLeads = leads.filter(l => MEETING_STAGES.some(s => getStage(l).includes(s))).length;
     const closedLeads = leads.filter(l => CLOSED_STAGES.some(s => getStage(l).includes(s))).length;
     const ghostedLeads = leads.filter(l => getStage(l) === 'ghosted').length;
-    const notConvertLeads = leads.filter(l => getStage(l) === 'not convert').length;
+    const notConvertedMeetingLeads = leads.filter(l => getStage(l) === 'meeting booked not convert').length;
 
     const meetingRate = totalLeads > 0 ? (meetingLeads / totalLeads * 100).toFixed(1) : '0.0';
     const closeRate = totalLeads > 0 ? (closedLeads / totalLeads * 100).toFixed(1) : '0.0';
@@ -161,7 +161,7 @@ export default function AnalyticsPage() {
                     { label: 'Meetings Booked', value: meetingLeads, icon: '📅', color: '#10b981', bg: '#f0fdf9' },
                     { label: 'Closed Won', value: closedLeads, icon: '🤝', color: '#16a34a', bg: '#f0fdf4' },
                     { label: 'Ghosted', value: ghostedLeads, icon: '👻', color: '#6b7280', bg: '#f9fafb' },
-                    { label: 'Not Convert', value: notConvertLeads, icon: '🚫', color: '#dc2626', bg: '#fef2f2' },
+                    { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', color: '#dc2626', bg: '#fef2f2' },
                     { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff' },
                 ].map(s => (
                     <div key={s.label} className="stat-card card-hover">
@@ -311,7 +311,7 @@ export default function AnalyticsPage() {
                                     { label: '📅 Meetings', count: meetingLeads, prevCount: totalLeads, color: '#10b981' },
                                     { label: '🤝 Closed Won', count: closedLeads, prevCount: meetingLeads, color: '#16a34a' },
                                     { label: '👻 Ghosted', count: ghostedLeads, prevCount: totalLeads, color: '#6b7280' },
-                                    { label: '🚫 Not Convert', count: notConvertLeads, prevCount: totalLeads, color: '#dc2626' },
+                                    { label: '🚫 Not Converted', count: notConvertedMeetingLeads, prevCount: totalLeads, color: '#dc2626' },
                                 ].map(row => {
                                     const rate = row.prevCount && row.prevCount > 0 ? (row.count / row.prevCount * 100).toFixed(1) : null;
                                     const pct = totalSent > 0 ? (row.count / totalSent * 100) : 0;

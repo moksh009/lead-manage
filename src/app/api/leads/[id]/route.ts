@@ -36,7 +36,7 @@ export async function PATCH(
 
         // Handle meeting auto-tracking
         if (newStage !== undefined && newStage !== existing.pipelineStage) {
-            const isNowMeeting = newStage === 'meeting';
+            const isNowMeeting = ['meeting', 'meeting booked', 'meeting booked not convert', 'upcoming call', 'upcoming google-meet'].includes(newStage);
             const wasMeeting = existing.countedAsMeeting;
 
             if (isNowMeeting && !wasMeeting) {
@@ -49,7 +49,7 @@ export async function PATCH(
                 data.countedAsMeeting = false;
             }
 
-            const isNowClosed = newStage === 'closed';
+            const isNowClosed = ['closed', 'closed won', 'client'].includes(newStage);
             const wasClosed = existing.countedAsClosed;
 
             if (isNowClosed && !wasClosed) {

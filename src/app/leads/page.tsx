@@ -22,10 +22,8 @@ const PIPELINE_STAGE_OPTIONS = [
     {
         label: 'Complete / Dead', options: [
             { value: 'ghosted', label: 'Ghosted' },
-            { value: 'not convert', label: 'Not Convert' },
-            { value: 'not interested', label: 'Not Interested' },
-            { value: 'closed won', label: 'Closed Won' },
-            { value: 'closed lost', label: 'Closed Lost' }
+            { value: 'meeting booked not convert', label: 'Meeting Booked Not Convert' },
+            { value: 'not interested', label: 'Not Interested' }
         ]
     },
     {
@@ -216,8 +214,8 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; emoji: string }
     'Follow-up Scheduled': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
     'Interested': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
     'Meeting Booked': { color: '#10b981', bg: 'rgba(16,185,129,0.1)', emoji: '📅' },
+    'Meeting Booked Not Convert': { color: '#f97316', bg: 'rgba(249,115,22,0.1)', emoji: '⚠️' },
     'Ghosted': { color: '#6b7280', bg: 'rgba(107,114,128,0.1)', emoji: '👻' },
-    'Not Convert': { color: '#dc2626', bg: 'rgba(220,38,38,0.1)', emoji: '🚫' },
 
     // Legacy placeholders for compatibility (fallback handling)
     'Qualified': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },

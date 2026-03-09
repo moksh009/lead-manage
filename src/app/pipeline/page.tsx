@@ -14,13 +14,8 @@ const STAGES = [
 
     // Dead-ends
     { id: 'ghosted', label: 'Ghosted', color: '#6b7280', emoji: '👻' },
-    { id: 'not convert', label: 'Not Convert', color: '#dc2626', emoji: '🚫' },
+    { id: 'meeting booked not convert', label: 'Meeting Booked Not Convert', color: '#f97316', emoji: '⚠️' },
     { id: 'not interested', label: 'Not Interested', color: '#dc2626', emoji: '🔴' },
-
-    // Closed
-    { id: 'closed won', label: 'Closed Won 🎉', color: '#16a34a', emoji: '🟢' },
-
-    { id: 'closed lost', label: 'Closed Lost', color: '#8e8e93', emoji: '⚫' },
 
     // Legacy (keep for fallback)
     { id: 'new', label: 'New', color: '#6e6e73', emoji: '🆕' },

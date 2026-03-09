@@ -81,15 +81,15 @@ export default function DashboardPage() {
     return 'contacted';
   }
 
-  // Meetings = leads with meeting booked / meeting stages
-  const MEETING_STAGES = ['meeting booked', 'meeting'];
+  // Meetings = leads with meeting booked / meeting booked not convert stages
+  const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting'];
   const CLOSED_STAGES = ['closed won', 'closed', 'client'];
 
   const totalLeads = leads.length;
   const meetingLeads = leads.filter(l => MEETING_STAGES.some(s => getStage(l).includes(s)));
   const closedLeads = leads.filter(l => CLOSED_STAGES.some(s => getStage(l).includes(s)));
   const ghostedLeads = leads.filter(l => getStage(l) === 'ghosted');
-  const notConvertLeads = leads.filter(l => getStage(l) === 'not convert');
+  const notConvertedMeetingLeads = leads.filter(l => getStage(l) === 'meeting booked not convert');
   const hotQualified = leads.filter(l => l.leadType === 'Hot lead' || l.leadType === 'Qualified');
   const activeClients = clients.filter(c => c.isActive);
 
@@ -117,26 +117,27 @@ export default function DashboardPage() {
   });
 
   const doughnutData = {
-    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'Not Convert'],
+    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'Meeting Details (Not Converted)'],
     datasets: [{
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertLeads.length],
-      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#dc2626'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertedMeetingLeads.length],
+      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#f97316'],
       borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
   const funnelData = {
-    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted', 'Not Convert'],
+    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted', 'Not Converted'],
     datasets: [{
       label: 'Leads',
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertLeads.length],
-      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(220,38,38,0.4)'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertedMeetingLeads.length],
+      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(249,115,22,0.4)'],
       borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
 
   const statCards = [
-    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#2563eb', bg: '#eff6ff', change: 'All channels combined', dir: 'neutral' },
+    { label: 'Outreach Sent', value: totalSent, icon: '📤', color: '#8b5cf6', bg: '#f3e8ff', change: 'All channels combined', dir: 'neutral' },
+    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#2563eb', bg: '#eff6ff', change: 'Total leads captured', dir: 'neutral' },
     { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', color: '#10b981', bg: '#f0fdf9', change: `${meetingRate}% of leads`, dir: 'neutral' },
     { label: 'Closed Won', value: closedLeads.length, icon: '🤝', color: '#16a34a', bg: '#f0fdf4', change: `${closeRate}% close rate`, dir: 'neutral' },
     { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', color: '#d97706', bg: '#fffbeb', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, dir: 'neutral' },
