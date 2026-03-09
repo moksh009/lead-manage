@@ -10,6 +10,7 @@ const navItems = [
     { href: '/outreach', icon: '📊', label: 'Daily Outreach Log' },
     { href: '/leads', icon: '🎯', label: 'Leads' },
     { href: '/pipeline', icon: '🔄', label: 'Pipeline Board' },
+    { href: '/script-inventory', icon: '📄', label: 'Script Inventory' },
     { href: '/clients', icon: '💼', label: 'Clients & Billing' },
     { href: '/team-goals', icon: '🏆', label: 'Team Goals' },
     { href: '/analytics', icon: '📈', label: 'Analytics' },
@@ -17,16 +18,7 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const { collapsed, toggle } = useSidebar();
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth <= 768);
-        check();
-        window.addEventListener('resize', check);
-        return () => window.removeEventListener('resize', check);
-    }, []);
+    const { collapsed, toggle, mobileOpen, setMobileOpen, isMobile } = useSidebar();
 
     // Close drawer when route changes
     useEffect(() => { setMobileOpen(false); }, [pathname]);

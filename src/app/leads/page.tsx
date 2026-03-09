@@ -203,30 +203,29 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
 };
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; emoji: string }> = {
-    // New status list items based on user image
-    'Not Interested': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
-    'Closed Won': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },
-    'Closed Lost': { color: '#8e8e93', bg: 'rgba(142,142,147,0.1)', emoji: '🟤' },
+    'not interested': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
+    'closed won': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },
+    'closed lost': { color: '#8e8e93', bg: 'rgba(142,142,147,0.1)', emoji: '🟤' },
+    'contacted': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
+    'waiting for resp.': { color: '#a2845e', bg: 'rgba(162,132,94,0.1)', emoji: '🟤' },
+    'follow-up scheduled': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
+    'interested': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
+    'meeting booked': { color: '#10b981', bg: 'rgba(16,185,129,0.1)', emoji: '📅' },
+    'meeting booked not convert': { color: '#f97316', bg: 'rgba(249,115,22,0.1)', emoji: '⚠️' },
+    'ghosted': { color: '#6b7280', bg: 'rgba(107,114,128,0.1)', emoji: '👻' },
 
-    'Contacted': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
-
-    'Waiting for resp.': { color: '#a2845e', bg: 'rgba(162,132,94,0.1)', emoji: '🟤' },
-    'Follow-up Scheduled': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
-    'Interested': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
-    'Meeting Booked': { color: '#10b981', bg: 'rgba(16,185,129,0.1)', emoji: '📅' },
-    'Meeting Booked Not Convert': { color: '#f97316', bg: 'rgba(249,115,22,0.1)', emoji: '⚠️' },
-    'Ghosted': { color: '#6b7280', bg: 'rgba(107,114,128,0.1)', emoji: '👻' },
-
-    // Legacy placeholders for compatibility (fallback handling)
+    // Legacy / Fallbacks
+    'new': { color: '#8e8e93', bg: 'rgba(142,142,147,0.1)', emoji: '🆕' },
+    'followup': { color: '#ff9500', bg: 'rgba(255,149,0,0.1)', emoji: '🔄' },
+    'meeting': { color: '#5856d6', bg: 'rgba(88,86,214,0.1)', emoji: '📅' },
+    'proposal': { color: '#ff2d55', bg: 'rgba(255,45,85,0.1)', emoji: '📋' },
+    'closed': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🤝' },
     'Qualified': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },
     'Hot lead': { color: '#ff2d55', bg: 'rgba(255,45,85,0.1)', emoji: '🔥' },
     'Soft lead': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
     'Unqualified Lead': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
-
-    // Fallbacks
-    'UN-QUALIFIED': { color: '#ff3b30', bg: 'rgba(255,59,48,0.1)', emoji: '🔴' },
-    'Pending': { color: '#ff9500', bg: 'rgba(255,149,0,0.1)', emoji: '🟡' },
 };
+
 
 export default function LeadsPage() {
     const [leads, setLeads] = useState<any[]>([]);

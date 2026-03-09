@@ -202,7 +202,7 @@ export default function OutreachPage() {
                     </div>
 
                     {/* Column headers */}
-                    <div style={{
+                    <div className="outreach-grid-header" style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr 130px 130px 110px',
                         padding: '8px 24px',
@@ -232,6 +232,7 @@ export default function OutreachPage() {
                         return (
                             <div
                                 key={ch.sentKey}
+                                className="outreach-row"
                                 style={{
                                     display: 'grid',
                                     gridTemplateColumns: '1fr 130px 130px 110px',
@@ -258,25 +259,19 @@ export default function OutreachPage() {
 
                                 {/* Sent input or display */}
                                 <div style={{ textAlign: 'center' }}>
-                                    {isEditing ? (
+                                    {isEditing || !existingRecord ? (
                                         <input
-                                            type="number" min="0"
+                                            type="number"
                                             className="form-input"
-                                            style={{
-                                                textAlign: 'center', fontWeight: 800, fontSize: '1.125rem',
-                                                padding: '6px 8px', borderRadius: 10,
-                                                color: sentVal > 0 ? ch.color : 'var(--text-primary)',
-                                                borderColor: sentVal > 0 ? `${ch.color}40` : 'var(--border)',
-                                                background: sentVal > 0 ? '#ffffff' : 'var(--bg-secondary)'
-                                            }}
-                                            placeholder="0"
                                             value={form[ch.sentKey as keyof typeof form]}
                                             onChange={e => setField(ch.sentKey, e.target.value)}
+                                            placeholder="0"
+                                            style={{ width: '80px', textAlign: 'center', padding: '6px' }}
                                         />
                                     ) : (
-                                        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: displaySent > 0 ? ch.color : 'var(--text-tertiary)' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: displaySent > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
                                             {displaySent.toLocaleString()}
-                                        </span>
+                                        </div>
                                     )}
                                 </div>
 

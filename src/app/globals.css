@@ -1905,10 +1905,24 @@ h5 {
 
   .page-title {
     font-size: 1.375rem;
+    text-align: center;
+    width: 100%;
   }
 
   .page-subtitle {
     font-size: 0.875rem;
+    text-align: center;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .page-hero {
+    text-align: center;
+    padding: 24px 20px;
+  }
+
+  .page-hero-actions {
+    justify-content: center;
   }
 
   /* Grids collapse to single column */
@@ -1943,6 +1957,26 @@ h5 {
   .form-row.cols-2,
   .form-row.cols-3 {
     grid-template-columns: 1fr;
+  }
+
+  /* Outreach log grid responsive */
+  .outreach-grid-header {
+    display: none !important;
+  }
+
+  .outreach-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+    padding: 20px !important;
+    text-align: center;
+  }
+
+  .outreach-row>div {
+    justify-content: center !important;
+  }
+
+  .outreach-row .sent-input-cell {
+    width: 100% !important;
   }
 
   /* Table scroll */
