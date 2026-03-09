@@ -257,22 +257,35 @@ export default function DashboardPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
             {[
-              { label: 'Instagram DMs', val: sentByChannel?.dms || 0, color: '#e1306c' },
-              { label: 'Emails', val: sentByChannel?.emails || 0, color: '#2563eb' },
-              { label: 'WhatsApp', val: sentByChannel?.whatsapp || 0, color: '#25D366' },
-              { label: 'Cold Calls', val: sentByChannel?.calls || 0, color: '#7c3aed' },
-            ].map(ch => (
-              <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: ch.color }} />
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
+              { label: 'Instagram DMs', sent: sentByChannel?.dms || 0, replies: byChannel?.dms || 0, color: '#e1306c' },
+              { label: 'Emails', sent: sentByChannel?.emails || 0, replies: byChannel?.emails || 0, color: '#2563eb' },
+              { label: 'WhatsApp', sent: sentByChannel?.whatsapp || 0, replies: byChannel?.whatsapp || 0, color: '#25D366' },
+              { label: 'Cold Calls', sent: sentByChannel?.calls || 0, replies: byChannel?.calls || 0, color: '#7c3aed' },
+            ].map(ch => {
+              const replyRate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
+              return (
+                <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: ch.color }} />
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, textAlign: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Sent</div>
+                      <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{ch.sent.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Replies</div>
+                      <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--success)' }}>{ch.replies.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Rate</div>
+                      <div style={{ fontWeight: 800, fontSize: '0.9rem', color: replyRate !== '0.0' ? 'var(--accent)' : 'var(--text-tertiary)' }}>{replyRate}%</div>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text-primary)' }}>{ch.val.toLocaleString()}</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 1 }}>
-                  {totalSent > 0 ? ((ch.val / totalSent) * 100).toFixed(1) : '0.0'}%
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

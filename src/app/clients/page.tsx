@@ -205,6 +205,18 @@ export default function ClientsPage() {
         setSelectedClient(null);
     };
 
+    const handleDeleteClient = async (id: string, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this client? This cannot be undone.')) return;
+        try {
+            await fetch(`/api/clients/${id}`, { method: 'DELETE' });
+            setClients(clients.filter(c => c._id !== id));
+            if (selectedClient?._id === id) setSelectedClient(null);
+        } catch (err) {
+            console.error('Failed to delete client', err);
+        }
+    };
+
     const handleRecordPayment = async (e: React.FormEvent) => {
         e.preventDefault();
         setBillingSaving(true);
@@ -329,7 +341,10 @@ export default function ClientsPage() {
                                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                         <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--success)' }}>₹{(client.monthlyFee || 0).toLocaleString()}</div>
                                         <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>per month</div>
-                                        <button className="btn btn-ghost btn-sm" style={{ marginTop: 6, fontSize: '0.75rem', padding: '3px 8px' }} onClick={() => openEdit(client)}>✏️ Edit</button>
+                                        <div style={{ display: 'flex', gap: 6, marginTop: 6, justifyContent: 'flex-end' }}>
+                                            <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '3px 8px' }} onClick={e => { e.stopPropagation(); openEdit(client); }}>✏️ Edit</button>
+                                            <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.75rem', padding: '3px 8px', color: 'var(--danger)', background: 'rgba(239,68,68,0.05)' }} onClick={e => handleDeleteClient(client._id, e)} title="Delete Client">🗑️</button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -471,6 +486,7 @@ export default function ClientsPage() {
                             </div>
                             <div style={{ display: 'flex', gap: 8 }}>
                                 <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(selectedClient)}>✏️ Edit</button>
+                                <button type="button" className="btn btn-secondary btn-sm" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteClient(selectedClient._id)}>🗑️ Delete</button>
                                 <button type="button" className="modal-close" onClick={() => setSelectedClient(null)}>
                                     <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
                                 </button>

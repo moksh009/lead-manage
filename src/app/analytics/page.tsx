@@ -116,6 +116,22 @@ export default function AnalyticsPage() {
     const closeRate = totalLeads > 0 ? (closedLeads / totalLeads * 100).toFixed(1) : '0.0';
     const meetToClose = meetingLeads > 0 ? (closedLeads / meetingLeads * 100).toFixed(1) : '0.0';
 
+    // Channel breakdown from leads (Replies)
+    const byChannel = {
+        dms: leads.filter(l => l.channel === 'instagram_dm' || l.channel === 'instagram' || l.channel === 'dm').length,
+        emails: leads.filter(l => l.channel === 'email').length,
+        whatsapp: leads.filter(l => l.channel === 'whatsapp').length,
+        calls: leads.filter(l => l.channel === 'cold_call' || l.channel === 'call').length,
+    };
+
+    // Channel breakdown from outreach logs (Sent)
+    const sentByChannel = {
+        dms: records.reduce((s, r) => s + (r.dmsSent || 0), 0),
+        emails: records.reduce((s, r) => s + (r.emailsSent || 0), 0),
+        whatsapp: records.reduce((s, r) => s + (r.whatsappSent || 0), 0),
+        calls: records.reduce((s, r) => s + (r.callsMade || 0), 0),
+    };
+
     if (loading) {
         return (
             <div className="animate-in">
@@ -180,6 +196,46 @@ export default function AnalyticsPage() {
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 3 }}>{r.sub}</div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* Channel Breakdown */}
+                    <div className="card card-p" style={{ marginBottom: 20 }}>
+                        <div style={{ marginBottom: 18 }}>
+                            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Channel Breakdown</h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Sent vs Replies per channel</p>
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                            {[
+                                { label: 'Instagram DMs', sent: sentByChannel.dms, replies: byChannel.dms, color: '#e1306c' },
+                                { label: 'Emails', sent: sentByChannel.emails, replies: byChannel.emails, color: '#2563eb' },
+                                { label: 'WhatsApp', sent: sentByChannel.whatsapp, replies: byChannel.whatsapp, color: '#25D366' },
+                                { label: 'Cold Calls', sent: sentByChannel.calls, replies: byChannel.calls, color: '#7c3aed' },
+                            ].map(ch => {
+                                const rate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
+                                return (
+                                    <div key={ch.label} style={{ padding: '12px 16px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: ch.color }} />
+                                            <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
+                                            <div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Sent</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>{ch.sent.toLocaleString()}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Replies</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>{ch.replies.toLocaleString()}</div>
+                                            </div>
+                                            <div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Rate</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: rate !== '0.0' ? 'var(--accent)' : 'var(--text-tertiary)' }}>{rate}%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
 
                     {/* Channel Trend */}

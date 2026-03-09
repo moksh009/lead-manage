@@ -1,149 +1,421 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const CHANNELS = [
-    { sentKey: 'dmsSent', label: 'Instagram DMs', icon: '📸', color: '#e1306c', bg: '#fff1f5', desc: 'Direct messages via Instagram' },
-    { sentKey: 'emailsSent', label: 'Emails', icon: '📧', color: '#2563eb', bg: '#eff6ff', desc: 'Cold / warm emails sent' },
-    { sentKey: 'whatsappSent', label: 'WhatsApp', icon: '💬', color: '#25D366', bg: '#f0fdf4', desc: 'WhatsApp outreach messages' },
-    { sentKey: 'callsMade', label: 'Cold Calls', icon: '📞', color: '#7c3aed', bg: '#faf5ff', desc: 'Calls made to prospects' },
+    { sentKey: 'dmsSent', leadChannel: 'dm', label: 'Instagram DMs', icon: '📸', color: '#e1306c', bg: '#fff1f5', desc: 'Direct messages via Instagram' },
+    { sentKey: 'emailsSent', leadChannel: 'email', label: 'Emails', icon: '📧', color: '#2563eb', bg: '#eff6ff', desc: 'Cold / warm emails sent' },
+    { sentKey: 'whatsappSent', leadChannel: 'whatsapp', label: 'WhatsApp', icon: '💬', color: '#25D366', bg: '#f0fdf4', desc: 'WhatsApp outreach messages' },
+    { sentKey: 'callsMade', leadChannel: 'call', label: 'Cold Calls', icon: '📞', color: '#7c3aed', bg: '#faf5ff', desc: 'Calls made to prospects' },
 ];
 
-const EMPTY = { dmsSent: '', emailsSent: '', whatsappSent: '', callsMade: '' };
+type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export default function OutreachPage() {
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-    const [form, setForm] = useState(EMPTY);
-    const [submitted, setSubmitted] = useState(false);
 
-    const totalSent = CHANNELS.reduce((s, ch) => s + (Number(form[ch.sentKey as keyof typeof form]) || 0), 0);
+    // Per-channel numbers (sent counts only — user enters these)
+    const [form, setForm] = useState({ dmsSent: '', emailsSent: '', whatsappSent: '', callsMade: '' });
+
+    // Existing record for the selected date (null = no entry yet for that date)
+    const [existingRecord, setExistingRecord] = useState<any>(null);
+
+    // Leads data for reply rate calculation
+    const [leadsPerChannel, setLeadsPerChannel] = useState<Record<string, number>>({});
+
+    // Historical logs
+    const [allLogs, setAllLogs] = useState<any[]>([]);
+    const [allLeads, setAllLeads] = useState<any[]>([]);
+
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+    const [isEditing, setIsEditing] = useState(false);
+
+    // Load leads (for reply count per channel) and all logs once
+    useEffect(() => {
+        Promise.all([
+            fetch('/api/leads').then(r => r.json()),
+            fetch('/api/outreach').then(r => r.json()),
+        ]).then(([leadsData, outreachData]) => {
+            const leads: any[] = leadsData.data || [];
+            setAllLeads(leads);
+
+            // Count leads per channel (each lead = 1 reply)
+            const counts: Record<string, number> = {};
+            CHANNELS.forEach(ch => {
+                counts[ch.leadChannel] = leads.filter(l => l.channel === ch.leadChannel).length;
+            });
+            setLeadsPerChannel(counts);
+
+            setAllLogs((outreachData.records || []).sort((a: any, b: any) =>
+                new Date(b.date).getTime() - new Date(a.date).getTime()
+            ));
+        });
+    }, []);
+
+    // Whenever date changes, fetch that date's existing outreach record
+    useEffect(() => {
+        fetch(`/api/outreach?date=${date}`)
+            .then(r => r.json())
+            .then(data => {
+                const rec = data.data;
+                setExistingRecord(rec);
+                if (rec) {
+                    // Pre-fill form with existing values
+                    setForm({
+                        dmsSent: rec.dmsSent > 0 ? String(rec.dmsSent) : '',
+                        emailsSent: rec.emailsSent > 0 ? String(rec.emailsSent) : '',
+                        whatsappSent: rec.whatsappSent > 0 ? String(rec.whatsappSent) : '',
+                        callsMade: rec.callsMade > 0 ? String(rec.callsMade) : '',
+                    });
+                    setIsEditing(false); // start in "view" mode for existing entry
+                } else {
+                    setForm({ dmsSent: '', emailsSent: '', whatsappSent: '', callsMade: '' });
+                    setIsEditing(true); // new date → straight to entry mode
+                }
+            });
+    }, [date]);
+
     const setField = (key: string, val: string) => setForm(f => ({ ...f, [key]: val }));
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const totalSent = CHANNELS.reduce((s, ch) => s + (Number(form[ch.sentKey as keyof typeof form]) || 0), 0);
+
+    const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setSaveStatus('saving');
         try {
-            const payload: any = { date, dmsReplies: 0, emailReplies: 0, whatsappReplies: 0, callReplies: 0, meetings: 0, clientsClosed: 0 };
-            Object.keys(form).forEach(k => { payload[k] = Number(form[k as keyof typeof form]) || 0; });
-            await fetch('/api/outreach', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            setSubmitted(true);
-            setTimeout(() => router.push('/'), 1200);
-        } finally { setLoading(false); }
+            const payload: any = { date };
+            CHANNELS.forEach(ch => { payload[ch.sentKey] = Number(form[ch.sentKey as keyof typeof form]) || 0; });
+
+            if (existingRecord) {
+                // PATCH = set exact values (overwrite)
+                await fetch('/api/outreach', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } else {
+                // POST = create new
+                await fetch('/api/outreach', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            setSaveStatus('saved');
+            setIsEditing(false);
+
+            // Refresh allLogs
+            const updated = await fetch('/api/outreach').then(r => r.json());
+            setAllLogs((updated.records || []).sort((a: any, b: any) =>
+                new Date(b.date).getTime() - new Date(a.date).getTime()
+            ));
+
+            // Also update existing record reference
+            const rec = await fetch(`/api/outreach?date=${date}`).then(r => r.json());
+            setExistingRecord(rec.data);
+
+            setTimeout(() => setSaveStatus('idle'), 2500);
+        } catch {
+            setSaveStatus('error');
+            setTimeout(() => setSaveStatus('idle'), 3000);
+        }
     };
 
-    if (submitted) {
-        return (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16 }}>
-                <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--success-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36 }}>✅</div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.03em' }}>Log Submitted!</h2>
-                <p style={{ color: 'var(--text-secondary)' }}>Redirecting to dashboard…</p>
-            </div>
-        );
+    // Per-channel stats for a specific date's log entry and given leads
+    // Replies are counted as leads added on that same date per channel
+    function leadsOnDate(dateStr: string, channel: string) {
+        const d = new Date(dateStr).toDateString();
+        return allLeads.filter(l => l.channel === channel && new Date(l.createdAt || 0).toDateString() === d).length;
     }
 
+    const today = new Date().toISOString().split('T')[0];
+    const isToday = date === today;
+
     return (
-        <div className="animate-in" style={{ maxWidth: 700, margin: '0 auto' }}>
+        <div className="animate-in" style={{ maxWidth: 720, margin: '0 auto' }}>
 
             {/* Hero */}
-            <div className="page-hero" style={{ marginBottom: 28 }}>
+            <div className="page-hero" style={{ marginBottom: 24 }}>
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ fontSize: '2rem', marginBottom: 8 }}>📊</div>
                     <h1 className="page-hero-title">Daily Outreach Log</h1>
-                    <p className="page-hero-sub">Record today's outreach — replies & meetings are auto-tracked from leads</p>
+                    <p className="page-hero-sub">Track messages sent per channel — replies are auto-calculated from leads you add</p>
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-                {/* Date selector */}
-                <div className="card card-p">
-                    <label className="form-label" style={{ marginBottom: 8, display: 'block', fontSize: '0.8125rem', fontWeight: 700 }}>📅 Log Date</label>
-                    <input type="date" className="form-input" value={date} onChange={e => setDate(e.target.value)} required />
+            {/* Date Picker */}
+            <div className="card card-p" style={{ marginBottom: 16 }}>
+                <label className="form-label" style={{ marginBottom: 8, display: 'block', fontSize: '0.8125rem', fontWeight: 700 }}>
+                    📅 Select Date
+                </label>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <input
+                        type="date"
+                        className="form-input"
+                        style={{ maxWidth: 200 }}
+                        value={date}
+                        onChange={e => setDate(e.target.value)}
+                    />
+                    {existingRecord && (
+                        <span style={{ fontSize: '0.8125rem', color: 'var(--success)', fontWeight: 700, background: 'var(--success-light)', padding: '4px 12px', borderRadius: 99 }}>
+                            ✓ Log exists for this date
+                        </span>
+                    )}
+                    {!existingRecord && (
+                        <span style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', background: 'var(--bg-secondary)', padding: '4px 12px', borderRadius: 99 }}>
+                            No entry yet
+                        </span>
+                    )}
                 </div>
+            </div>
 
-                {/* Channel cards */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 0, overflow: 'hidden', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', background: 'var(--surface)', boxShadow: 'var(--shadow-xs)' }}>
+            {/* Channel Entry / Edit Form */}
+            <form onSubmit={handleSave} style={{ marginBottom: 24 }}>
+                <div style={{ overflow: 'hidden', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', background: 'var(--surface)', boxShadow: 'var(--shadow-xs)' }}>
                     {/* Header */}
-                    <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)' }}>
+                    <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)' }}>
                         <div>
-                            <h2 style={{ fontSize: '0.9375rem', fontWeight: 700 }}>📤 Outreach Sent Today</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Enter numbers per channel</p>
+                            <h2 style={{ fontSize: '0.9375rem', fontWeight: 700 }}>
+                                {existingRecord && !isEditing ? '📋 Log Summary' : '📤 Enter Outreach Numbers'}
+                            </h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                                {existingRecord && !isEditing
+                                    ? 'Click "Edit" to update any number'
+                                    : 'Enter how many you sent per channel — add more later anytime'}
+                            </p>
                         </div>
-                        {totalSent > 0 && (
-                            <div style={{ background: 'var(--accent)', color: 'white', padding: '4px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, boxShadow: 'var(--shadow-accent)' }}>
-                                {totalSent.toLocaleString()} total
-                            </div>
-                        )}
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                            {totalSent > 0 && (
+                                <div style={{ background: 'var(--accent)', color: 'white', padding: '4px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, boxShadow: 'var(--shadow-accent)' }}>
+                                    {totalSent.toLocaleString()} total
+                                </div>
+                            )}
+                            {existingRecord && !isEditing && (
+                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setIsEditing(true)}>
+                                    ✏️ Edit
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Column headers */}
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 130px 130px 110px',
+                        padding: '8px 24px',
+                        background: 'var(--bg-tertiary)',
+                        borderBottom: '1px solid var(--border)',
+                        fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)',
+                        textTransform: 'uppercase', letterSpacing: '0.07em'
+                    }}>
+                        <span>Channel</span>
+                        <span style={{ textAlign: 'center' }}>Sent</span>
+                        <span style={{ textAlign: 'center' }}>Replies (leads)</span>
+                        <span style={{ textAlign: 'center' }}>Reply %</span>
                     </div>
 
                     {CHANNELS.map((ch, idx) => {
-                        const val = Number(form[ch.sentKey as keyof typeof form]) || 0;
+                        const sentVal = Number(form[ch.sentKey as keyof typeof form]) || 0;
+                        const existingSent = existingRecord?.[ch.sentKey] || 0;
+                        const displaySent = !isEditing && existingRecord ? existingSent : sentVal;
+
+                        // Replies = leads from this channel (total all-time per channel)
+                        const channelReplies = leadsPerChannel[ch.leadChannel] || 0;
+                        const totalSentForChannel = allLogs.reduce((s: number, log: any) => s + (log[ch.sentKey] || 0), 0);
+                        const replyRate = totalSentForChannel > 0
+                            ? ((channelReplies / totalSentForChannel) * 100).toFixed(1)
+                            : '—';
+
                         return (
-                            <div key={ch.sentKey} style={{
-                                display: 'grid', gridTemplateColumns: '1fr 160px',
-                                padding: '16px 24px', borderBottom: idx < CHANNELS.length - 1 ? '1px solid var(--border)' : 'none',
-                                alignItems: 'center', gap: 16,
-                                background: val > 0 ? `${ch.bg}` : 'transparent',
-                                transition: 'background 0.2s ease'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                            <div
+                                key={ch.sentKey}
+                                style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 130px 130px 110px',
+                                    padding: '14px 24px',
+                                    borderBottom: idx < CHANNELS.length - 1 ? '1px solid var(--border)' : 'none',
+                                    alignItems: 'center',
+                                    background: displaySent > 0 ? ch.bg : 'transparent',
+                                    transition: 'background 0.2s ease'
+                                }}
+                            >
+                                {/* Channel name */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     <div style={{
-                                        width: 44, height: 44, borderRadius: 12,
-                                        background: ch.bg, border: `1.5px solid ${ch.color}25`,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0
+                                        width: 40, height: 40, borderRadius: 11,
+                                        background: 'white', border: `1.5px solid ${ch.color}25`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0,
+                                        boxShadow: 'var(--shadow-xs)'
                                     }}>{ch.icon}</div>
                                     <div>
-                                        <div style={{ fontWeight: 700, fontSize: '0.9375rem', color: 'var(--text-primary)' }}>{ch.label}</div>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: 2 }}>{ch.desc}</div>
+                                        <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{ch.label}</div>
+                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 1 }}>{ch.desc}</div>
                                     </div>
                                 </div>
-                                <div style={{ position: 'relative' }}>
-                                    <input
-                                        type="number" min="0"
-                                        className="form-input"
-                                        style={{
-                                            textAlign: 'center', fontWeight: 800, fontSize: '1.25rem',
-                                            padding: '8px 12px', borderRadius: 12,
-                                            color: val > 0 ? ch.color : 'var(--text-primary)',
-                                            borderColor: val > 0 ? `${ch.color}40` : 'var(--border)',
-                                            background: val > 0 ? '#ffffff' : 'var(--bg-secondary)'
-                                        }}
-                                        placeholder="0"
-                                        value={form[ch.sentKey as keyof typeof form]}
-                                        onChange={e => setField(ch.sentKey, e.target.value)}
-                                    />
+
+                                {/* Sent input or display */}
+                                <div style={{ textAlign: 'center' }}>
+                                    {isEditing ? (
+                                        <input
+                                            type="number" min="0"
+                                            className="form-input"
+                                            style={{
+                                                textAlign: 'center', fontWeight: 800, fontSize: '1.125rem',
+                                                padding: '6px 8px', borderRadius: 10,
+                                                color: sentVal > 0 ? ch.color : 'var(--text-primary)',
+                                                borderColor: sentVal > 0 ? `${ch.color}40` : 'var(--border)',
+                                                background: sentVal > 0 ? '#ffffff' : 'var(--bg-secondary)'
+                                            }}
+                                            placeholder="0"
+                                            value={form[ch.sentKey as keyof typeof form]}
+                                            onChange={e => setField(ch.sentKey, e.target.value)}
+                                        />
+                                    ) : (
+                                        <span style={{ fontWeight: 800, fontSize: '1.25rem', color: displaySent > 0 ? ch.color : 'var(--text-tertiary)' }}>
+                                            {displaySent.toLocaleString()}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {/* Replies (leads count from this channel) */}
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{ fontWeight: 800, fontSize: '1.125rem', color: channelReplies > 0 ? 'var(--success)' : 'var(--text-tertiary)' }}>
+                                        {channelReplies}
+                                    </span>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 1 }}>total leads</div>
+                                </div>
+
+                                {/* Reply rate */}
+                                <div style={{ textAlign: 'center' }}>
+                                    <span style={{
+                                        fontWeight: 800, fontSize: '1rem',
+                                        color: replyRate === '—' || replyRate === '0.0'
+                                            ? 'var(--text-tertiary)'
+                                            : Number(replyRate) >= 5 ? 'var(--success)' : 'var(--warning)'
+                                    }}>
+                                        {replyRate === '—' ? '—' : `${replyRate}%`}
+                                    </span>
                                 </div>
                             </div>
                         );
                     })}
                 </div>
 
-                {/* Auto-tracking info */}
-                <div style={{ padding: '14px 18px', background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.2)', borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 22, flexShrink: 0 }}>🤖</span>
-                    <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--success)', marginBottom: 4 }}>Auto-tracking is active</div>
-                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                            Replies, meetings & closed clients are tracked automatically from your Leads — no double entry needed.
-                        </div>
+                {/* Save row */}
+                {isEditing && (
+                    <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 14 }}>
+                        {existingRecord && (
+                            <button type="button" className="btn btn-secondary" onClick={() => {
+                                // Revert form to saved values
+                                setForm({
+                                    dmsSent: existingRecord.dmsSent > 0 ? String(existingRecord.dmsSent) : '',
+                                    emailsSent: existingRecord.emailsSent > 0 ? String(existingRecord.emailsSent) : '',
+                                    whatsappSent: existingRecord.whatsappSent > 0 ? String(existingRecord.whatsappSent) : '',
+                                    callsMade: existingRecord.callsMade > 0 ? String(existingRecord.callsMade) : '',
+                                });
+                                setIsEditing(false);
+                            }}>
+                                Cancel
+                            </button>
+                        )}
+                        <button
+                            type="submit"
+                            className="btn btn-primary btn-lg"
+                            disabled={saveStatus === 'saving'}
+                            style={{ minWidth: 160 }}
+                        >
+                            {saveStatus === 'saving' ? '⏳ Saving...' :
+                                saveStatus === 'saved' ? '✅ Saved!' :
+                                    existingRecord ? '💾 Update Log' : '✓ Save Log'}
+                        </button>
+                    </div>
+                )}
+            </form>
+
+            {/* Auto-tracking info */}
+            <div style={{ padding: '14px 18px', background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.2)', borderRadius: 12, marginBottom: 28, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                <span style={{ fontSize: 22, flexShrink: 0 }}>🤖</span>
+                <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.875rem', color: 'var(--success)', marginBottom: 4 }}>Replies auto-calculated from Leads</div>
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                        Every lead you add counts as 1 reply for its channel. Reply rate = (leads from channel) ÷ (total sent to channel).
+                        You can save partial numbers and edit them any time.
                     </div>
                 </div>
+            </div>
 
-                {/* Submit row */}
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', paddingTop: 4 }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => router.back()}>Cancel</button>
-                    <button type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ minWidth: 160 }}>
-                        {loading ? '⏳ Saving...' : '✓ Submit Log'}
-                    </button>
+            {/* All Logs History */}
+            {allLogs.length > 0 && (
+                <div className="card" style={{ marginBottom: 20 }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>📅 Log History</h2>
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>Click any day to load and edit it</p>
+                        </div>
+                        <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                            {allLogs.length} entries
+                        </span>
+                    </div>
+                    <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {allLogs.map((log: any) => {
+                            const logDate = new Date(log.date).toISOString().split('T')[0];
+                            const totalForDay = (log.dmsSent || 0) + (log.emailsSent || 0) + (log.whatsappSent || 0) + (log.callsMade || 0);
+                            const isSelected = logDate === date;
+                            const isLogToday = logDate === today;
+
+                            return (
+                                <button
+                                    key={log._id}
+                                    type="button"
+                                    onClick={() => setDate(logDate)}
+                                    style={{
+                                        display: 'flex', alignItems: 'center', gap: 12,
+                                        padding: '10px 14px', borderRadius: 10, border: '1px solid',
+                                        borderColor: isSelected ? 'var(--accent)' : 'var(--border)',
+                                        background: isSelected ? 'rgba(37,99,235,0.05)' : 'var(--bg-secondary)',
+                                        cursor: 'pointer', textAlign: 'left', width: '100%',
+                                        transition: 'all 0.15s ease',
+                                    }}
+                                >
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: isSelected ? 'var(--accent)' : 'var(--text-primary)' }}>
+                                            {isLogToday ? 'Today' : new Date(log.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+                                            {CHANNELS.filter(ch => (log[ch.sentKey] || 0) > 0).map(ch => (
+                                                <span key={ch.sentKey} style={{ fontSize: '0.7rem', color: ch.color, fontWeight: 600 }}>
+                                                    {ch.icon} {log[ch.sentKey]}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <span style={{
+                                        fontSize: '1rem', fontWeight: 800,
+                                        color: 'var(--text-primary)',
+                                        minWidth: 50, textAlign: 'right'
+                                    }}>
+                                        {totalForDay.toLocaleString()}
+                                    </span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', minWidth: 20 }}>→</span>
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
-            </form >
-        </div >
+            )}
+
+            {allLogs.length === 0 && (
+                <div className="card card-p">
+                    <div className="empty-state">
+                        <div className="empty-icon">📋</div>
+                        <div className="empty-title">No logs yet</div>
+                        <div className="empty-desc">Enter your first outreach numbers above</div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }

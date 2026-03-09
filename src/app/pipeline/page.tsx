@@ -37,7 +37,7 @@ const STAGES = [
 function getStage(lead: any) {
     if (lead.pipelineStage) return lead.pipelineStage;
     if (lead.leadType === 'Unqualified Lead') return 'not interested';
-    if (lead.leadType === 'Soft lead') return 'follow-up scheduled';
+    if (lead.leadType === 'Sofat lead') return 'follow-up scheduled';
     if (lead.leadType === 'Qualified') return 'upcoming call';
     if (lead.leadType === 'Hot lead') return 'interested';
     return 'new';

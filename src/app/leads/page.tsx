@@ -405,6 +405,17 @@ export default function LeadsPage() {
         if (selectedLead?._id === id) setSelectedLead({ ...selectedLead, pipelineStage: stage });
     };
 
+    const handleDeleteLead = async (id: string, e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this lead? This cannot be undone.')) return;
+        try {
+            await fetch(`/api/leads/${id}`, { method: 'DELETE' });
+            setLeads(leads.filter(l => l._id !== id));
+            if (selectedLead?._id === id) setShowModal(false);
+        } catch (err) {
+            console.error('Failed to delete lead', err);
+        }
+    };
 
     const counts = {
         All: leads.length,
@@ -780,7 +791,10 @@ export default function LeadsPage() {
                                             </div>
                                         </td>
                                         <td>
-                                            <button className="btn btn-ghost btn-sm" onClick={e => { e.stopPropagation(); setSelectedLead(lead); }}>Details →</button>
+                                            <div style={{ display: 'flex', gap: 6 }}>
+                                                <button className="btn btn-ghost btn-sm" onClick={e => { e.stopPropagation(); setSelectedLead(lead); setShowModal(true); }}>Details →</button>
+                                                <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--danger)', background: 'rgba(239,68,68,0.05)' }} onClick={e => handleDeleteLead(lead._id, e)} title="Delete Lead">🗑️</button>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
@@ -1291,7 +1305,10 @@ export default function LeadsPage() {
                                 </>
                             ) : (
                                 <>
-                                    <button type="button" className="btn btn-secondary" onClick={() => { setEditForm(selectedLead); setIsEditingExisting(true); }}>✏️ Edit Lead Details</button>
+                                    <div style={{ display: 'flex', gap: 10 }}>
+                                        <button type="button" className="btn btn-secondary" onClick={() => { setEditForm(selectedLead); setIsEditingExisting(true); }}>✏️ Edit Lead Details</button>
+                                        <button type="button" className="btn btn-secondary" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteLead(selectedLead._id)}>🗑️ Delete</button>
+                                    </div>
                                     {selectedLead.phoneNumber && (
                                         <div style={{ display: 'flex', gap: 10 }}>
                                             <a href={`tel:${selectedLead.phoneNumber}`} className="btn btn-secondary">📞 Call</a>
