@@ -91,11 +91,30 @@ export default function AnalyticsPage() {
     };
 
     const totalSent = records.reduce((s, r) => s + r.dmsSent + r.emailsSent + r.whatsappSent + r.callsMade, 0);
-    const totalReplies = records.reduce((s, r) => s + (r.replies || 0), 0);
-    const totalMeetings = records.reduce((s, r) => s + (r.meetings || 0), 0);
-    const totalClosed = records.reduce((s, r) => s + (r.clientsClosed || 0), 0);
     const avgPerDay = records.length > 0 ? Math.round(totalSent / records.length) : 0;
-    const replyRate = totalSent > 0 ? (totalReplies / totalSent * 100).toFixed(1) : '0.0';
+
+    // Lead-derived metrics (real data from pipeline stages)
+    function getStage(lead: any) {
+        if (lead.pipelineStage) return lead.pipelineStage.toLowerCase();
+        if (lead.leadType === 'Unqualified Lead') return 'not interested';
+        if (lead.leadType === 'Soft lead') return 'follow-up scheduled';
+        if (lead.leadType === 'Qualified') return 'upcoming call';
+        if (lead.leadType === 'Hot lead') return 'interested';
+        return 'contacted';
+    }
+
+    const MEETING_STAGES = ['upcoming call', 'upcoming google-meet', 'meeting'];
+    const CLOSED_STAGES = ['closed won', 'closed', 'client'];
+
+    const totalLeads = leads.length;
+    const meetingLeads = leads.filter(l => MEETING_STAGES.some(s => getStage(l).includes(s))).length;
+    const closedLeads = leads.filter(l => CLOSED_STAGES.some(s => getStage(l).includes(s))).length;
+    const ghostedLeads = leads.filter(l => getStage(l) === 'ghosted').length;
+    const noShowLeads = leads.filter(l => getStage(l) === 'no-showup').length;
+
+    const meetingRate = totalLeads > 0 ? (meetingLeads / totalLeads * 100).toFixed(1) : '0.0';
+    const closeRate = totalLeads > 0 ? (closedLeads / totalLeads * 100).toFixed(1) : '0.0';
+    const meetToClose = meetingLeads > 0 ? (closedLeads / meetingLeads * 100).toFixed(1) : '0.0';
 
     if (loading) {
         return (
@@ -122,12 +141,12 @@ export default function AnalyticsPage() {
             {/* KPI strip */}
             <div className="stats-grid stagger-children" style={{ marginBottom: 28 }}>
                 {[
-                    { label: 'Total Outreach', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff' },
-                    { label: 'Total Replies', value: totalReplies, icon: '💬', color: '#16a34a', bg: '#f0fdf4' },
-                    { label: 'Meetings Set', value: totalMeetings, icon: '📅', color: '#d97706', bg: '#fffbeb' },
-                    { label: 'Clients Closed', value: totalClosed, icon: '🤝', color: '#7c3aed', bg: '#faf5ff' },
-                    { label: 'Avg/Day', value: avgPerDay, icon: '📊', color: '#0284c7', bg: '#f0f9ff' },
-                    { label: 'Total Leads', value: leads.length, icon: '🎯', color: '#db2777', bg: '#fdf2f8' },
+                    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#db2777', bg: '#fdf2f8' },
+                    { label: 'Meetings Booked', value: meetingLeads, icon: '📅', color: '#10b981', bg: '#f0fdf9' },
+                    { label: 'Closed Won', value: closedLeads, icon: '🤝', color: '#16a34a', bg: '#f0fdf4' },
+                    { label: 'Ghosted', value: ghostedLeads, icon: '👻', color: '#6b7280', bg: '#f9fafb' },
+                    { label: 'No Show Up', value: noShowLeads, icon: '🚫', color: '#9333ea', bg: '#faf5ff' },
+                    { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff' },
                 ].map(s => (
                     <div key={s.label} className="stat-card card-hover">
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
@@ -148,12 +167,12 @@ export default function AnalyticsPage() {
                 </div>
             ) : (
                 <>
-                    {/* Reply rate banner */}
+                    {/* Conversion rate highlights */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}>
                         {[
-                            { label: 'Reply Rate', val: `${replyRate}%`, sub: `${totalReplies} replies from ${totalSent}`, color: '#16a34a', bg: '#f0fdf4', border: 'rgba(22,163,74,0.2)' },
-                            { label: 'Meeting Conversion', val: totalReplies > 0 ? `${(totalMeetings / totalReplies * 100).toFixed(1)}%` : '—', sub: `${totalMeetings} meetings from replies`, color: '#2563eb', bg: '#eff6ff', border: 'rgba(37,99,235,0.2)' },
-                            { label: 'Close Rate', val: totalMeetings > 0 ? `${(totalClosed / totalMeetings * 100).toFixed(1)}%` : '—', sub: `${totalClosed} closed from meetings`, color: '#7c3aed', bg: '#faf5ff', border: 'rgba(124,58,237,0.2)' },
+                            { label: 'Meeting Rate', val: `${meetingRate}%`, sub: `${meetingLeads} meetings from ${totalLeads} leads`, color: '#10b981', bg: '#f0fdf9', border: 'rgba(16,185,129,0.2)' },
+                            { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, color: '#2563eb', bg: '#eff6ff', border: 'rgba(37,99,235,0.2)' },
+                            { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, color: '#16a34a', bg: '#f0fdf4', border: 'rgba(22,163,74,0.2)' },
                         ].map(r => (
                             <div key={r.label} className="card card-p" style={{ background: r.bg, border: `1px solid ${r.border}`, textAlign: 'center' }}>
                                 <div style={{ fontSize: '2rem', fontWeight: 800, color: r.color, letterSpacing: '-0.04em' }}>{r.val}</div>
@@ -232,10 +251,11 @@ export default function AnalyticsPage() {
                             </thead>
                             <tbody>
                                 {[
-                                    { label: '📤 Sent', count: totalSent, prevCount: null, color: '#2563eb' },
-                                    { label: '💬 Replies', count: totalReplies, prevCount: totalSent, color: '#16a34a' },
-                                    { label: '📅 Meetings', count: totalMeetings, prevCount: totalReplies, color: '#d97706' },
-                                    { label: '🤝 Closed', count: totalClosed, prevCount: totalMeetings, color: '#7c3aed' },
+                                    { label: '🎯 Total Leads', count: totalLeads, prevCount: null, color: '#db2777' },
+                                    { label: '📅 Meetings', count: meetingLeads, prevCount: totalLeads, color: '#10b981' },
+                                    { label: '🤝 Closed Won', count: closedLeads, prevCount: meetingLeads, color: '#16a34a' },
+                                    { label: '👻 Ghosted', count: ghostedLeads, prevCount: totalLeads, color: '#6b7280' },
+                                    { label: '🚫 No Show', count: noShowLeads, prevCount: totalLeads, color: '#9333ea' },
                                 ].map(row => {
                                     const rate = row.prevCount && row.prevCount > 0 ? (row.count / row.prevCount * 100).toFixed(1) : null;
                                     const pct = totalSent > 0 ? (row.count / totalSent * 100) : 0;

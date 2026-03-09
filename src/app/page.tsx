@@ -50,10 +50,10 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
 };
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any>(null);
   const [leads, setLeads] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
+  const [outreachStats, setOutreachStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function DashboardPage() {
       fetch('/api/clients').then(r => r.json()),
       fetch('/api/team-goals').then(r => r.json()),
     ]).then(([outreach, leadsData, clientsData, goalsData]) => {
-      setStats(outreach.aggregate || { totalSent: 0, byChannel: { dms: 0, emails: 0, whatsapp: 0, calls: 0 }, replies: 0, meetings: 0, clients: 0 });
+      setOutreachStats(outreach.aggregate || null);
       setLeads(leadsData.data || []);
       setClients(clientsData.data || []);
       setGoals(goalsData.data || []);
@@ -71,12 +71,45 @@ export default function DashboardPage() {
     }).catch(() => setLoading(false));
   }, []);
 
-  const totalSent = stats?.totalSent || 0;
-  const replyRate = totalSent > 0 ? ((stats?.replies || 0) / totalSent * 100).toFixed(1) : '0.0';
-  const meetingRate = (stats?.replies || 0) > 0 ? ((stats?.meetings || 0) / (stats?.replies || 1) * 100).toFixed(1) : '0.0';
-  const closeRate = (stats?.meetings || 0) > 0 ? ((stats?.clients || 0) / (stats?.meetings || 1) * 100).toFixed(1) : '0.0';
-  const qualifiedLeads = leads.filter(l => l.leadType === 'Qualified' || l.leadType === 'Hot lead').length;
-  const activeClients = clients.filter(c => c.isActive).length;
+  // ── Lead-derived KPIs (real data from pipeline stages) ──────────────────
+  function getStage(lead: any) {
+    if (lead.pipelineStage) return lead.pipelineStage.toLowerCase();
+    if (lead.leadType === 'Unqualified Lead') return 'not interested';
+    if (lead.leadType === 'Soft lead') return 'follow-up scheduled';
+    if (lead.leadType === 'Qualified') return 'upcoming call';
+    if (lead.leadType === 'Hot lead') return 'interested';
+    return 'contacted';
+  }
+
+  // Meetings = leads with upcoming call / google-meet / meeting stages
+  const MEETING_STAGES = ['upcoming call', 'upcoming google-meet', 'meeting'];
+  const CLOSED_STAGES = ['closed won', 'closed', 'client'];
+
+  const totalLeads = leads.length;
+  const meetingLeads = leads.filter(l => MEETING_STAGES.some(s => getStage(l).includes(s)));
+  const closedLeads = leads.filter(l => CLOSED_STAGES.some(s => getStage(l).includes(s)));
+  const ghostedLeads = leads.filter(l => getStage(l) === 'ghosted');
+  const noShowLeads = leads.filter(l => getStage(l) === 'no-showup');
+  const hotQualified = leads.filter(l => l.leadType === 'Hot lead' || l.leadType === 'Qualified');
+  const activeClients = clients.filter(c => c.isActive);
+
+  // Channel breakdown from leads
+  const byChannel = {
+    dms: leads.filter(l => l.channel === 'instagram_dm' || l.channel === 'instagram' || l.channel === 'dm').length,
+    emails: leads.filter(l => l.channel === 'email').length,
+    whatsapp: leads.filter(l => l.channel === 'whatsapp').length,
+    calls: leads.filter(l => l.channel === 'cold_call' || l.channel === 'call').length,
+  };
+
+  // Rates derived from leads
+  const meetingRate = totalLeads > 0 ? (meetingLeads.length / totalLeads * 100).toFixed(1) : '0';
+  const closeRate = totalLeads > 0 ? (closedLeads.length / totalLeads * 100).toFixed(1) : '0';
+  const ghostRate = totalLeads > 0 ? (ghostedLeads.length / totalLeads * 100).toFixed(1) : '0';
+
+  // Also keep totalSent from outreach logs for outreach-sent KPI only
+  const totalSent = outreachStats?.totalSent || 0;
+  const sentByChannel = outreachStats?.byChannel || { dms: 0, emails: 0, whatsapp: 0, calls: 0 };
+
   const todayGoals = goals.filter(g => {
     const d = new Date(g.date);
     const today = new Date();
@@ -84,31 +117,31 @@ export default function DashboardPage() {
   });
 
   const doughnutData = {
-    labels: ['Instagram DMs', 'Emails', 'WhatsApp', 'Cold Calls'],
+    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted'],
     datasets: [{
-      data: [stats?.byChannel?.dms || 0, stats?.byChannel?.emails || 0, stats?.byChannel?.whatsapp || 0, stats?.byChannel?.calls || 0],
-      backgroundColor: ['#e1306c', '#2563eb', '#25D366', '#7c3aed'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length],
+      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280'],
       borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
   const funnelData = {
-    labels: ['Sent', 'Replies', 'Meetings', 'Closed'],
+    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted'],
     datasets: [{
-      label: 'Count',
-      data: [totalSent, stats?.replies || 0, stats?.meetings || 0, stats?.clients || 0],
-      backgroundColor: ['rgba(37,99,235,0.15)', 'rgba(37,99,235,0.35)', 'rgba(37,99,235,0.6)', 'rgba(37,99,235,0.9)'],
+      label: 'Leads',
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length],
+      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)'],
       borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
 
   const statCards = [
-    { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff', change: '+12% this month', dir: 'up' },
-    { label: 'Replies', value: stats?.replies || 0, icon: '💬', color: '#16a34a', bg: '#f0fdf4', change: `${replyRate}% rate`, dir: 'neutral' },
-    { label: 'Meetings', value: stats?.meetings || 0, icon: '📅', color: '#d97706', bg: '#fffbeb', change: `${meetingRate}% of replies`, dir: 'neutral' },
-    { label: 'Clients Closed', value: stats?.clients || 0, icon: '🤝', color: '#7c3aed', bg: '#faf5ff', change: `${closeRate}% close rate`, dir: 'neutral' },
-    { label: 'Hot + Qualified', value: qualifiedLeads, icon: '🎯', color: '#0284c7', bg: '#f0f9ff', change: `${leads.length} total leads`, dir: 'neutral' },
-    { label: 'Active Clients', value: activeClients, icon: '💼', color: '#16a34a', bg: '#f0fdf4', change: `${clients.length} onboarded`, dir: 'up' },
+    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#2563eb', bg: '#eff6ff', change: 'All channels combined', dir: 'neutral' },
+    { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', color: '#10b981', bg: '#f0fdf9', change: `${meetingRate}% of leads`, dir: 'neutral' },
+    { label: 'Closed Won', value: closedLeads.length, icon: '🤝', color: '#16a34a', bg: '#f0fdf4', change: `${closeRate}% close rate`, dir: 'neutral' },
+    { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', color: '#d97706', bg: '#fffbeb', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, dir: 'neutral' },
+    { label: 'Ghosted', value: ghostedLeads.length, icon: '👻', color: '#6b7280', bg: '#f9fafb', change: `${ghostRate}% ghost rate`, dir: 'neutral' },
+    { label: 'Active Clients', value: activeClients.length, icon: '💼', color: '#7c3aed', bg: '#faf5ff', change: `${clients.length} total onboarded`, dir: 'up' },
   ];
 
   const recentLeads = [...leads].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 5);
@@ -224,10 +257,10 @@ export default function DashboardPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
             {[
-              { label: 'Instagram DMs', val: stats?.byChannel?.dms || 0, color: '#e1306c' },
-              { label: 'Emails', val: stats?.byChannel?.emails || 0, color: '#2563eb' },
-              { label: 'WhatsApp', val: stats?.byChannel?.whatsapp || 0, color: '#25D366' },
-              { label: 'Cold Calls', val: stats?.byChannel?.calls || 0, color: '#7c3aed' },
+              { label: 'Instagram DMs', val: sentByChannel?.dms || 0, color: '#e1306c' },
+              { label: 'Emails', val: sentByChannel?.emails || 0, color: '#2563eb' },
+              { label: 'WhatsApp', val: sentByChannel?.whatsapp || 0, color: '#25D366' },
+              { label: 'Cold Calls', val: sentByChannel?.calls || 0, color: '#7c3aed' },
             ].map(ch => (
               <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
@@ -262,9 +295,9 @@ export default function DashboardPage() {
           <hr className="divider" style={{ margin: '14px 0' }} />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {[
-              { label: 'Reply Rate', val: `${replyRate}%`, color: replyRate === '0.0' ? 'var(--text-tertiary)' : 'var(--success)' },
-              { label: 'Meeting Rate', val: `${meetingRate}%`, color: meetingRate === '0.0' ? 'var(--text-tertiary)' : 'var(--warning)' },
-              { label: 'Close Rate', val: `${closeRate}%`, color: closeRate === '0.0' ? 'var(--text-tertiary)' : 'var(--accent)' },
+              { label: 'Meeting Rate', val: `${meetingRate}%`, color: meetingRate === '0' ? 'var(--text-tertiary)' : 'var(--success)' },
+              { label: 'Close Rate', val: `${closeRate}%`, color: closeRate === '0' ? 'var(--text-tertiary)' : 'var(--accent)' },
+              { label: 'Ghost Rate', val: `${ghostRate}%`, color: ghostRate === '0' ? 'var(--text-tertiary)' : '#6b7280' },
             ].map(r => (
               <div key={r.label} style={{ textAlign: 'center', padding: '10px 0', borderRadius: 10, background: 'var(--bg-secondary)' }}>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: r.color }}>{r.val}</div>
