@@ -536,12 +536,21 @@ export default function LeadsPage() {
                 }
             `}</style>
 
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Leads</h1>
-                    <p className="page-subtitle">{leads.length} leads · {counts.Qualified} qualified · {followUps.length} with follow-ups</p>
+            {/* Premium hero */}
+            <div className="page-hero" style={{ marginBottom: 20 }}>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.875rem' }}>🎯</span>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 12px', borderRadius: 99, backdropFilter: 'blur(8px)' }}>
+                            {leads.length} Leads · {counts.Qualified} Qualified
+                        </span>
+                    </div>
+                    <h1 className="page-hero-title">Leads</h1>
+                    <p className="page-hero-sub">{leads.length} leads · {counts.Qualified} qualified · {followUps.length} with follow-ups</p>
+                    <div className="page-hero-actions">
+                        <button className="btn-hero btn-hero-primary" onClick={() => setShowModal(true)}>+ New Lead</button>
+                    </div>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ New Lead</button>
             </div>
 
             {/* Status filter pills */}

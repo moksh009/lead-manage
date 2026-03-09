@@ -4,59 +4,50 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Filler,
+  ArcElement, Tooltip, Legend, CategoryScale,
+  LinearScale, BarElement, PointElement, LineElement, Title, Filler,
 } from 'chart.js';
-import { Doughnut, Bar, Line } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Filler);
 
 const chartDefaults = {
   plugins: {
-    legend: {
-      labels: { color: '#6e6e73', font: { family: '-apple-system, BlinkMacSystemFont, Inter', size: 12 }, usePointStyle: true, pointStyleWidth: 8 }
-    },
+    legend: { labels: { color: '#6b7280', font: { family: 'inherit', size: 12 }, usePointStyle: true, pointStyleWidth: 8 } },
     tooltip: {
       backgroundColor: 'rgba(255,255,255,0.98)',
-      titleColor: '#1d1d1f',
-      bodyColor: '#6e6e73',
-      borderColor: 'rgba(0,0,0,0.08)',
-      borderWidth: 1,
-      padding: 12,
-      cornerRadius: 10,
-      boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+      titleColor: '#111110', bodyColor: '#6b7280',
+      borderColor: 'rgba(0,0,0,0.08)', borderWidth: 1,
+      padding: 12, cornerRadius: 10,
     }
   },
-  responsive: true,
-  maintainAspectRatio: false,
+  responsive: true, maintainAspectRatio: false,
 };
 
 function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number; prefix?: string; suffix?: string }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
-    let start = 0;
-    const end = value;
+    let start = 0; const end = value;
     if (start === end) return;
-    const duration = 1000;
-    const step = (timestamp: number, startTime: number) => {
-      const elapsed = timestamp - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+    const step = (ts: number, startTime: number) => {
+      const elapsed = ts - startTime;
+      const progress = Math.min(elapsed / 1000, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplay(Math.round(start + (end - start) * eased));
-      if (progress < 1) requestAnimationFrame((ts) => step(ts, startTime));
+      if (progress < 1) requestAnimationFrame((t) => step(t, startTime));
     };
-    requestAnimationFrame((ts) => step(ts, ts));
+    requestAnimationFrame((t) => step(t, t));
   }, [value]);
   return <>{prefix}{display.toLocaleString()}{suffix}</>;
 }
+
+// Color palettes per status type
+const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  'Hot lead': { bg: '#fef2f2', text: '#dc2626', border: 'rgba(220,38,38,0.2)' },
+  'Qualified': { bg: '#f0fdf4', text: '#16a34a', border: 'rgba(22,163,74,0.2)' },
+  'Soft lead': { bg: '#eff6ff', text: '#2563eb', border: 'rgba(37,99,235,0.2)' },
+  'Unqualified Lead': { bg: '#fafafa', text: '#6b7280', border: 'rgba(107,114,128,0.2)' },
+};
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
@@ -84,7 +75,7 @@ export default function DashboardPage() {
   const replyRate = totalSent > 0 ? ((stats?.replies || 0) / totalSent * 100).toFixed(1) : '0.0';
   const meetingRate = (stats?.replies || 0) > 0 ? ((stats?.meetings || 0) / (stats?.replies || 1) * 100).toFixed(1) : '0.0';
   const closeRate = (stats?.meetings || 0) > 0 ? ((stats?.clients || 0) / (stats?.meetings || 1) * 100).toFixed(1) : '0.0';
-  const qualifiedLeads = leads.filter(l => l.leadType === 'Qualified').length;
+  const qualifiedLeads = leads.filter(l => l.leadType === 'Qualified' || l.leadType === 'Hot lead').length;
   const activeClients = clients.filter(c => c.isActive).length;
   const todayGoals = goals.filter(g => {
     const d = new Date(g.date);
@@ -93,71 +84,49 @@ export default function DashboardPage() {
   });
 
   const doughnutData = {
-    labels: ['DMs', 'Emails', 'WhatsApp', 'Calls'],
+    labels: ['Instagram DMs', 'Emails', 'WhatsApp', 'Cold Calls'],
     datasets: [{
-      data: [
-        stats?.byChannel?.dms || 0,
-        stats?.byChannel?.emails || 0,
-        stats?.byChannel?.whatsapp || 0,
-        stats?.byChannel?.calls || 0,
-      ],
-      backgroundColor: ['#0071e3', '#30d158', '#ff9500', '#5856d6'],
-      borderColor: '#ffffff',
-      borderWidth: 3,
-      hoverOffset: 8,
+      data: [stats?.byChannel?.dms || 0, stats?.byChannel?.emails || 0, stats?.byChannel?.whatsapp || 0, stats?.byChannel?.calls || 0],
+      backgroundColor: ['#e1306c', '#2563eb', '#25D366', '#7c3aed'],
+      borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
   const funnelData = {
-    labels: ['Sent', 'Replies', 'Meetings', 'Clients'],
+    labels: ['Sent', 'Replies', 'Meetings', 'Closed'],
     datasets: [{
       label: 'Count',
       data: [totalSent, stats?.replies || 0, stats?.meetings || 0, stats?.clients || 0],
-      backgroundColor: ['rgba(0,113,227,0.15)', 'rgba(0,113,227,0.3)', 'rgba(0,113,227,0.55)', 'rgba(0,113,227,0.9)'],
-      borderColor: 'rgba(0,113,227,0.8)',
-      borderWidth: 0,
-      borderRadius: 6,
-      indexAxis: 'y' as const,
+      backgroundColor: ['rgba(37,99,235,0.15)', 'rgba(37,99,235,0.35)', 'rgba(37,99,235,0.6)', 'rgba(37,99,235,0.9)'],
+      borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
 
   const statCards = [
-    { label: 'Total Sent', value: totalSent, icon: '📤', color: 'accent', change: '+12%', changeDir: 'up', sub: 'All channels combined' },
-    { label: 'Replies', value: stats?.replies || 0, icon: '💬', color: 'success', change: `${replyRate}% reply rate`, changeDir: 'neutral', sub: 'From all outreach' },
-    { label: 'Meetings Booked', value: stats?.meetings || 0, icon: '📅', color: 'warning', change: `${meetingRate}% of replies`, changeDir: 'neutral', sub: 'Calls scheduled' },
-    { label: 'Clients Closed', value: stats?.clients || 0, icon: '🤝', color: 'purple', change: `${closeRate}% close rate`, changeDir: 'neutral', sub: 'Paying clients' },
-    { label: 'Qualified Leads', value: qualifiedLeads, icon: '⭐', color: 'info', change: `${leads.length} total leads`, changeDir: 'neutral', sub: 'Ready for follow-up' },
-    { label: 'Active Clients', value: activeClients, icon: '💼', color: 'success', change: `${clients.length} total onboarded`, changeDir: 'up', sub: 'Current retainers' },
+    { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff', change: '+12% this month', dir: 'up' },
+    { label: 'Replies', value: stats?.replies || 0, icon: '💬', color: '#16a34a', bg: '#f0fdf4', change: `${replyRate}% rate`, dir: 'neutral' },
+    { label: 'Meetings', value: stats?.meetings || 0, icon: '📅', color: '#d97706', bg: '#fffbeb', change: `${meetingRate}% of replies`, dir: 'neutral' },
+    { label: 'Clients Closed', value: stats?.clients || 0, icon: '🤝', color: '#7c3aed', bg: '#faf5ff', change: `${closeRate}% close rate`, dir: 'neutral' },
+    { label: 'Hot + Qualified', value: qualifiedLeads, icon: '🎯', color: '#0284c7', bg: '#f0f9ff', change: `${leads.length} total leads`, dir: 'neutral' },
+    { label: 'Active Clients', value: activeClients, icon: '💼', color: '#16a34a', bg: '#f0fdf4', change: `${clients.length} onboarded`, dir: 'up' },
   ];
 
-  const recentLeads = leads.slice(0, 5);
+  const recentLeads = [...leads].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 5);
   const upcomingFollowUps = leads
     .filter(l => l.followUpDate && new Date(l.followUpDate) >= new Date())
     .sort((a, b) => new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime())
-    .slice(0, 4);
-
-  const leadTypeSummary = [
-    { label: 'Hot lead', count: leads.filter(l => l.leadType === 'Hot lead').length, color: 'danger' },
-    { label: 'Qualified', count: leads.filter(l => l.leadType === 'Qualified').length, color: 'success' },
-    { label: 'Soft lead', count: leads.filter(l => l.leadType === 'Soft lead' || l.leadType === 'Soft Lead' || l.leadType === 'Pending').length, color: 'info' },
-    { label: 'Unqualified Lead', count: leads.filter(l => l.leadType === 'Unqualified Lead' || l.leadType === 'UN-QUALIFIED').length, color: 'neutral' },
-  ];
+    .slice(0, 5);
 
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div className="page-header">
-          <div>
-            <div className="skeleton" style={{ height: 36, width: 300, marginBottom: 8 }} />
-            <div className="skeleton" style={{ height: 20, width: 200 }} />
-          </div>
-        </div>
+        <div className="skeleton" style={{ height: 140, borderRadius: 16, marginBottom: 4 }} />
         <div className="stats-grid">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="stat-card" style={{ height: 130 }}>
+            <div key={i} className="stat-card" style={{ height: 120 }}>
               <div className="skeleton" style={{ height: 40, width: 40, borderRadius: 12, marginBottom: 14 }} />
-              <div className="skeleton" style={{ height: 16, width: 80, marginBottom: 8 }} />
-              <div className="skeleton" style={{ height: 32, width: 60 }} />
+              <div className="skeleton" style={{ height: 14, width: 80, marginBottom: 8 }} />
+              <div className="skeleton" style={{ height: 30, width: 60 }} />
             </div>
           ))}
         </div>
@@ -167,40 +136,49 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in">
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Here's your outreach overview — MOKSH & Smit</p>
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/outreach">
-            <button className="btn btn-secondary">📋 Add Daily Log</button>
-          </Link>
-          <Link href="/leads">
-            <button className="btn btn-primary">+ New Lead</button>
-          </Link>
+      {/* HERO BANNER */}
+      <div className="page-hero" style={{ marginBottom: 28 }}>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <span style={{ fontSize: 28 }}>🚀</span>
+            <span style={{ fontSize: '0.8125rem', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 12px', borderRadius: 99, backdropFilter: 'blur(8px)' }}>
+              Live Dashboard
+            </span>
+          </div>
+          <h1 className="page-hero-title">Dashboard</h1>
+          <p className="page-hero-sub">Here's your outreach overview — MOKSH & Smit</p>
+          <div className="page-hero-actions">
+            <Link href="/outreach">
+              <button className="btn-hero">📋 Add Daily Log</button>
+            </Link>
+            <Link href="/leads">
+              <button className="btn-hero btn-hero-primary">+ New Lead</button>
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Today's Team Check-in */}
+      {/* Today's Team Check-In */}
       {todayGoals.length > 0 && (
-        <div className="card card-p mb-6 animate-in" style={{ background: 'linear-gradient(135deg, rgba(0,113,227,0.04), rgba(88,86,214,0.04))', border: '1px solid rgba(0,113,227,0.15)' }}>
+        <div className="card card-accent card-p animate-in" style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Today's Team Check-In</h2>
-            <span className="badge badge-success">✓ Active</span>
+            <div>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>👥 Today's Team Check-In</h2>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Monday, March 9</p>
+            </div>
+            <span className="badge badge-success" style={{ fontWeight: 600 }}>✓ Active</span>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
             {todayGoals.map(g => (
-              <div key={g._id} style={{ background: 'white', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)' }}>
+              <div key={g._id} style={{ background: 'white', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <div className={`avatar avatar-sm ${g.user === 'MOKSH' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
                   <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user}</span>
-                  <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>🕐 {g.timeJoinedOffice}</span>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: 99 }}>🕐 {g.timeJoinedOffice}</span>
                 </div>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>{g.dailyGoals}</p>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{g.dailyGoals}</p>
                 {g.completedGoals && (
-                  <div style={{ marginTop: 8, padding: '6px 10px', background: 'var(--success-light)', borderRadius: 8, fontSize: '0.75rem', color: '#1a8240' }}>
+                  <div style={{ marginTop: 8, padding: '6px 10px', background: 'var(--success-light)', borderRadius: 8, fontSize: '0.75rem', color: 'var(--success)', fontWeight: 600 }}>
                     ✓ {g.completedGoals}
                   </div>
                 )}
@@ -210,46 +188,54 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="stats-grid stagger-children" style={{ marginBottom: 24 }}>
+      {/* KPI Stats Grid */}
+      <div className="stats-grid stagger-children" style={{ marginBottom: 28 }}>
         {statCards.map((card) => (
-          <div key={card.label} className={`stat-card ${card.color}`}>
-            <div className={`stat-icon ${card.color}`}>{card.icon}</div>
+          <div key={card.label} className="stat-card card-hover" style={{ cursor: 'default' }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 12,
+              background: card.bg, border: `1.5px solid ${card.color}20`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 20, marginBottom: 14
+            }}>{card.icon}</div>
             <div className="stat-label">{card.label}</div>
-            <div className="stat-value">
+            <div className="stat-value" style={{ color: card.color }}>
               <AnimatedNumber value={card.value} />
             </div>
-            <div className={`stat-change ${card.changeDir}`}>
-              {card.changeDir === 'up' ? '↑' : card.changeDir === 'down' ? '↓' : '·'} {card.change}
+            <div className="stat-change neutral" style={{ marginTop: 5 }}>
+              {card.dir === 'up' ? '↑ ' : '· '}{card.change}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Channel Performance */}
+      {/* Charts row */}
       <div className="grid-2" style={{ marginBottom: 24 }}>
+        {/* Channel Donut */}
         <div className="card card-p animate-in" style={{ animationDelay: '0.1s' }}>
-          <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, marginBottom: 16 }}>Channel Breakdown</h2>
-          <div style={{ height: 220 }}>
-            <Doughnut data={doughnutData} options={{
-              ...chartDefaults,
-              plugins: { ...chartDefaults.plugins, legend: { ...chartDefaults.plugins.legend, position: 'bottom' as const } }
-            }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+            <div>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Channel Breakdown</h2>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{totalSent.toLocaleString()} total messages sent</p>
+            </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16 }}>
+          <div style={{ height: 200 }}>
+            <Doughnut data={doughnutData} options={{ ...chartDefaults, plugins: { ...chartDefaults.plugins, legend: { ...chartDefaults.plugins.legend, position: 'bottom' as const } } }} />
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
             {[
-              { label: 'DMs', val: stats?.byChannel?.dms || 0, color: '#0071e3' },
-              { label: 'Emails', val: stats?.byChannel?.emails || 0, color: '#30d158' },
-              { label: 'WhatsApp', val: stats?.byChannel?.whatsapp || 0, color: '#ff9500' },
-              { label: 'Calls', val: stats?.byChannel?.calls || 0, color: '#5856d6' },
+              { label: 'Instagram DMs', val: stats?.byChannel?.dms || 0, color: '#e1306c' },
+              { label: 'Emails', val: stats?.byChannel?.emails || 0, color: '#2563eb' },
+              { label: 'WhatsApp', val: stats?.byChannel?.whatsapp || 0, color: '#25D366' },
+              { label: 'Cold Calls', val: stats?.byChannel?.calls || 0, color: '#7c3aed' },
             ].map(ch => (
-              <div key={ch.label} style={{ padding: '10px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: ch.color }} />
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>{ch.label}</span>
+              <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: ch.color }} />
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
                 </div>
-                <div style={{ fontWeight: 700, fontSize: '1.25rem' }}>{ch.val.toLocaleString()}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                <div style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text-primary)' }}>{ch.val.toLocaleString()}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', marginTop: 1 }}>
                   {totalSent > 0 ? ((ch.val / totalSent) * 100).toFixed(1) : '0.0'}%
                 </div>
               </div>
@@ -257,108 +243,135 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="card card-p animate-in" style={{ animationDelay: '0.2s' }}>
-          <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, marginBottom: 16 }}>Sales Funnel</h2>
-          <div style={{ height: 220 }}>
+        {/* Funnel */}
+        <div className="card card-p animate-in" style={{ animationDelay: '0.15s' }}>
+          <div style={{ marginBottom: 18 }}>
+            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Sales Funnel</h2>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>Outreach → Conversion breakdown</p>
+          </div>
+          <div style={{ height: 200 }}>
             <Bar data={funnelData} options={{
-              ...chartDefaults,
-              indexAxis: 'y',
+              ...chartDefaults, indexAxis: 'y',
               scales: {
-                x: { ticks: { color: '#6e6e73' }, grid: { color: 'rgba(0,0,0,0.04)' } },
-                y: { ticks: { color: '#6e6e73' }, grid: { display: false } }
+                x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(0,0,0,0.04)' } },
+                y: { ticks: { color: '#9ca3af' }, grid: { display: false } }
               },
               plugins: { ...chartDefaults.plugins, legend: { display: false } }
             } as any} />
           </div>
-          <hr className="divider" />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 2 }}>Reply Rate</div>
-              <div style={{ fontWeight: 700, color: replyRate === '0.0' ? 'var(--text-tertiary)' : 'var(--success)' }}>{replyRate}%</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 2 }}>Close Rate</div>
-              <div style={{ fontWeight: 700, color: closeRate === '0.0' ? 'var(--text-tertiary)' : 'var(--accent)' }}>{closeRate}%</div>
-            </div>
+          <hr className="divider" style={{ margin: '14px 0' }} />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {[
+              { label: 'Reply Rate', val: `${replyRate}%`, color: replyRate === '0.0' ? 'var(--text-tertiary)' : 'var(--success)' },
+              { label: 'Meeting Rate', val: `${meetingRate}%`, color: meetingRate === '0.0' ? 'var(--text-tertiary)' : 'var(--warning)' },
+              { label: 'Close Rate', val: `${closeRate}%`, color: closeRate === '0.0' ? 'var(--text-tertiary)' : 'var(--accent)' },
+            ].map(r => (
+              <div key={r.label} style={{ textAlign: 'center', padding: '10px 0', borderRadius: 10, background: 'var(--bg-secondary)' }}>
+                <div style={{ fontSize: '1.25rem', fontWeight: 800, color: r.color }}>{r.val}</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: 2, fontWeight: 500 }}>{r.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Lead Summary + Follow-ups */}
-      <div className="grid-2" style={{ marginBottom: 24 }}>
-        <div className="card card-p animate-in" style={{ animationDelay: '0.3s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ fontSize: '1.0625rem', fontWeight: 700 }}>Lead Pipeline</h2>
-            <Link href="/leads"><span style={{ fontSize: '0.8125rem', color: 'var(--accent)', fontWeight: 600 }}>View all →</span></Link>
+      {/* Recent Leads + Follow-Ups */}
+      <div className="grid-2" style={{ marginBottom: 16 }}>
+        {/* Recent Leads */}
+        <div className="card animate-in" style={{ animationDelay: '0.2s' }}>
+          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>🎯 Lead Pipeline</h2>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{leads.length} total leads</p>
+            </div>
+            <Link href="/leads"><span style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600 }}>View all →</span></Link>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
-            {leadTypeSummary.map(lt => (
-              <div key={lt.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', width: 100, flex: 1 }}>{lt.label}</span>
-                <div style={{ flex: 2, background: 'var(--bg-secondary)', borderRadius: 99, height: 6, overflow: 'hidden' }}>
-                  <div style={{
-                    height: '100%', borderRadius: 99,
-                    width: leads.length > 0 ? `${(lt.count / leads.length * 100)}%` : '0%',
-                    background: lt.color === 'success' ? 'var(--success)' : lt.color === 'info' ? 'var(--accent)' : lt.color === 'danger' ? 'var(--danger)' : 'var(--border-medium)',
-                    transition: 'width 1s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                  }} />
+          <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {/* Lead type summary bars */}
+            {[
+              { label: 'Hot lead 🔥', count: leads.filter(l => l.leadType === 'Hot lead').length, color: '#dc2626' },
+              { label: 'Qualified ✅', count: leads.filter(l => l.leadType === 'Qualified').length, color: '#16a34a' },
+              { label: 'Soft lead', count: leads.filter(l => l.leadType === 'Soft lead').length, color: '#2563eb' },
+              { label: 'Unqualified', count: leads.filter(l => l.leadType === 'Unqualified Lead').length, color: '#9ca3af' },
+            ].map(lt => (
+              <div key={lt.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
+                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', minWidth: 100 }}>{lt.label}</span>
+                <div style={{ flex: 1, background: 'var(--bg-secondary)', borderRadius: 99, height: 6, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', borderRadius: 99, width: leads.length > 0 ? `${(lt.count / leads.length * 100)}%` : '0%', background: lt.color, transition: 'width 1s ease' }} />
                 </div>
-                <span style={{ fontSize: '0.8125rem', fontWeight: 600, minWidth: 30, textAlign: 'right' }}>{lt.count}</span>
+                <span style={{ fontSize: '0.8125rem', fontWeight: 700, minWidth: 24, textAlign: 'right', color: lt.color }}>{lt.count}</span>
               </div>
             ))}
           </div>
-          {recentLeads.length === 0 ? (
-            <div className="empty-state" style={{ padding: '20px 0' }}>
-              <div className="empty-icon">🎯</div>
-              <div className="empty-title">No leads yet</div>
-              <Link href="/leads"><button className="btn btn-primary btn-sm" style={{ marginTop: 10 }}>Add First Lead</button></Link>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {recentLeads.map(lead => (
-                <div key={lead._id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
-                  <div className="avatar avatar-sm avatar-gradient-1">{lead.companyName[0]}</div>
+          <div style={{ padding: '4px 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {recentLeads.length === 0 ? (
+              <div className="empty-state" style={{ padding: '20px 0' }}>
+                <div className="empty-icon">🎯</div>
+                <div className="empty-title">No leads yet</div>
+                <Link href="/leads"><button className="btn btn-primary btn-sm" style={{ marginTop: 10 }}>Add First Lead</button></Link>
+              </div>
+            ) : recentLeads.map(lead => {
+              const sc = STATUS_COLORS[lead.leadType] || { bg: '#f9fafb', text: '#6b7280', border: 'rgba(0,0,0,0.1)' };
+              return (
+                <div key={lead._id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                  <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>{(lead.companyName || '?')[0].toUpperCase()}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lead.companyName}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.companyName}</div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.prospectName}</div>
                   </div>
-                  <span className={`badge badge-${lead.leadType === 'Qualified' ? 'success' : lead.leadType === 'Hot lead' ? 'danger' : lead.leadType === 'Soft lead' ? 'info' : 'neutral'}`}>{lead.leadType}</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, whiteSpace: 'nowrap' }}>{lead.leadType}</span>
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
 
-        <div className="card card-p animate-in" style={{ animationDelay: '0.4s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h2 style={{ fontSize: '1.0625rem', fontWeight: 700 }}>Upcoming Follow-ups</h2>
-            <Link href="/leads"><span style={{ fontSize: '0.8125rem', color: 'var(--accent)', fontWeight: 600 }}>View all →</span></Link>
+        {/* Upcoming Follow-ups */}
+        <div className="card animate-in" style={{ animationDelay: '0.25s' }}>
+          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>📅 Upcoming Follow-ups</h2>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{upcomingFollowUps.length} scheduled</p>
+            </div>
+            <Link href="/leads"><span style={{ fontSize: '0.8rem', color: 'var(--accent)', fontWeight: 600 }}>View all →</span></Link>
           </div>
-          {upcomingFollowUps.length === 0 ? (
-            <div className="empty-state" style={{ padding: '20px 0' }}>
-              <div className="empty-icon">📅</div>
-              <div className="empty-title">No follow-ups scheduled</div>
-              <div className="empty-desc">Add follow-up dates to your leads</div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {upcomingFollowUps.map(lead => {
-                const daysUntil = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                return (
-                  <div key={lead._id} style={{ padding: '12px 14px', background: daysUntil <= 1 ? 'var(--warning-light)' : 'var(--bg-secondary)', borderRadius: 12, border: `1px solid ${daysUntil <= 1 ? 'rgba(255,149,0,0.3)' : 'transparent'}` }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: 3 }}>{lead.companyName}</div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{lead.prospectName}</span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: daysUntil <= 1 ? 'var(--warning)' : daysUntil <= 3 ? 'var(--danger)' : 'var(--text-secondary)' }}>
-                        {daysUntil === 0 ? 'Today!' : daysUntil === 1 ? 'Tomorrow' : `in ${daysUntil}d`}
-                      </span>
+          <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {upcomingFollowUps.length === 0 ? (
+              <div className="empty-state" style={{ padding: '20px 0' }}>
+                <div className="empty-icon">📅</div>
+                <div className="empty-title">No follow-ups scheduled</div>
+                <div className="empty-desc">Add follow-up dates to your leads</div>
+              </div>
+            ) : upcomingFollowUps.map(lead => {
+              const daysUntil = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+              const isUrgent = daysUntil <= 1;
+              const isNear = daysUntil <= 3;
+              return (
+                <div key={lead._id} style={{
+                  padding: '12px 14px', borderRadius: 12, border: '1px solid',
+                  background: isUrgent ? '#fffbeb' : 'var(--bg-secondary)',
+                  borderColor: isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{lead.companyName}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
                     </div>
-                    {lead.notes && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.4 }}>{lead.notes.slice(0, 80)}...</p>}
+                    <span style={{
+                      fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: 99,
+                      background: isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
+                      color: isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
+                      border: `1px solid ${isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {daysUntil === 0 ? '🔥 Today!' : daysUntil === 1 ? '⚡ Tomorrow' : `📆 in ${daysUntil}d`}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
-          )}
+                  {lead.notes && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.4 }}>{lead.notes.slice(0, 80)}{lead.notes.length > 80 ? '…' : ''}</p>}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

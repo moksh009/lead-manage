@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 const STAGES = [
     // To-do
-    { id: 'contacted', label: 'Contacted', color: '#0071e3', emoji: '🔵' },
+    { id: 'contacted', label: 'Contacted', color: '#2563eb', emoji: '🔵' },
 
     // In progress
     { id: 'prepare report & send', label: 'Prepare report & send', color: '#af52de', emoji: '🟣' },
@@ -71,13 +71,15 @@ export default function PipelinePage() {
 
     return (
         <div className="animate-in">
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Pipeline Board</h1>
-                    <p className="page-subtitle">{leads.length} total leads tracked · {totalValue} closed</p>
-                </div>
-                <div style={{ display: 'flex', gap: 10 }}>
-                    <a href="/leads"><button className="btn btn-primary">+ Add Lead</button></a>
+            {/* Premium hero banner */}
+            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%)', marginBottom: 24 }}>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>🔄</div>
+                    <h1 className="page-hero-title">Pipeline Board</h1>
+                    <p className="page-hero-sub">{leads.length} leads tracked &middot; {totalValue} closed &middot; Drag cards to update stage</p>
+                    <div className="page-hero-actions">
+                        <a href="/leads"><button className="btn-hero btn-hero-primary">+ Add Lead</button></a>
+                    </div>
                 </div>
             </div>
 

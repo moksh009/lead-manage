@@ -240,12 +240,16 @@ export default function ClientsPage() {
 
     return (
         <div className="animate-in">
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Clients & Billing</h1>
-                    <p className="page-subtitle">{clients.filter(c => c.isActive).length} active clients · ₹{totalMRR.toLocaleString()} monthly revenue</p>
+            {/* Premium hero */}
+            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', marginBottom: 20 }}>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>💼</div>
+                    <h1 className="page-hero-title">Clients &amp; Billing</h1>
+                    <p className="page-hero-sub">{clients.filter(c => c.isActive).length} active clients &middot; ₹{totalMRR.toLocaleString()} monthly revenue</p>
+                    <div className="page-hero-actions">
+                        <button className="btn-hero btn-hero-primary" onClick={() => { setForm(EMPTY_FORM); setShowAddModal(true); }}>+ Add Client</button>
+                    </div>
                 </div>
-                <button className="btn btn-primary" onClick={() => { setForm(EMPTY_FORM); setShowAddModal(true); }}>+ Add Client</button>
             </div>
 
             {/* Billing Alerts */}
@@ -274,15 +278,15 @@ export default function ClientsPage() {
             {/* Summary Cards */}
             <div className="stats-grid" style={{ marginBottom: 24 }}>
                 {[
-                    { label: 'Total Clients', value: clients.length, icon: '👥', color: 'accent' },
-                    { label: 'Active', value: clients.filter(c => c.isActive).length, icon: '✅', color: 'success' },
-                    { label: 'Monthly Revenue', value: `₹${totalMRR.toLocaleString()}`, icon: '💰', color: 'purple', raw: true },
-                    { label: 'Due This Week', value: urgentClients.length, icon: '⏰', color: urgentClients.length > 0 ? 'warning' : 'success' },
+                    { label: 'Total Clients', value: clients.length, icon: '👥', color: '#2563eb', bg: '#eff6ff' },
+                    { label: 'Active', value: clients.filter(c => c.isActive).length, icon: '✅', color: '#16a34a', bg: '#f0fdf4' },
+                    { label: 'Monthly Revenue', value: `₹${totalMRR.toLocaleString()}`, icon: '💰', color: '#7c3aed', bg: '#faf5ff', raw: true },
+                    { label: 'Due This Week', value: urgentClients.length, icon: '⏰', color: urgentClients.length > 0 ? '#d97706' : '#16a34a', bg: urgentClients.length > 0 ? '#fffbeb' : '#f0fdf4' },
                 ].map(s => (
-                    <div key={s.label} className={`stat-card ${s.color}`}>
-                        <div className={`stat-icon ${s.color}`}>{s.icon}</div>
+                    <div key={s.label} className="stat-card card-hover">
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
                         <div className="stat-label">{s.label}</div>
-                        <div className="stat-value" style={{ fontSize: '1.75rem' }}>{s.raw ? s.value : (s.value as number).toLocaleString()}</div>
+                        <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.raw ? s.value : (s.value as number).toLocaleString()}</div>
                     </div>
                 ))}
             </div>

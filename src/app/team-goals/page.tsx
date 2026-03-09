@@ -143,26 +143,30 @@ export default function TeamGoalsPage() {
 
     return (
         <div className="animate-in">
-            <div className="page-header">
-                <div>
-                    <h1 className="page-title">Team Goals</h1>
-                    <p className="page-subtitle">Daily office tracking for MOKSH & Smit · {overallCompletionRate}% overall completion rate</p>
+            {/* Premium hero banner */}
+            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%)', marginBottom: 24 }}>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>🏆</div>
+                    <h1 className="page-hero-title">Team Goals</h1>
+                    <p className="page-hero-sub">Daily office tracking for MOKSH &amp; Smit &middot; {overallCompletionRate}% overall completion</p>
+                    <div className="page-hero-actions">
+                        <button className="btn-hero btn-hero-primary" onClick={() => setShowModal(true)}>+ Log Today</button>
+                    </div>
                 </div>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>+ Log Today</button>
             </div>
 
             {/* Summary Stats */}
             <div className="stats-grid" style={{ marginBottom: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
                 {[
-                    { label: 'Total Days', value: totalDays, icon: '📅', color: 'accent' },
-                    { label: 'Completion Rate', value: `${overallCompletionRate}%`, icon: '✅', color: overallCompletionRate >= 70 ? 'success' : 'warning', raw: true },
-                    { label: 'MOKSH Logs', value: goals.filter(g => g.user === 'MOKSH').length, icon: '👤', color: 'purple' },
-                    { label: 'Smit Logs', value: goals.filter(g => g.user === 'smit').length, icon: '👤', color: 'info' },
+                    { label: 'Total Days', value: totalDays, icon: '📅', color: '#2563eb', bg: '#eff6ff' },
+                    { label: 'Completion Rate', value: `${overallCompletionRate}%`, icon: '✅', color: overallCompletionRate >= 70 ? '#16a34a' : '#d97706', bg: overallCompletionRate >= 70 ? '#f0fdf4' : '#fffbeb' },
+                    { label: 'MOKSH Logs', value: goals.filter(g => g.user === 'MOKSH').length, icon: '👤', color: '#7c3aed', bg: '#faf5ff' },
+                    { label: 'Smit Logs', value: goals.filter(g => g.user === 'smit').length, icon: '👤', color: '#0284c7', bg: '#f0f9ff' },
                 ].map(s => (
-                    <div key={s.label} className={`stat-card ${s.color}`}>
-                        <div className={`stat-icon ${s.color}`}>{s.icon}</div>
+                    <div key={s.label} className="stat-card card-hover">
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
                         <div className="stat-label">{s.label}</div>
-                        <div className="stat-value" style={{ fontSize: '1.75rem' }}>{s.raw ? s.value : (s.value as number)}</div>
+                        <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.value}</div>
                     </div>
                 ))}
             </div>
