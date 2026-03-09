@@ -7,22 +7,19 @@ const STAGES = [
     { id: 'contacted', label: 'Contacted', color: '#2563eb', emoji: '🔵' },
 
     // In progress
-    { id: 'prepare report & send', label: 'Prepare Report & Send', color: '#af52de', emoji: '🟣' },
     { id: 'waiting for resp.', label: 'Waiting for Resp.', color: '#a2845e', emoji: '🟤' },
-    { id: 'whatsapp', label: 'WhatsApp', color: '#25D366', emoji: '💬' },
-    { id: 'email', label: 'Email', color: '#2563eb', emoji: '📧' },
     { id: 'follow-up scheduled', label: 'Follow-up Scheduled', color: '#af52de', emoji: '🟣' },
     { id: 'interested', label: 'Interested', color: '#d4af37', emoji: '🟡' },
-    { id: 'upcoming google-meet', label: 'Upcoming Google Meet', color: '#10b981', emoji: '📹' },
-    { id: 'upcoming call', label: 'Upcoming Call', color: '#10b981', emoji: '📞' },
+    { id: 'meeting booked', label: 'Meeting Booked', color: '#10b981', emoji: '📅' },
 
     // Dead-ends
     { id: 'ghosted', label: 'Ghosted', color: '#6b7280', emoji: '👻' },
-    { id: 'no-showup', label: 'No Show Up', color: '#9333ea', emoji: '🚫' },
+    { id: 'not convert', label: 'Not Convert', color: '#dc2626', emoji: '🚫' },
     { id: 'not interested', label: 'Not Interested', color: '#dc2626', emoji: '🔴' },
 
     // Closed
     { id: 'closed won', label: 'Closed Won 🎉', color: '#16a34a', emoji: '🟢' },
+
     { id: 'closed lost', label: 'Closed Lost', color: '#8e8e93', emoji: '⚫' },
 
     // Legacy (keep for fallback)
@@ -37,8 +34,8 @@ const STAGES = [
 function getStage(lead: any) {
     if (lead.pipelineStage) return lead.pipelineStage;
     if (lead.leadType === 'Unqualified Lead') return 'not interested';
-    if (lead.leadType === 'Sofat lead') return 'follow-up scheduled';
-    if (lead.leadType === 'Qualified') return 'upcoming call';
+    if (lead.leadType === 'Soft lead') return 'follow-up scheduled';
+    if (lead.leadType === 'Qualified') return 'meeting booked';
     if (lead.leadType === 'Hot lead') return 'interested';
     return 'new';
 }

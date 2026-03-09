@@ -13,18 +13,16 @@ const PIPELINE_STAGE_OPTIONS = [
     { label: 'To-do', options: [{ value: 'contacted', label: 'Contacted' }] },
     {
         label: 'In progress', options: [
-            { value: 'prepare report & send', label: 'Prepare report & send' },
             { value: 'waiting for resp.', label: 'Waiting for resp.' },
-            { value: 'whatsapp', label: 'Whatsapp' },
-            { value: 'email', label: 'Email' },
             { value: 'follow-up scheduled', label: 'Follow-up Scheduled' },
             { value: 'interested', label: 'Interested' },
-            { value: 'upcoming google-meet', label: 'Upcoming Google-meet' },
-            { value: 'upcoming call', label: 'Upcoming Call' }
+            { value: 'meeting booked', label: 'Meeting Booked' }
         ]
     },
     {
-        label: 'Complete', options: [
+        label: 'Complete / Dead', options: [
+            { value: 'ghosted', label: 'Ghosted' },
+            { value: 'not convert', label: 'Not Convert' },
             { value: 'not interested', label: 'Not Interested' },
             { value: 'closed won', label: 'Closed Won' },
             { value: 'closed lost', label: 'Closed Lost' }
@@ -214,15 +212,12 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; emoji: string }
 
     'Contacted': { color: '#007aff', bg: 'rgba(0,122,255,0.1)', emoji: '🔵' },
 
-    'Prepare report & send': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
     'Waiting for resp.': { color: '#a2845e', bg: 'rgba(162,132,94,0.1)', emoji: '🟤' },
-    'Whatsapp': { color: '#d97d54', bg: 'rgba(217,125,84,0.1)', emoji: '🟠' },
-    'Email': { color: '#d97d54', bg: 'rgba(217,125,84,0.1)', emoji: '🟠' },
     'Follow-up Scheduled': { color: '#af52de', bg: 'rgba(175,82,222,0.1)', emoji: '🟣' },
-
     'Interested': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
-    'Upcoming Google-meet': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
-    'Upcoming Call': { color: '#d4af37', bg: 'rgba(212,175,55,0.1)', emoji: '🟡' },
+    'Meeting Booked': { color: '#10b981', bg: 'rgba(16,185,129,0.1)', emoji: '📅' },
+    'Ghosted': { color: '#6b7280', bg: 'rgba(107,114,128,0.1)', emoji: '👻' },
+    'Not Convert': { color: '#dc2626', bg: 'rgba(220,38,38,0.1)', emoji: '🚫' },
 
     // Legacy placeholders for compatibility (fallback handling)
     'Qualified': { color: '#30d158', bg: 'rgba(48,209,88,0.1)', emoji: '🟢' },

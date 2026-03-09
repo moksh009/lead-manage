@@ -81,15 +81,15 @@ export default function DashboardPage() {
     return 'contacted';
   }
 
-  // Meetings = leads with upcoming call / google-meet / meeting stages
-  const MEETING_STAGES = ['upcoming call', 'upcoming google-meet', 'meeting'];
+  // Meetings = leads with meeting booked / meeting stages
+  const MEETING_STAGES = ['meeting booked', 'meeting'];
   const CLOSED_STAGES = ['closed won', 'closed', 'client'];
 
   const totalLeads = leads.length;
   const meetingLeads = leads.filter(l => MEETING_STAGES.some(s => getStage(l).includes(s)));
   const closedLeads = leads.filter(l => CLOSED_STAGES.some(s => getStage(l).includes(s)));
   const ghostedLeads = leads.filter(l => getStage(l) === 'ghosted');
-  const noShowLeads = leads.filter(l => getStage(l) === 'no-showup');
+  const notConvertLeads = leads.filter(l => getStage(l) === 'not convert');
   const hotQualified = leads.filter(l => l.leadType === 'Hot lead' || l.leadType === 'Qualified');
   const activeClients = clients.filter(c => c.isActive);
 
@@ -117,20 +117,20 @@ export default function DashboardPage() {
   });
 
   const doughnutData = {
-    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted'],
+    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'Not Convert'],
     datasets: [{
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length],
-      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertLeads.length],
+      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#dc2626'],
       borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
   const funnelData = {
-    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted'],
+    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted', 'Not Convert'],
     datasets: [{
       label: 'Leads',
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length],
-      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertLeads.length],
+      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(220,38,38,0.4)'],
       borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
