@@ -618,17 +618,17 @@ export default function LeadsPage() {
                     <table className="data-table">
                         <thead>
                             <tr>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>added on</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>lead date</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>company</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>channel</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>prospect</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>lead type</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>pipeline stage</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>follow-up</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>phone</th>
-                                <th className="form-label-premium" style={{ minWidth: 200, border: 'none', background: 'transparent' }}>notes</th>
-                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>actions</th>
+                                <th>Added On</th>
+                                <th>Lead Date</th>
+                                <th>Company</th>
+                                <th>Channel</th>
+                                <th>Prospect</th>
+                                <th>Lead Type</th>
+                                <th>Pipeline Stage</th>
+                                <th>Follow-up</th>
+                                <th>Phone</th>
+                                <th style={{ minWidth: 200 }}>Notes</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>

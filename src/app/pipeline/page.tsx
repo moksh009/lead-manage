@@ -26,6 +26,20 @@ const STAGES = [
     { id: 'closed', label: 'Client 🎉', color: '#16a34a', emoji: '🤝' },
 ];
 
+const CHANNELS: Record<string, { label: string; icon: string; color: string; bg: string }> = {
+    'dm': { label: 'Instagram DM', icon: '📸', color: '#E1306C', bg: 'rgba(225,48,108,0.1)' },
+    'email': { label: 'Email', icon: '📧', color: '#0071e3', bg: 'rgba(0,113,227,0.1)' },
+    'whatsapp': { label: 'WhatsApp', icon: '💬', color: '#25D366', bg: 'rgba(37,211,102,0.1)' },
+    'call': { label: 'Cold Call', icon: '📞', color: '#5856d6', bg: 'rgba(88,86,214,0.1)' },
+};
+
+const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+    'Hot lead': { bg: '#fef2f2', text: '#dc2626', border: 'rgba(220,38,38,0.2)' },
+    'Qualified': { bg: '#f0fdf4', text: '#16a34a', border: 'rgba(22,163,74,0.2)' },
+    'Soft lead': { bg: '#eff6ff', text: '#2563eb', border: 'rgba(37,99,235,0.2)' },
+    'Unqualified Lead': { bg: '#fafafa', text: '#6b7280', border: 'rgba(107,114,128,0.2)' },
+};
+
 // Map old leadType to a pipeline stage
 function getStage(lead: any) {
     if (lead.pipelineStage) return lead.pipelineStage;
@@ -148,24 +162,106 @@ export default function PipelinePage() {
                                             draggable
                                             onDragStart={() => setDragging(lead._id)}
                                             onDragEnd={() => setDragging(null)}
-                                            style={{ opacity: dragging === lead._id ? 0.5 : 1 }}
+                                            style={{ opacity: dragging === lead._id ? 0.5 : 1, padding: '12px 14px' }}
                                         >
-                                            <div className="kanban-card-title">{lead.companyName}</div>
-                                            <div className="kanban-card-sub" style={{ marginBottom: 8 }}>{lead.prospectName || '—'}</div>
-                                            {lead.notes && <p style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', lineHeight: 1.4, marginBottom: 8, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{lead.notes}</p>}
-                                            <div className="kanban-card-footer">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                                                <div className="kanban-card-title" style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 0 }}>{lead.companyName}</div>
+                                                {lead.channel && CHANNELS[lead.channel] && (
+                                                    <span style={{ fontSize: '1rem' }} title={CHANNELS[lead.channel].label}>
+                                                        {CHANNELS[lead.channel].icon}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="kanban-card-sub" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                <span style={{ fontWeight: 600 }}>{lead.prospectName || '—'}</span>
+                                                {lead.leadType && STATUS_COLORS[lead.leadType] && (
+                                                    <span style={{
+                                                        fontSize: '0.625rem',
+                                                        fontWeight: 900,
+                                                        textTransform: 'lowercase',
+                                                        letterSpacing: '0.02em',
+                                                        padding: '1px 6px',
+                                                        borderRadius: 4,
+                                                        background: STATUS_COLORS[lead.leadType].bg,
+                                                        color: STATUS_COLORS[lead.leadType].text,
+                                                        border: `1px solid ${STATUS_COLORS[lead.leadType].border}`
+                                                    }}>
+                                                        {lead.leadType.replace(' Lead', '')}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            {(lead.phoneNumber || lead.email) && (
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
+                                                    {lead.phoneNumber && (
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                            <span style={{ opacity: 0.6 }}>📞</span> {lead.phoneNumber}
+                                                        </div>
+                                                    )}
+                                                    {lead.email && (
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                            <span style={{ opacity: 0.6 }}>📧</span> {lead.email}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            {lead.notes && (
+                                                <p style={{
+                                                    fontSize: '0.75rem',
+                                                    color: 'var(--text-tertiary)',
+                                                    lineHeight: 1.5,
+                                                    marginBottom: 12,
+                                                    overflow: 'hidden',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    background: 'var(--bg-secondary)',
+                                                    padding: '6px 8px',
+                                                    borderRadius: 6
+                                                }}>
+                                                    {lead.notes}
+                                                </p>
+                                            )}
+
+                                            <div className="kanban-card-footer" style={{ marginTop: 'auto', paddingTop: 10, borderTop: '1px solid var(--border-light)' }}>
                                                 <div style={{ display: 'flex', gap: 6 }}>
-                                                    {STAGES.filter(s => s.id !== stage.id).slice(0, 2).map(s => (
+                                                    {STAGES.filter(s => s.id !== stage.id && s.id !== 'new' && s.id !== 'followup' && s.id !== 'meeting' && s.id !== 'proposal' && s.id !== 'closed').slice(0, 3).map(s => (
                                                         <button
                                                             key={s.id}
                                                             onClick={() => handleMoveStage(lead._id, s.id)}
-                                                            style={{ fontSize: '0.6875rem', padding: '3px 7px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer', color: 'var(--text-secondary)', fontWeight: 600, transition: 'all 0.15s' }}
+                                                            style={{
+                                                                fontSize: '0.6875rem',
+                                                                padding: '4px 8px',
+                                                                background: 'var(--bg-secondary)',
+                                                                border: '1px solid var(--border)',
+                                                                borderRadius: 6,
+                                                                cursor: 'pointer',
+                                                                color: 'var(--text-secondary)',
+                                                                fontWeight: 600,
+                                                                transition: 'all 0.15s',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 4
+                                                            }}
+                                                            onMouseEnter={e => e.currentTarget.style.borderColor = s.color}
+                                                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
                                                             title={`Move to ${s.label}`}
-                                                        >{s.emoji}</button>
+                                                        >
+                                                            {s.emoji}
+                                                        </button>
                                                     ))}
                                                 </div>
                                                 {lead.followUpDate && (
-                                                    <span style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>
+                                                    <span style={{
+                                                        fontSize: '0.6875rem',
+                                                        fontWeight: 700,
+                                                        color: new Date(lead.followUpDate) < new Date() ? 'var(--danger)' : 'var(--text-tertiary)',
+                                                        background: 'var(--bg-secondary)',
+                                                        padding: '2px 6px',
+                                                        borderRadius: 4
+                                                    }}>
                                                         📅 {new Date(lead.followUpDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                                                     </span>
                                                 )}
