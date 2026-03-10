@@ -104,7 +104,7 @@ export default function DashboardPage() {
   // Rates derived from leads
   const meetingRate = totalLeads > 0 ? (meetingLeads.length / totalLeads * 100).toFixed(1) : '0';
   const closeRate = totalLeads > 0 ? (closedLeads.length / totalLeads * 100).toFixed(1) : '0';
-  const ghostRate = totalLeads > 0 ? (ghostedLeads.length / totalLeads * 100).toFixed(1) : '0';
+  const ghostRate = totalLeads > 0 ? ((ghostedLeads.length + leads.filter(l => getStage(l) === 'no show up').length) / totalLeads * 100).toFixed(1) : '0';
 
   // Also keep totalSent from outreach logs for outreach-sent KPI only
   const totalSent = outreachStats?.totalSent || 0;
@@ -117,20 +117,20 @@ export default function DashboardPage() {
   });
 
   const doughnutData = {
-    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'Meeting Details (Not Converted)'],
+    labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'No Show Up', 'Meeting Details (Not Converted)'],
     datasets: [{
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertedMeetingLeads.length],
-      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#f97316'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, leads.filter(l => getStage(l) === 'no show up').length, notConvertedMeetingLeads.length],
+      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#ff3b30', '#f97316'],
       borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
   const funnelData = {
-    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted', 'Not Converted'],
+    labels: ['All Leads', 'Meetings Booked', 'Closed Won', 'Ghosted', 'No Show Up', 'Not Converted'],
     datasets: [{
       label: 'Leads',
-      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, notConvertedMeetingLeads.length],
-      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(249,115,22,0.4)'],
+      data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, leads.filter(l => getStage(l) === 'no show up').length, notConvertedMeetingLeads.length],
+      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(255,59,48,0.5)', 'rgba(249,115,22,0.4)'],
       borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
@@ -272,15 +272,15 @@ export default function DashboardPage() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 4, textAlign: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Sent</div>
+                      <div className="form-label-premium" style={{ marginBottom: 0 }}>sent</div>
                       <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{ch.sent.toLocaleString()}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Replies</div>
+                      <div className="form-label-premium" style={{ marginBottom: 0 }}>replies</div>
                       <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--success)' }}>{ch.replies.toLocaleString()}</div>
                     </div>
                     <div>
-                      <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase' }}>Rate</div>
+                      <div className="form-label-premium" style={{ marginBottom: 0 }}>rate</div>
                       <div style={{ fontWeight: 800, fontSize: '0.9rem', color: replyRate !== '0.0' ? 'var(--accent)' : 'var(--text-tertiary)' }}>{replyRate}%</div>
                     </div>
                   </div>

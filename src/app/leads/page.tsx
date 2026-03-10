@@ -23,7 +23,8 @@ const PIPELINE_STAGE_OPTIONS = [
         label: 'Complete / Dead', options: [
             { value: 'ghosted', label: 'Ghosted' },
             { value: 'meeting booked not convert', label: 'Meeting Booked Not Convert' },
-            { value: 'not interested', label: 'Not Interested' }
+            { value: 'not interested', label: 'Not Interested' },
+            { value: 'no show up', label: 'No Show Up' }
         ]
     },
     {
@@ -617,17 +618,17 @@ export default function LeadsPage() {
                     <table className="data-table">
                         <thead>
                             <tr>
-                                <th>Added On</th>
-                                <th>Lead Date</th>
-                                <th>Company</th>
-                                <th>Channel</th>
-                                <th>Prospect</th>
-                                <th>Lead Type</th>
-                                <th>Pipeline Stage</th>
-                                <th>Follow-up</th>
-                                <th>Phone</th>
-                                <th style={{ minWidth: 200 }}>Notes</th>
-                                <th>Actions</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>added on</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>lead date</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>company</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>channel</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>prospect</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>lead type</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>pipeline stage</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>follow-up</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>phone</th>
+                                <th className="form-label-premium" style={{ minWidth: 200, border: 'none', background: 'transparent' }}>notes</th>
+                                <th className="form-label-premium" style={{ border: 'none', background: 'transparent' }}>actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -935,19 +936,17 @@ export default function LeadsPage() {
 
             {/* ===== RESPONSIVE NEW LEAD MODAL ===== */}
             {showModal && (
-                <div className="glass-overlay" onClick={() => setShowModal(false)}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
-                        <div className="glass-modal-header">
+                <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
                             <div>
-                                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>✨ New Lead</h2>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>Click fields to edit — Company Name required</p>
+                                <h1 className="modal-title">✨ New Lead</h1>
+                                <p className="modal-subtitle">Click fields to edit — Company Name required</p>
                             </div>
-                            <button type="button" className="modal-close" onClick={() => setShowModal(false)}>
-                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
-                            </button>
+                            <button type="button" className="modal-close" onClick={() => setShowModal(false)}>×</button>
                         </div>
 
-                        <div className="glass-modal-body">
+                        <div className="modal-body">
                             <div style={{ borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
 
                                 {/* Source Channel */}
@@ -955,7 +954,7 @@ export default function LeadsPage() {
                                     <div className="notion-label">
                                         <span style={{ fontSize: 18 }}>📡</span>
                                         <div>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>Source Channel</span>
+                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>source channel</span>
                                             <span style={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 600 }}>Auto-logs a reply ✓</span>
                                         </div>
                                     </div>
@@ -978,7 +977,7 @@ export default function LeadsPage() {
                                     <div className="notion-label">
                                         <span style={{ fontSize: 18 }}>🗓️</span>
                                         <div>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>Lead Date</span>
+                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>lead date</span>
                                             <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>When did this happen?</span>
                                         </div>
                                     </div>
@@ -1003,8 +1002,8 @@ export default function LeadsPage() {
                                     <div className="notion-row" key={field.key}>
                                         <div className="notion-label">
                                             <span style={{ fontSize: 18 }}>{field.icon}</span>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                                                {field.label}
+                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>
+                                                {field.label.toLowerCase()}
                                                 {field.required && <span style={{ color: 'var(--danger)', marginLeft: 4 }}>*</span>}
                                             </span>
                                         </div>
@@ -1024,7 +1023,7 @@ export default function LeadsPage() {
                                 <div className="notion-row">
                                     <div className="notion-label">
                                         <span style={{ fontSize: 18 }}>🏷️</span>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Lead Status</span>
+                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>lead status</span>
                                     </div>
                                     <div className="notion-input-wrap">
                                         {LEAD_TYPES.map(t => {
@@ -1047,7 +1046,7 @@ export default function LeadsPage() {
                                 <div className="notion-row" style={{ alignItems: 'flex-start' }}>
                                     <div className="notion-label" style={{ minHeight: '100px' }}>
                                         <span style={{ fontSize: 18, marginTop: 2 }}>📝</span>
-                                        <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Call Notes</span>
+                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>call notes</span>
                                     </div>
                                     <div className="notion-input-wrap" style={{ alignItems: 'flex-start' }}>
                                         <textarea
@@ -1063,11 +1062,11 @@ export default function LeadsPage() {
                             </div>
                         </div>
 
-                        <div className="glass-modal-footer">
+                        <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
                             <button
                                 type="button"
-                                className="btn btn-primary"
+                                className="btn btn-premium"
                                 disabled={!form.companyName.trim() || saving}
                                 onClick={handleSubmit}
                             >
@@ -1080,9 +1079,9 @@ export default function LeadsPage() {
 
             {/* RESPONSIVE LEAD DETAIL MODAL */}
             {selectedLead && (
-                <div className="glass-overlay" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()}>
-                        <div className="glass-modal-header">
+                <div className="modal-overlay" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
+                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                                 <div className="avatar avatar-md avatar-gradient-1" style={{ fontSize: '1.2rem', width: 44, height: 44 }}>{selectedLead.companyName?.[0]}</div>
                                 {isEditingExisting ? (
@@ -1110,7 +1109,7 @@ export default function LeadsPage() {
                                         <div className="notion-label">
                                             <span style={{ fontSize: 18 }}>📡</span>
                                             <div>
-                                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>Source Channel</span>
+                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>source channel</span>
                                             </div>
                                         </div>
                                         <div className="notion-input-wrap">
@@ -1132,7 +1131,7 @@ export default function LeadsPage() {
                                         <div className="notion-label">
                                             <span style={{ fontSize: 18 }}>🗓️</span>
                                             <div>
-                                                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', display: 'block' }}>Lead Date</span>
+                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>lead date</span>
                                             </div>
                                         </div>
                                         <div className="notion-input-wrap">
@@ -1154,8 +1153,8 @@ export default function LeadsPage() {
                                         <div className="notion-row" key={field.key}>
                                             <div className="notion-label">
                                                 <span style={{ fontSize: 18 }}>{field.icon}</span>
-                                                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                                                    {field.label}
+                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>
+                                                    {field.label.toLowerCase()}
                                                 </span>
                                             </div>
                                             <div className="notion-input-wrap">
@@ -1174,7 +1173,7 @@ export default function LeadsPage() {
                                     <div className="notion-row">
                                         <div className="notion-label">
                                             <span style={{ fontSize: 18 }}>🏷️</span>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Lead Status</span>
+                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>lead status</span>
                                         </div>
                                         <div className="notion-input-wrap">
                                             {LEAD_TYPES.map(t => {
@@ -1197,7 +1196,7 @@ export default function LeadsPage() {
                                     <div className="notion-row" style={{ alignItems: 'flex-start' }}>
                                         <div className="notion-label" style={{ minHeight: '100px' }}>
                                             <span style={{ fontSize: 18, marginTop: 2 }}>📝</span>
-                                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Call Notes</span>
+                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>call notes</span>
                                         </div>
                                         <div className="notion-input-wrap" style={{ alignItems: 'flex-start' }}>
                                             <textarea
@@ -1244,7 +1243,7 @@ export default function LeadsPage() {
                                     <div style={{ marginBottom: 16 }}>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                                             <div>
-                                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 12, fontWeight: 700 }}>🔄 Update Status</div>
+                                                <div className="form-label-premium">🔄 update status</div>
                                                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                                                     {LEAD_TYPES.map(t => {
                                                         const sc = STATUS_CONFIG[t];
@@ -1267,7 +1266,7 @@ export default function LeadsPage() {
                                                 </div>
                                             </div>
                                             <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: 16 }}>
-                                                <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 12, fontWeight: 700 }}>📍 Pipeline Stage</div>
+                                                <div className="form-label-premium">📍 pipeline stage</div>
                                                 <select
                                                     className="filter-select"
                                                     value={selectedLead.pipelineStage || 'new'}
@@ -1289,17 +1288,17 @@ export default function LeadsPage() {
 
                         </div>
 
-                        <div className="glass-modal-footer" style={{ justifyContent: 'space-between' }}>
+                        <div className="modal-footer">
                             {isEditingExisting ? (
                                 <>
                                     <button type="button" className="btn btn-secondary" onClick={() => setIsEditingExisting(false)}>Cancel Edit</button>
-                                    <button type="button" className="btn btn-primary" onClick={handleSaveExistingLead} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
+                                    <button type="button" className="btn btn-premium" onClick={handleSaveExistingLead} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
                                 </>
                             ) : (
                                 <>
                                     <div style={{ display: 'flex', gap: 10 }}>
                                         <button type="button" className="btn btn-secondary" onClick={() => { setEditForm(selectedLead); setIsEditingExisting(true); }}>✏️ Edit Lead Details</button>
-                                        <button type="button" className="btn btn-secondary" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteLead(selectedLead._id)}>🗑️ Delete</button>
+                                        <button type="button" className="btn" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteLead(selectedLead._id)}>🗑️ Delete</button>
                                     </div>
                                     {selectedLead.phoneNumber && (
                                         <div style={{ display: 'flex', gap: 10 }}>

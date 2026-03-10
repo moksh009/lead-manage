@@ -99,7 +99,7 @@ function ServiceEditor({ services, onChange }: { services: any[]; onChange: (s: 
                                             {selected && (
                                                 <div style={{ padding: '8px 16px 12px 48px', background: 'rgba(0,113,227,0.04)', borderTop: '1px solid var(--border)' }} onClick={e => e.stopPropagation()}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600, whiteSpace: 'nowrap' }}>Custom price (₹):</span>
+                                                        <span className="form-label-premium" style={{ marginBottom: 0, whiteSpace: 'nowrap' }}>custom price (₹):</span>
                                                         <input
                                                             type="number"
                                                             min="0"
@@ -410,7 +410,7 @@ export default function ClientsPage() {
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: 14 }}>
-                                    <label className="form-label">Amount Received (₹) *</label>
+                                    <label className="form-label-premium">amount received (₹) *</label>
                                     <input
                                         type="number" required min="1"
                                         className="form-input"
@@ -421,7 +421,7 @@ export default function ClientsPage() {
                                     />
                                 </div>
                                 <div className="form-group" style={{ marginBottom: 14 }}>
-                                    <label className="form-label">Payment Date *</label>
+                                    <label className="form-label-premium">payment date *</label>
                                     <input
                                         type="date" required
                                         className="form-input"
@@ -430,7 +430,7 @@ export default function ClientsPage() {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Note (optional)</label>
+                                    <label className="form-label-premium">note (optional)</label>
                                     <input
                                         type="text"
                                         className="form-input"
@@ -442,7 +442,7 @@ export default function ClientsPage() {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setBillingClient(null)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary" disabled={billingSaving} style={{ background: 'var(--success)', boxShadow: '0 2px 8px rgba(48,209,88,0.3)' }}>
+                                <button type="submit" className="btn btn-premium" disabled={billingSaving} style={{ background: 'var(--success)', boxShadow: '0 2px 8px rgba(48,209,88,0.3)' }}>
                                     {billingSaving ? '⏳ Saving...' : '✓ Confirm Payment'}
                                 </button>
                             </div>
@@ -597,32 +597,32 @@ function ClientFormModal({
 
                         {/* Client Info */}
                         <div style={{ marginBottom: 20 }}>
-                            <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>Client Info</div>
+                            <div className="form-label-premium">client info</div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, marginBottom: 12 }}>
                                 <div className="form-group">
-                                    <label className="form-label">Business Name *</label>
+                                    <label className="form-label-premium">business name *</label>
                                     <input className="form-input" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Choice Salon" />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Contact Person</label>
+                                    <label className="form-label-premium">contact person</label>
                                     <input className="form-input" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} placeholder="Owner / Admin name" />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Email</label>
+                                    <label className="form-label-premium">email</label>
                                     <input className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="client@email.com" />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Phone</label>
+                                    <label className="form-label-premium">phone</label>
                                     <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 900 000 0000" />
                                 </div>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                                 <div className="form-group">
-                                    <label className="form-label">Joining Date</label>
+                                    <label className="form-label-premium">joining date</label>
                                     <input className="form-input" type="date" value={form.joiningDate} onChange={e => setForm({ ...form, joiningDate: e.target.value })} />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Status</label>
+                                    <label className="form-label-premium">status</label>
                                     <select className="form-input" value={form.isActive ? 'active' : 'inactive'} onChange={e => setForm({ ...form, isActive: e.target.value === 'active' })}>
                                         <option value="active">✅ Active</option>
                                         <option value="inactive">❌ Inactive</option>
@@ -634,7 +634,7 @@ function ClientFormModal({
                         {/* Services Catalog */}
                         <div style={{ marginBottom: 20 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Services</div>
+                                <div className="form-label-premium">services</div>
                                 {formMonthlyFee > 0 && (
                                     <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>
                                         Total: ₹{formMonthlyFee.toLocaleString()}/mo
@@ -646,14 +646,14 @@ function ClientFormModal({
 
                         {/* Notes */}
                         <div className="form-group">
-                            <label className="form-label">Notes (optional)</label>
+                            <label className="form-label-premium">notes (optional)</label>
                             <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any special terms, agreements, or context..." />
                         </div>
                     </div>
 
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn btn-primary">
+                        <button type="submit" className="btn btn-premium">
                             {isEdit ? '✓ Save Changes' : '✓ Add Client'}
                         </button>
                     </div>

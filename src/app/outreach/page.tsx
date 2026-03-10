@@ -148,8 +148,8 @@ export default function OutreachPage() {
 
             {/* Date Picker */}
             <div className="card card-p" style={{ marginBottom: 16 }}>
-                <label className="form-label" style={{ marginBottom: 8, display: 'block', fontSize: '0.8125rem', fontWeight: 700 }}>
-                    📅 Select Date
+                <label className="form-label-premium">
+                    📅 select date
                 </label>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                     <input
@@ -208,8 +208,8 @@ export default function OutreachPage() {
                         padding: '8px 24px',
                         background: 'var(--bg-tertiary)',
                         borderBottom: '1px solid var(--border)',
-                        fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-tertiary)',
-                        textTransform: 'uppercase', letterSpacing: '0.07em'
+                        fontSize: '10px', fontWeight: 900, color: 'var(--text-tertiary)',
+                        textTransform: 'lowercase', letterSpacing: '-0.01em'
                     }}>
                         <span>Channel</span>
                         <span style={{ textAlign: 'center' }}>Sent</span>
@@ -318,7 +318,7 @@ export default function OutreachPage() {
                         )}
                         <button
                             type="submit"
-                            className="btn btn-primary btn-lg"
+                            className="btn btn-premium btn-lg"
                             disabled={saveStatus === 'saving'}
                             style={{ minWidth: 160 }}
                         >

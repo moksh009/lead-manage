@@ -378,24 +378,24 @@ export default function TeamGoalsPage() {
                             <div className="modal-body">
                                 <div className="form-row cols-2 mb-4">
                                     <div className="form-group">
-                                        <label className="form-label">Team Member *</label>
+                                        <label className="form-label-premium">Team Member *</label>
                                         <select className="form-input" value={form.user} onChange={e => setForm({ ...form, user: e.target.value as User })}>
                                             {USERS.map(u => <option key={u} value={u}>{u}</option>)}
                                         </select>
                                     </div>
                                     <div className="form-group">
-                                        <label className="form-label">Date</label>
+                                        <label className="form-label-premium">Date</label>
                                         <input type="date" className="form-input" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
                                     </div>
                                 </div>
                                 <div className="form-group mb-5">
-                                    <label className="form-label">Time Joined Office *</label>
+                                    <label className="form-label-premium">Time Joined Office *</label>
                                     <input type="time" className="form-input" required value={form.timeJoinedOffice} onChange={e => setForm({ ...form, timeJoinedOffice: e.target.value })} />
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                                        <span>Daily Tasks *</span>
+                                    <label className="form-label-premium" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                        <span>daily tasks *</span>
                                         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 400 }}>Break down your day</span>
                                     </label>
 
@@ -436,7 +436,7 @@ export default function TeamGoalsPage() {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary">Save Log</button>
+                                <button type="submit" className="btn btn-premium">Save Log</button>
                             </div>
                         </form>
                     </div>

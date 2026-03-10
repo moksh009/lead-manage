@@ -740,6 +740,30 @@ h5 {
   transform: translateY(-1px);
 }
 
+/* Premium UI Logic */
+.form-label-premium {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: lowercase;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.btn-premium {
+  background: var(--accent-gradient) !important;
+  color: white !important;
+  font-weight: 700;
+  box-shadow: var(--shadow-accent);
+}
+
+.btn-premium:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -5px rgba(37, 99, 235, 0.3);
+}
+
 .btn-secondary {
   background: var(--surface);
   color: var(--text-primary);
@@ -1006,11 +1030,15 @@ h5 {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  /* Changed from center to align to top */
   justify-content: center;
   z-index: 1500;
   animation: fadeInOverlay 0.18s ease;
-  padding: 24px;
+  padding: 40px 24px;
+  /* Changed from 24px to 40px top/bottom */
+  overflow-y: auto;
+  /* Allow overlay itself to scroll if modal is very tall */
 }
 
 .modal {
@@ -1020,11 +1048,13 @@ h5 {
   border: 1px solid var(--border);
   width: 100%;
   max-width: 560px;
-  max-height: 90vh;
+  max-height: calc(100vh - 80px);
+  /* Adjust for 40px top/bottom padding */
   display: flex;
   flex-direction: column;
   animation: slideUpModal 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  margin: auto;
+  margin: 0 auto;
+  /* Changed from margin: auto to only horizontal center */
   flex-shrink: 0;
 }
 
@@ -1796,11 +1826,11 @@ h5 {
   left: 0;
   right: 0;
   height: 56px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  z-index: 200;
+  z-index: 500;
   align-items: center;
   padding: 0 16px;
   gap: 12px;
@@ -1859,7 +1889,7 @@ h5 {
 
   /* Show mobile header */
   .mobile-header {
-    display: flex;
+    display: flex !important;
   }
 
   /* Show sidebar overlay when open */

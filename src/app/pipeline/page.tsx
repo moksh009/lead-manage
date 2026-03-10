@@ -16,6 +16,7 @@ const STAGES = [
     { id: 'ghosted', label: 'Ghosted', color: '#6b7280', emoji: '👻' },
     { id: 'meeting booked not convert', label: 'Meeting Booked Not Convert', color: '#f97316', emoji: '⚠️' },
     { id: 'not interested', label: 'Not Interested', color: '#dc2626', emoji: '🔴' },
+    { id: 'no show up', label: 'No Show Up', color: '#ff3b30', emoji: '🚫' },
 
     // Legacy (keep for fallback)
     { id: 'new', label: 'New', color: '#6e6e73', emoji: '🆕' },
@@ -81,13 +82,13 @@ export default function PipelinePage() {
 
             {/* Summary Bar */}
             <div className="card card-p" style={{ marginBottom: 24 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 0 }}>
-                    {STAGES.map((stage, idx) => {
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
+                    {STAGES.filter(s => s.id !== 'new' && s.id !== 'followup' && s.id !== 'meeting' && s.id !== 'proposal' && s.id !== 'closed').map((stage, idx) => {
                         const count = groupedLeads[stage.id]?.length || 0;
                         const pct = leads.length > 0 ? (count / leads.length * 100) : 0;
                         return (
-                            <div key={stage.id} style={{ textAlign: 'center', padding: '0 8px', borderRight: idx < STAGES.length - 1 ? '1px solid var(--border)' : 'none' }}>
-                                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage.label}</div>
+                            <div key={stage.id} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                                <div className="form-label-premium" style={{ marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage.label}</div>
                                 <div style={{ fontWeight: 800, fontSize: '1.25rem', color: stage.color }}>{count}</div>
                                 <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>{pct.toFixed(0)}%</div>
                             </div>

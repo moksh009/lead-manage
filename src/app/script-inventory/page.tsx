@@ -157,17 +157,23 @@ export default function ScriptInventoryPage() {
 
             {/* Modal */}
             {showModal && (
-                <div className="glass-overlay" onClick={() => setShowModal(false)} style={{ zIndex: 1000 }}>
-                    <div className="glass-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 600, width: '90%' }}>
-                        <div className="glass-modal-header">
-                            <h2 className="modal-title">{editingScript ? '✏️ Edit Script' : '✨ Create New Script'}</h2>
-                            <button className="btn-close" onClick={() => setShowModal(false)}>×</button>
+                <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div>
+                                <h2 className="modal-title">{editingScript ? '✏️ Edit Script' : '✨ Create New Script'}</h2>
+                                <p className="modal-subtitle">
+                                    {editingScript ? 'Update your script details below.' : 'Design a new high-converting outreach template.'}
+                                </p>
+                            </div>
+                            <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
                         </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="glass-modal-body">
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                    <div>
-                                        <label className="form-label">Script Title</label>
+
+                        <form onSubmit={handleSubmit} className="flex-col h-full overflow-hidden">
+                            <div className="modal-body">
+                                <div className="form-section">
+                                    <div className="form-group">
+                                        <label className="form-label-premium">Script Title</label>
                                         <input
                                             className="form-input"
                                             placeholder="e.g. Intro Hook - High Ticket"
@@ -175,42 +181,46 @@ export default function ScriptInventoryPage() {
                                             onChange={e => setForm({ ...form, title: e.target.value })}
                                             required
                                         />
+                                        <span className="form-hint">Give your script a descriptive name to find it easily later.</span>
                                     </div>
-                                    <div className="grid-2">
-                                        <div>
-                                            <label className="form-label">Target Channel</label>
-                                            <select
-                                                className="filter-select"
-                                                value={form.channel}
-                                                onChange={e => setForm({ ...form, channel: e.target.value as Channel })}
-                                                style={{ width: '100%' }}
-                                                required
-                                            >
-                                                <option value="instagram">Instagram</option>
-                                                <option value="whatsapp">WhatsApp</option>
-                                                <option value="email">Email</option>
-                                                <option value="call">Call</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
+
+                                    <div className="form-group">
+                                        <label className="form-label-premium">Target Channel</label>
+                                        <select
+                                            className="form-input"
+                                            value={form.channel}
+                                            onChange={e => setForm({ ...form, channel: e.target.value as Channel })}
+                                            required
+                                        >
+                                            <option value="instagram">📸 Instagram</option>
+                                            <option value="whatsapp">💬 WhatsApp</option>
+                                            <option value="email">✉️ Email</option>
+                                            <option value="call">📞 Call</option>
+                                            <option value="other">📄 Other</option>
+                                        </select>
                                     </div>
-                                    <div>
-                                        <label className="form-label">Content</label>
+
+                                    <div className="form-group">
+                                        <label className="form-label-premium">Content</label>
                                         <textarea
                                             className="form-input"
                                             placeholder="Paste your script here..."
                                             value={form.content}
                                             onChange={e => setForm({ ...form, content: e.target.value })}
-                                            rows={12}
-                                            style={{ resize: 'vertical', minHeight: 200, lineHeight: 1.6 }}
+                                            rows={10}
+                                            style={{ resize: 'vertical', minHeight: 180, lineHeight: 1.6 }}
                                             required
                                         />
+                                        <span className="form-hint">Tip: Use placeholders like [Name] or [Company] to personalize your outreach.</span>
                                     </div>
                                 </div>
                             </div>
-                            <div className="glass-modal-footer">
+
+                            <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button type="submit" className="btn btn-primary">{editingScript ? 'Save Changes' : 'Create Script'}</button>
+                                <button type="submit" className="btn btn-premium">
+                                    {editingScript ? 'Save Changes' : 'Create Script'}
+                                </button>
                             </div>
                         </form>
                     </div>
