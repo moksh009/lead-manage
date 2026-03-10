@@ -164,7 +164,7 @@ export default function AnalyticsPage() {
                     { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', color: '#dc2626', bg: '#fef2f2' },
                     { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff' },
                 ].map(s => (
-                    <div key={s.label} className="stat-card card-hover">
+                    <div key={s.label} className="stat-card card-hover" style={{ borderRadius: 'var(--radius-xl)' }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
                         <div className="stat-label">{s.label}</div>
                         <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.value.toLocaleString()}</div>
@@ -190,7 +190,7 @@ export default function AnalyticsPage() {
                             { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, color: '#2563eb', bg: '#eff6ff', border: 'rgba(37,99,235,0.2)' },
                             { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, color: '#16a34a', bg: '#f0fdf4', border: 'rgba(22,163,74,0.2)' },
                         ].map(r => (
-                            <div key={r.label} className="card card-p" style={{ background: r.bg, border: `1px solid ${r.border}`, textAlign: 'center' }}>
+                            <div key={r.label} className="card card-p card-hover" style={{ background: r.bg, border: `1px solid ${r.border}`, textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
                                 <div style={{ fontSize: '2rem', fontWeight: 800, color: r.color, letterSpacing: '-0.04em' }}>{r.val}</div>
                                 <div style={{ fontWeight: 700, fontSize: '0.875rem', marginTop: 4 }}>{r.label}</div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 3 }}>{r.sub}</div>
@@ -213,7 +213,7 @@ export default function AnalyticsPage() {
                             ].map(ch => {
                                 const rate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
                                 return (
-                                    <div key={ch.label} style={{ padding: '12px 16px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                                    <div key={ch.label} style={{ padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)' }} className="card-hover">
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
                                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: ch.color }} />
                                             <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>

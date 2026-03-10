@@ -4,14 +4,14 @@
    ========================================= */
 
 :root {
-  /* Core background — subtle warm off-white */
-  --bg: #f8f8f7;
-  --bg-secondary: #f3f3f1;
-  --bg-tertiary: #eeeeeb;
+  /* Core background — solid cool/Apple-style light */
+  --bg: #f5f5f7;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f0f0f2;
   --surface: #ffffff;
-  --surface-hover: #f7f7f5;
-  --border: rgba(55, 53, 47, 0.09);
-  --border-medium: rgba(55, 53, 47, 0.16);
+  --surface-hover: #fafafa;
+  --border: rgba(0, 0, 0, 0.06);
+  --border-medium: rgba(0, 0, 0, 0.12);
 
   /* Text — deep readable tones */
   --text-primary: #111110;
@@ -44,27 +44,27 @@
   /* Layout */
   --sidebar-width: 250px;
   --header-height: 60px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
   --radius-full: 9999px;
 
-  /* Shadows — layered depth */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 36px rgba(0, 0, 0, 0.09), 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 56px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-accent: 0 8px 24px rgba(37, 99, 235, 0.25);
-  --shadow-purple: 0 8px 24px rgba(124, 58, 237, 0.22);
-  --shadow-card: 0 0 0 1px rgba(55, 53, 47, 0.09), 0 2px 8px rgba(0, 0, 0, 0.05);
+  /* Shadows — layered depth, Apple-style soft blurs */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-float: 0 12px 36px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-accent: 0 8px 32px rgba(37, 99, 235, 0.2);
+  --shadow-purple: 0 8px 32px rgba(124, 58, 237, 0.18);
+  --shadow-card: 0 0 0 1px rgba(55, 53, 47, 0.05), 0 4px 16px rgba(0, 0, 0, 0.04);
 
-  /* Transitions */
-  --t-fast: 0.15s ease;
-  --t-base: 0.22s ease;
-  --t-slow: 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Transitions — snappy spring-like cubic bezier */
+  --t-fast: 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  --t-base: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  --t-slow: 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Reset */
@@ -285,6 +285,7 @@ h5 {
 .nav-item:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
+  transform: translateX(2px);
 }
 
 .nav-item.active {
@@ -432,6 +433,7 @@ h5 {
   height: 220px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
+  filter: blur(30px);
 }
 
 .page-hero::after {
@@ -443,6 +445,7 @@ h5 {
   height: 180px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.05);
+  filter: blur(20px);
 }
 
 .page-hero-title {
@@ -508,10 +511,12 @@ h5 {
    ================================ */
 
 .card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-xs);
+  box-shadow: var(--shadow-sm);
   transition: box-shadow var(--t-base), transform var(--t-base);
 }
 
@@ -555,10 +560,12 @@ h5 {
   border: 1px solid var(--border);
   padding: 22px 24px;
   box-shadow: var(--shadow-sm);
-  transition: all var(--t-base);
   cursor: default;
   position: relative;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .stat-card::after {
@@ -926,21 +933,23 @@ h5 {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   text-align: left;
   white-space: nowrap;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
 }
 
 .data-table th:first-child {
-  border-radius: var(--radius) 0 0 0;
+  border-radius: var(--radius-lg) 0 0 0;
 }
 
 .data-table th:last-child {
-  border-radius: 0 var(--radius) 0 0;
+  border-radius: 0 var(--radius-lg) 0 0;
 }
 
 .data-table td {
@@ -956,8 +965,12 @@ h5 {
   border-bottom: none;
 }
 
+.data-table tr {
+  transition: all var(--t-fast);
+}
+
 .data-table tr:hover td {
-  background: var(--surface-hover);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .data-table tr td:first-child {
@@ -1328,6 +1341,7 @@ h5 {
 
 .tab:hover:not(.active) {
   color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 /* ================================
@@ -1423,8 +1437,10 @@ h5 {
 
 .kanban-col {
   flex: 0 0 280px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -1464,7 +1480,7 @@ h5 {
 .kanban-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 14px;
   cursor: pointer;
   transition: all var(--t-fast);

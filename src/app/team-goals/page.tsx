@@ -163,7 +163,7 @@ export default function TeamGoalsPage() {
                     { label: 'MOKSH Logs', value: goals.filter(g => g.user === 'MOKSH').length, icon: '👤', color: '#7c3aed', bg: '#faf5ff' },
                     { label: 'Smit Logs', value: goals.filter(g => g.user === 'smit').length, icon: '👤', color: '#0284c7', bg: '#f0f9ff' },
                 ].map(s => (
-                    <div key={s.label} className="stat-card card-hover">
+                    <div key={s.label} className="stat-card card-hover" style={{ borderRadius: 'var(--radius-xl)' }}>
                         <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
                         <div className="stat-label">{s.label}</div>
                         <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.value}</div>
@@ -189,7 +189,7 @@ export default function TeamGoalsPage() {
                         }
 
                         return (
-                            <div key={user} className="card card-p" style={{ border: entry ? '1.5px solid rgba(0,113,227,0.15)' : '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
+                            <div key={user} className="card card-p card-hover" style={{ border: entry ? '1.5px solid rgba(0,113,227,0.15)' : '1px solid var(--border)', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                                     <div className={`avatar avatar-md ${gradClass}`}>{user[0]}</div>
                                     <div style={{ flex: 1 }}>

@@ -101,7 +101,7 @@ export default function PipelinePage() {
                         const count = groupedLeads[stage.id]?.length || 0;
                         const pct = leads.length > 0 ? (count / leads.length * 100) : 0;
                         return (
-                            <div key={stage.id} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                            <div key={stage.id} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)' }} className="card-hover">
                                 <div className="form-label-premium" style={{ marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage.label}</div>
                                 <div style={{ fontWeight: 800, fontSize: '1.25rem', color: stage.color }}>{count}</div>
                                 <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>{pct.toFixed(0)}%</div>

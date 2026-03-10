@@ -204,7 +204,7 @@ export default function DashboardPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
             {todayGoals.map(g => (
-              <div key={g._id} style={{ background: 'white', borderRadius: 12, padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}>
+              <div key={g._id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius-xl)', padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', transition: 'transform var(--t-fast)' }} className="card-hover">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <div className={`avatar avatar-sm ${g.user === 'MOKSH' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
                   <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user}</span>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
             ].map(ch => {
               const replyRate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
               return (
-                <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div key={ch.label} style={{ padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'background var(--t-fast)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                     <div style={{ width: 7, height: 7, borderRadius: '50%', background: ch.color }} />
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
@@ -313,7 +313,7 @@ export default function DashboardPage() {
               { label: 'Close Rate', val: `${closeRate}%`, color: closeRate === '0' ? 'var(--text-tertiary)' : 'var(--accent)' },
               { label: 'Ghost Rate', val: `${ghostRate}%`, color: ghostRate === '0' ? 'var(--text-tertiary)' : '#6b7280' },
             ].map(r => (
-              <div key={r.label} style={{ textAlign: 'center', padding: '10px 0', borderRadius: 10, background: 'var(--bg-secondary)' }}>
+              <div key={r.label} style={{ textAlign: 'center', padding: '12px 4px', borderRadius: 'var(--radius-lg)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: r.color }}>{r.val}</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: 2, fontWeight: 500 }}>{r.label}</div>
               </div>
@@ -360,7 +360,7 @@ export default function DashboardPage() {
             ) : recentLeads.map(lead => {
               const sc = STATUS_COLORS[lead.leadType] || { bg: '#f9fafb', text: '#6b7280', border: 'rgba(0,0,0,0.1)' };
               return (
-                <div key={lead._id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: 'var(--bg-secondary)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div key={lead._id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)', cursor: 'pointer' }} className="card-hover">
                   <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>{(lead.companyName || '?')[0].toUpperCase()}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.companyName}</div>
@@ -395,10 +395,11 @@ export default function DashboardPage() {
               const isNear = daysUntil <= 3;
               return (
                 <div key={lead._id} style={{
-                  padding: '12px 14px', borderRadius: 12, border: '1px solid',
+                  padding: '14px 16px', borderRadius: 'var(--radius-xl)', border: '1px solid',
                   background: isUrgent ? '#fffbeb' : 'var(--bg-secondary)',
-                  borderColor: isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)'
-                }}>
+                  borderColor: isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)',
+                  transition: 'transform var(--t-fast)', cursor: 'pointer'
+                }} className="card-hover">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{lead.companyName}</div>

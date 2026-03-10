@@ -75,9 +75,18 @@ const InlineEditableInput = ({ value, type = "text", placeholder, field, leadId,
                 outline: 'none',
                 transition: 'all 0.15s'
             }}
-            onMouseEnter={e => e.currentTarget.style.border = '1px solid var(--border)'}
-            onMouseLeave={e => e.currentTarget.style.border = '1px solid transparent'}
-            onFocus={e => { e.currentTarget.style.border = '1px solid var(--accent)'; e.currentTarget.style.background = 'var(--surface)'; }}
+            onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(0,0,0,0.08)'; e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+            onMouseLeave={e => { e.currentTarget.style.border = '1px solid transparent'; e.currentTarget.style.background = 'transparent'; }}
+            onFocus={e => {
+                e.currentTarget.style.border = '1px solid var(--accent)';
+                e.currentTarget.style.background = 'var(--surface)';
+                e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-light)';
+            }}
+            onBlurCapture={e => {
+                e.currentTarget.style.border = '1px solid transparent';
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.boxShadow = 'none';
+            }}
         />
     )
 };
@@ -777,9 +786,18 @@ export default function LeadsPage() {
                                                         outline: 'none',
                                                         transition: 'all 0.15s'
                                                     }}
-                                                    onMouseEnter={e => e.currentTarget.style.border = '1px solid var(--border)'}
-                                                    onMouseLeave={e => e.currentTarget.style.border = '1px solid transparent'}
-                                                    onFocus={e => { e.currentTarget.style.border = '1px solid var(--accent)'; e.currentTarget.style.background = 'var(--surface)'; }}
+                                                    onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(0,0,0,0.08)'; e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.border = '1px solid transparent'; e.currentTarget.style.background = 'transparent'; }}
+                                                    onFocus={e => {
+                                                        e.currentTarget.style.border = '1px solid var(--accent)';
+                                                        e.currentTarget.style.background = 'var(--surface)';
+                                                        e.currentTarget.style.boxShadow = '0 0 0 3px var(--accent-light)';
+                                                    }}
+                                                    onBlurCapture={e => {
+                                                        e.currentTarget.style.border = '1px solid transparent';
+                                                        e.currentTarget.style.background = 'transparent';
+                                                        e.currentTarget.style.boxShadow = 'none';
+                                                    }}
                                                 />
                                             </div>
                                         </td>
