@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
         return 'contacted';
     }
 
-    const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting'];
+    const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting', 'no show up'];
     const CLOSED_STAGES = ['closed won', 'closed', 'client'];
 
     const totalLeads = leads.length;

@@ -31,7 +31,6 @@ const PIPELINE_STAGE_OPTIONS = [
         label: 'Legacy', options: [
             { value: 'new', label: 'New' },
             { value: 'followup', label: 'Follow-up' },
-            { value: 'meeting', label: 'Meeting Set' },
             { value: 'proposal', label: 'Proposal Sent' },
             { value: 'closed', label: 'Client 🎉' }
         ]
@@ -265,6 +264,7 @@ export default function LeadsPage() {
         leadDate: new Date().toISOString().split('T')[0],
         followUpDate: '',
         notes: '',
+        pipelineStage: 'contacted',
     });
 
     const [form, setForm] = useState({
@@ -277,6 +277,7 @@ export default function LeadsPage() {
         leadDate: new Date().toISOString().split('T')[0],
         followUpDate: '',
         notes: '',
+        pipelineStage: 'contacted',
     });
 
     const fetchLeads = async () => {
@@ -336,12 +337,26 @@ export default function LeadsPage() {
                 })
             });
             setShowModal(false);
-            setForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'call', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
+            setForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'call', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '', pipelineStage: 'contacted' });
             fetchLeads();
         } catch (e) {
             console.error(e);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleMarkFollowUpDone = async (e: any, leadId: string) => {
+        e.stopPropagation();
+        try {
+            await fetch(`/api/leads/${leadId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ followUpDate: null })
+            });
+            setLeads(leads.map(l => l._id === leadId ? { ...l, followUpDate: null } : l));
+        } catch (err) {
+            console.error(err);
         }
     };
 
@@ -388,7 +403,7 @@ export default function LeadsPage() {
                 })
             });
             setIsInlineAdding(false);
-            setInlineForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'dm', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '' });
+            setInlineForm({ companyName: '', prospectName: '', phoneNumber: '', link: '', leadType: 'Soft lead', channel: 'dm', leadDate: new Date().toISOString().split('T')[0], followUpDate: '', notes: '', pipelineStage: 'contacted' });
             fetchLeads();
         } catch (e) {
             console.error(e);
@@ -869,7 +884,20 @@ export default function LeadsPage() {
                                         </select>
                                     </td>
                                     <td>
-                                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)' }}>New</div>
+                                        <select
+                                            className="filter-select"
+                                            value={inlineForm.pipelineStage}
+                                            onChange={e => setInlineForm({ ...inlineForm, pipelineStage: e.target.value })}
+                                            style={{ padding: '6px 8px', fontSize: '0.875rem', width: '100%' }}
+                                        >
+                                            {PIPELINE_STAGE_OPTIONS.map((group, i) => (
+                                                <optgroup key={i} label={group.label}>
+                                                    {group.options.map((opt: any) => (
+                                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
                                     </td>
                                     <td>
                                         <input
@@ -941,8 +969,18 @@ export default function LeadsPage() {
                                     </div>
                                 </div>
                                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                    <div style={{ fontWeight: 700, fontSize: '1.1rem', color: days <= 0 ? 'var(--danger)' : days <= 3 ? 'var(--warning)' : 'var(--text-primary)' }}>
-                                        {days < 0 ? `${Math.abs(days)}d overdue` : days === 0 ? 'Today!' : days === 1 ? 'Tomorrow' : `${days} days`}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end', marginBottom: 2 }}>
+                                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: days <= 0 ? 'var(--danger)' : days <= 3 ? 'var(--warning)' : 'var(--text-primary)' }}>
+                                            {days < 0 ? `🚨 ${Math.abs(days)}d overdue` : days === 0 ? '🔥 Today!' : days === 1 ? '⚡ Tomorrow' : `${days} days`}
+                                        </div>
+                                        <button
+                                            onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
+                                            style={{ background: 'rgba(52,211,153,0.15)', color: '#10b981', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.15s' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,211,153,0.25)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(52,211,153,0.15)'}
+                                        >
+                                            ✓ Done
+                                        </button>
                                     </div>
                                     <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{format(new Date(lead.followUpDate), 'MMM dd, yyyy')}</div>
                                 </div>
@@ -1036,6 +1074,30 @@ export default function LeadsPage() {
                                         </div>
                                     </div>
                                 ))}
+
+                                {/* Pipeline Stage */}
+                                <div className="notion-row">
+                                    <div className="notion-label">
+                                        <span style={{ fontSize: 18 }}>📍</span>
+                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>pipeline stage</span>
+                                    </div>
+                                    <div className="notion-input-wrap">
+                                        <select
+                                            className="notion-input"
+                                            value={form.pipelineStage}
+                                            onChange={e => setForm({ ...form, pipelineStage: e.target.value })}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {PIPELINE_STAGE_OPTIONS.map((group, i) => (
+                                                <optgroup key={i} label={group.label}>
+                                                    {group.options.map((opt: any) => (
+                                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
 
                                 {/* Status */}
                                 <div className="notion-row">
@@ -1291,12 +1353,13 @@ export default function LeadsPage() {
                                                     style={{ width: '100%', padding: '10px 14px', fontSize: '0.85rem', background: 'var(--surface)', color: 'var(--text-primary)', fontWeight: 600, border: '1px solid var(--border)', borderRadius: 10 }}
                                                     onChange={e => handleUpdatePipelineStage(selectedLead._id, e.target.value)}
                                                 >
-                                                    <option value="new">New</option>
-                                                    <option value="contacted">Contacted</option>
-                                                    <option value="followup">Follow-up</option>
-                                                    <option value="meeting">Meeting Set</option>
-                                                    <option value="proposal">Proposal Sent</option>
-                                                    <option value="closed">Client 🎉</option>
+                                                    {PIPELINE_STAGE_OPTIONS.map((group, i) => (
+                                                        <optgroup key={i} label={group.label}>
+                                                            {group.options.map((opt: any) => (
+                                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>

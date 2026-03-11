@@ -21,7 +21,6 @@ const STAGES = [
     // Legacy (keep for fallback)
     { id: 'new', label: 'New', color: '#6e6e73', emoji: '🆕' },
     { id: 'followup', label: 'Follow-up', color: '#ff9500', emoji: '🔄' },
-    { id: 'meeting', label: 'Meeting Set', color: '#5856d6', emoji: '📅' },
     { id: 'proposal', label: 'Proposal Sent', color: '#ff2d55', emoji: '📋' },
     { id: 'closed', label: 'Client 🎉', color: '#16a34a', emoji: '🤝' },
 ];

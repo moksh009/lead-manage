@@ -82,7 +82,7 @@ export default function DashboardPage() {
   }
 
   // Meetings = leads with meeting booked / meeting booked not convert stages
-  const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting'];
+  const MEETING_STAGES = ['meeting booked', 'meeting booked not convert', 'meeting', 'no show up'];
   const CLOSED_STAGES = ['closed won', 'closed', 'client'];
 
   const totalLeads = leads.length;
@@ -116,6 +116,20 @@ export default function DashboardPage() {
     return d.toDateString() === today.toDateString();
   });
 
+  const handleMarkFollowUpDone = async (e: any, leadId: string) => {
+    e.stopPropagation();
+    try {
+      await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ followUpDate: null })
+      });
+      setLeads(prev => prev.map(l => l._id === leadId ? { ...l, followUpDate: null } : l));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const doughnutData = {
     labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'No Show Up', 'Meeting Details (Not Converted)'],
     datasets: [{
@@ -147,7 +161,7 @@ export default function DashboardPage() {
 
   const recentLeads = [...leads].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 5);
   const upcomingFollowUps = leads
-    .filter(l => l.followUpDate && new Date(l.followUpDate) >= new Date())
+    .filter(l => l.followUpDate)
     .sort((a, b) => new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime())
     .slice(0, 5);
 
@@ -391,13 +405,14 @@ export default function DashboardPage() {
               </div>
             ) : upcomingFollowUps.map(lead => {
               const daysUntil = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-              const isUrgent = daysUntil <= 1;
-              const isNear = daysUntil <= 3;
+              const isOverdue = daysUntil < 0;
+              const isUrgent = daysUntil >= 0 && daysUntil <= 1;
+              const isNear = daysUntil > 1 && daysUntil <= 3;
               return (
                 <div key={lead._id} style={{
                   padding: '14px 16px', borderRadius: 'var(--radius-xl)', border: '1px solid',
-                  background: isUrgent ? '#fffbeb' : 'var(--bg-secondary)',
-                  borderColor: isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)',
+                  background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--bg-secondary)',
+                  borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)',
                   transition: 'transform var(--t-fast)', cursor: 'pointer'
                 }} className="card-hover">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -405,15 +420,22 @@ export default function DashboardPage() {
                       <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{lead.companyName}</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
                     </div>
-                    <span style={{
-                      fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: 99,
-                      background: isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
-                      color: isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
-                      border: `1px solid ${isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {daysUntil === 0 ? '🔥 Today!' : daysUntil === 1 ? '⚡ Tomorrow' : `📆 in ${daysUntil}d`}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{
+                        fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: 99,
+                        background: isOverdue ? '#fee2e2' : isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
+                        color: isOverdue ? 'var(--danger)' : isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
+                        border: `1px solid ${isOverdue ? 'rgba(220,38,38,0.4)' : isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {isOverdue ? `🚨 ${Math.abs(daysUntil)}d Overdue` : daysUntil === 0 ? '🔥 Today!' : daysUntil === 1 ? '⚡ Tomorrow' : `📆 in ${daysUntil}d`}
+                      </span>
+                      <button
+                        onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
+                        style={{ background: 'var(--success-light)', color: 'var(--success)', border: 'none', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.8rem' }}
+                        title="Mark as Done"
+                      >✓</button>
+                    </div>
                   </div>
                   {lead.notes && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.4 }}>{lead.notes.slice(0, 80)}{lead.notes.length > 80 ? '…' : ''}</p>}
                 </div>
