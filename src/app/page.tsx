@@ -417,7 +417,7 @@ export default function DashboardPage() {
                   transition: 'transform var(--t-fast)', cursor: 'pointer',
                   boxShadow: 'var(--shadow-xs)'
                 }} className="card-hover">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{lead.companyName}</div>
                       <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
