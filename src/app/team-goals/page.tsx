@@ -173,7 +173,7 @@ export default function TeamGoalsPage() {
 
             {/* Today's Cards */}
             <div style={{ marginBottom: 28 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
                     <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Today — {format(new Date(), 'EEEE, MMMM d')}</h2>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
@@ -213,7 +213,7 @@ export default function TeamGoalsPage() {
                                     </div>
                                 ) : (
                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 10 }}>
                                             <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Daily Tasks</div>
                                             {(entry.tasks && entry.tasks.length > 0 && editingGoalId !== entry._id) && (
                                                 <button onClick={() => startEditingTasks(entry)} style={{ background: 'none', border: 'none', fontSize: '0.75rem', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>✏️ Edit</button>
@@ -394,7 +394,7 @@ export default function TeamGoalsPage() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="form-label-premium" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                    <label className="form-label-premium" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'baseline' }}>
                                         <span>daily tasks *</span>
                                         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 400 }}>Break down your day</span>
                                     </label>

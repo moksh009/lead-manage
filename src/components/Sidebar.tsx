@@ -57,8 +57,9 @@ export default function Sidebar() {
             </header>
 
             {/* ── Overlay backdrop ── */}
-            {isMobile && mobileOpen && (
+            {mobileOpen && (
                 <div
+                    className="sidebar-overlay"
                     onClick={closeMobile}
                     style={{
                         position: 'fixed',
@@ -67,23 +68,14 @@ export default function Sidebar() {
                         zIndex: 299,
                         backdropFilter: 'blur(3px)',
                         WebkitBackdropFilter: 'blur(3px)',
+                        display: 'block'
                     }}
                 />
             )}
 
             {/* ── Sidebar ── */}
             <aside
-                className={`sidebar${collapsed && !isMobile ? ' sidebar-collapsed' : ''}`}
-                style={
-                    isMobile
-                        ? {
-                            transform: mobileOpen ? 'translateX(0)' : 'translateX(-110%)',
-                            transition: 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                            zIndex: 300,
-                            width: 'var(--sidebar-width)',
-                        }
-                        : {}
-                }
+                className={`sidebar ${collapsed && !isMobile ? ' sidebar-collapsed' : ''} ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
             >
                 {/* Logo */}
                 <div className="sidebar-logo">

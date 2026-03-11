@@ -195,7 +195,7 @@ export default function DashboardPage() {
           </div>
           <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Overview</h1>
           <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Performance metrics for MOKSH & Smit</p>
-          <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+          <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
             <Link href="/outreach">
               <button className="btn" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>📋 Add Daily Log</button>
             </Link>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
       {/* Today's Team Check-In */}
       {todayGoals.length > 0 && (
         <div className="card card-accent card-p animate-in" style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <div>
               <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>👥 Today's Team Check-In</h2>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Monday, March 9</p>
@@ -240,7 +240,7 @@ export default function DashboardPage() {
       <div className="stats-grid stagger-children" style={{ marginBottom: 32 }}>
         {statCards.map((card) => (
           <div key={card.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
               <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
                 {card.icon}
               </div>
@@ -262,7 +262,7 @@ export default function DashboardPage() {
       <div className="grid-2" style={{ marginBottom: 32 }}>
         {/* Channel Donut */}
         <div className="card animate-in" style={{ padding: '24px', animationDelay: '0.1s', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 24 }}>
             <div>
               <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Channel Breakdown</h2>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>{totalSent.toLocaleString()} total messages sent</p>
@@ -341,7 +341,7 @@ export default function DashboardPage() {
       <div className="grid-2" style={{ marginBottom: 16 }}>
         {/* Recent Leads */}
         <div className="card animate-in" style={{ animationDelay: '0.2s' }}>
-          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
             <div>
               <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>🎯 Lead Pipeline</h2>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{leads.length} total leads</p>
@@ -390,7 +390,7 @@ export default function DashboardPage() {
 
         {/* Upcoming Follow-ups */}
         <div className="card animate-in" style={{ animationDelay: '0.25s' }}>
-          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '18px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
             <div>
               <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>📅 Upcoming Follow-ups</h2>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{upcomingFollowUps.length} scheduled</p>
@@ -417,7 +417,7 @@ export default function DashboardPage() {
                   transition: 'transform var(--t-fast)', cursor: 'pointer',
                   boxShadow: 'var(--shadow-xs)'
                 }} className="card-hover">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
                     <div>
                       <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{lead.companyName}</div>
                       <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>

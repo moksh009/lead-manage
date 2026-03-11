@@ -121,7 +121,7 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
             <div
                 className="notion-select"
                 onClick={() => setIsOpen(!isOpen)}
-                style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', height: '100%', paddingRight: 6 }}
+                style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', width: '100%', height: '100%', paddingRight: 6 }}
             >
                 <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
                     {getLabel(value)}
@@ -167,7 +167,7 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
                                                 borderRadius: 4,
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                justifyContent: 'space-between',
+                                                justifyContent: 'space-between', flexWrap: 'wrap',
                                                 background: value === subOpt.value ? 'var(--surface-hover)' : 'transparent',
                                                 color: value === subOpt.value ? 'var(--text-primary)' : 'var(--text-secondary)'
                                             }}
@@ -193,7 +193,7 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
                                     borderRadius: 4,
                                     display: 'flex',
                                     alignItems: 'center',
-                                    justifyContent: 'space-between',
+                                    justifyContent: 'space-between', flexWrap: 'wrap',
                                     background: value === opt.value ? 'var(--surface-hover)' : 'transparent',
                                     color: value === opt.value ? 'var(--text-primary)' : 'var(--text-secondary)'
                                 }}
@@ -628,7 +628,7 @@ export default function LeadsPage() {
                 marginBottom: 24,
                 boxShadow: 'var(--shadow-sm)',
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
                     <div>
                         <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>Selected Leads Export</h2>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>{selectedLeadsList.length} leads selected</p>
@@ -671,7 +671,7 @@ export default function LeadsPage() {
                             ).slice(0, 50).map(l => (
                                 <div
                                     key={l._id}
-                                    style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                    style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}
                                     onClick={() => {
                                         setSelectedLeadsList([...selectedLeadsList, l]);
                                         setLeadSearchStr('');
@@ -703,7 +703,7 @@ export default function LeadsPage() {
                 {selectedLeadsList.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 280, overflowY: 'auto', paddingRight: 4, marginTop: 12 }}>
                         {selectedLeadsList.map(l => (
-                            <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                            <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
                                 <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                                     <div className="avatar avatar-sm avatar-gradient-1">{l.companyName?.[0] || '?'}</div>
                                     <div>
@@ -1130,7 +1130,7 @@ export default function LeadsPage() {
             )}
 
             {activeTab === 'followups' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(340px, 100%), 1fr))', gap: 20 }}>
                     {followUps.length === 0 ? (
                         <div style={{ gridColumn: '1 / -1' }} className="card card-p"><div className="empty-state"><div className="empty-icon">📅</div><div className="empty-title">No follow-ups scheduled</div><div className="empty-desc">Add follow-up dates when creating leads</div></div></div>
                     ) : followUps.map(lead => {
@@ -1140,7 +1140,7 @@ export default function LeadsPage() {
                         const isNear = days > 1 && days <= 3;
                         return (
                             <div key={lead._id} className="card card-p card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--surface)', borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)' }} onClick={() => setSelectedLead(lead)}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                                     <div style={{ display: 'flex', gap: 14 }}>
                                         <div className="avatar avatar-md avatar-gradient-1">{lead.companyName?.[0]}</div>
                                         <div>
@@ -1168,7 +1168,7 @@ export default function LeadsPage() {
                                         </div>
                                     </div>
                                 )}
-                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         {lead.phoneNumber && <a href={`tel:${lead.phoneNumber}`} className="btn-icon-sm" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>📞</a>}
                                         {lead.phoneNumber && <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="btn-icon-sm" style={{ background: '#25d36615', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>💬</a>}

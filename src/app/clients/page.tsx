@@ -62,7 +62,7 @@ function ServiceEditor({ services, onChange }: { services: any[]; onChange: (s: 
                     <div key={cat} style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
                         <div
                             onClick={() => toggle(cat)}
-                            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', background: isOpen ? 'var(--accent-light)' : 'var(--bg-secondary)' }}
+                            style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', background: isOpen ? 'var(--accent-light)' : 'var(--bg-secondary)' }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                 <span style={{ fontSize: 16 }}>{cat === 'AI Caller' ? '📞' : '💬'}</span>
@@ -80,7 +80,7 @@ function ServiceEditor({ services, onChange }: { services: any[]; onChange: (s: 
                                     return (
                                         <div key={item.name} style={{ borderBottom: idx < items.length - 1 ? '1px solid var(--border)' : 'none' }}>
                                             <div
-                                                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', background: selected ? 'rgba(0,113,227,0.04)' : 'transparent', transition: 'background 0.15s' }}
+                                                style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '12px 16px', cursor: 'pointer', background: selected ? 'rgba(0,113,227,0.04)' : 'transparent', transition: 'background 0.15s' }}
                                                 onClick={() => handleToggle(item)}
                                             >
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -315,7 +315,7 @@ export default function ClientsPage() {
             {loading ? <div className="empty-state">Loading clients...</div> : filtered.length === 0 ? (
                 <div className="card card-p"><div className="empty-state"><div className="empty-icon">💼</div><div className="empty-title">No clients yet</div><button className="btn btn-primary btn-sm" style={{ marginTop: 12 }} onClick={() => setShowAddModal(true)}>Add First Client</button></div></div>
             ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(300px, 100%), 1fr))', gap: 16 }}>
                     {filtered.map(client => {
                         const next = client.joiningDate ? getNextBillingDate(client.joiningDate) : null;
                         const days = next ? differenceInDays(next, new Date()) : 30;
@@ -329,7 +329,7 @@ export default function ClientsPage() {
                         return (
                             <div key={client._id} className="card card-p" style={{ border: isUrgent ? '1.5px solid rgba(255,59,48,0.3)' : isWarning ? '1.5px solid rgba(255,149,0,0.3)' : '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 0 }}>
                                 {/* Header */}
-                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
+                                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 12 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', flex: 1 }} onClick={() => setSelectedClient(client)}>
                                         <div className="avatar avatar-md avatar-gradient-1">{client.name?.[0]}</div>
                                         <div>
@@ -353,7 +353,7 @@ export default function ClientsPage() {
 
                                 {/* Last payment */}
                                 {lastPayment && (
-                                    <div style={{ padding: '7px 10px', background: 'var(--success-light)', borderRadius: 8, marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ padding: '7px 10px', background: 'var(--success-light)', borderRadius: 8, marginBottom: 12, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
                                         <span style={{ fontSize: '0.75rem', color: '#1a8240' }}>✓ Last paid: ₹{lastPayment.amount?.toLocaleString()}</span>
                                         <span style={{ fontSize: '0.75rem', color: '#1a8240' }}>{format(new Date(lastPayment.date), 'MMM dd')}</span>
                                     </div>
@@ -362,7 +362,7 @@ export default function ClientsPage() {
                                 <hr className="divider" style={{ margin: '0 0 12px 0' }} />
 
                                 {/* Footer */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
                                     <div style={{ cursor: 'pointer' }} onClick={() => setSelectedClient(client)}>
                                         <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: 2 }}>Next billing</div>
                                         <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>{next ? format(next, 'MMM dd, yyyy') : '—'}</div>
@@ -516,7 +516,7 @@ export default function ClientsPage() {
                                     <div style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: 8 }}>🛠️ Services</div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                         {selectedClient.services.map((s: any, i: number) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
                                                 <div>
                                                     <span style={{ fontWeight: 600 }}>{s.name}</span>
                                                     <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 6 }}>· {s.category || s.tier}</span>
@@ -542,7 +542,7 @@ export default function ClientsPage() {
                                     <div style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: 8 }}>💳 Payment History</div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                                         {[...selectedClient.payments].reverse().slice(0, 8).map((p: any, i: number) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '9px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
                                                 <div>
                                                     <span style={{ fontWeight: 700, color: 'var(--success)' }}>₹{p.amount?.toLocaleString()}</span>
                                                     {p.note && <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: 8 }}>{p.note}</span>}
@@ -633,7 +633,7 @@ function ClientFormModal({
 
                         {/* Services Catalog */}
                         <div style={{ marginBottom: 20 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
                                 <div className="form-label-premium">services</div>
                                 {formMonthlyFee > 0 && (
                                     <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>

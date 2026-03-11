@@ -131,7 +131,7 @@ export default function ScriptInventoryPage() {
                 <div className="grid-auto">
                     {filteredScripts.map(script => (
                         <div key={script._id} className="card card-hover card-p" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 220 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start', marginBottom: 12 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                     <div style={{ width: 32, height: 32, borderRadius: 8, background: CHANNEL_CONFIG[script.channel].bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
                                         {CHANNEL_CONFIG[script.channel].icon}
@@ -146,7 +146,7 @@ export default function ScriptInventoryPage() {
                             <div style={{ flex: 1, fontSize: '0.875rem', color: 'var(--text-secondary)', whiteSpace: 'pre-wrap', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 6, WebkitBoxOrient: 'vertical', lineHeight: 1.6 }}>
                                 {script.content}
                             </div>
-                            <div style={{ marginTop: 16, borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+                            <div style={{ marginTop: 16, borderTop: '1px solid var(--border)', paddingTop: 12, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
                                 <span>Updated: {format(new Date(script.updatedAt), 'MMM d, yyyy')}</span>
                                 <button className="btn btn-ghost btn-sm" onClick={() => { navigator.clipboard.writeText(script.content); alert('Copied to clipboard!'); }} style={{ fontSize: '0.75rem' }}>📋 Copy</button>
                             </div>

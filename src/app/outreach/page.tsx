@@ -176,7 +176,7 @@ export default function OutreachPage() {
             <form onSubmit={handleSave} style={{ marginBottom: 24 }}>
                 <div style={{ overflow: 'hidden', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', background: 'var(--surface)', boxShadow: 'var(--shadow-xs)' }}>
                     {/* Header */}
-                    <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)' }}>
+                    <div style={{ padding: '14px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', background: 'var(--bg-secondary)' }}>
                         <div>
                             <h2 style={{ fontSize: '0.9375rem', fontWeight: 700 }}>
                                 {existingRecord && !isEditing ? '📋 Log Summary' : '📤 Enter Outreach Numbers'}
@@ -345,7 +345,7 @@ export default function OutreachPage() {
             {/* All Logs History */}
             {allLogs.length > 0 && (
                 <div className="card" style={{ marginBottom: 20 }}>
-                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
                         <div>
                             <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>📅 Log History</h2>
                             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>Click any day to load and edit it</p>

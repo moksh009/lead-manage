@@ -170,7 +170,7 @@ export default function AnalyticsPage() {
                     { label: 'Total Sent', value: totalSent, icon: '📤', color: 'var(--text-primary)' },
                 ].map(s => (
                     <div key={s.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                             <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
                                 {s.icon}
                             </div>
@@ -307,42 +307,44 @@ export default function AnalyticsPage() {
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Conversion Funnel</h2>
                             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Step-by-step conversion rates</p>
                         </div>
-                        <table className="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Stage</th>
-                                    <th>Count</th>
-                                    <th>Conversion</th>
-                                    <th>Visual</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {[
-                                    { label: '🎯 Total Leads', count: totalLeads, prevCount: null, color: '#db2777' },
-                                    { label: '📅 Meetings', count: meetingLeads, prevCount: totalLeads, color: '#10b981' },
-                                    { label: '🤝 Closed Won', count: closedLeads, prevCount: meetingLeads, color: '#16a34a' },
-                                    { label: '👻 Ghosted', count: ghostedLeads, prevCount: totalLeads, color: '#6b7280' },
-                                    { label: '🚫 Not Converted', count: notConvertedMeetingLeads, prevCount: totalLeads, color: '#dc2626' },
-                                ].map(row => {
-                                    const rate = row.prevCount && row.prevCount > 0 ? (row.count / row.prevCount * 100).toFixed(1) : null;
-                                    const pct = totalSent > 0 ? (row.count / totalSent * 100) : 0;
-                                    return (
-                                        <tr key={row.label}>
-                                            <td style={{ fontWeight: 700 }}>{row.label}</td>
-                                            <td style={{ fontWeight: 800, color: row.color, fontSize: '1.0625rem' }}>{row.count.toLocaleString()}</td>
-                                            <td style={{ color: rate ? (Number(rate) >= 5 ? 'var(--success)' : 'var(--text-secondary)') : 'var(--text-tertiary)', fontWeight: 600 }}>
-                                                {rate ? `${rate}%` : '—'}
-                                            </td>
-                                            <td style={{ minWidth: 130 }}>
-                                                <div style={{ background: 'var(--bg-secondary)', borderRadius: 99, height: 8, overflow: 'hidden' }}>
-                                                    <div style={{ height: '100%', borderRadius: 99, width: `${pct}%`, background: row.color, transition: 'width 1s ease' }} />
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                        <div className="table-wrap">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Stage</th>
+                                        <th>Count</th>
+                                        <th>Conversion</th>
+                                        <th>Visual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[
+                                        { label: '🎯 Total Leads', count: totalLeads, prevCount: null, color: '#db2777' },
+                                        { label: '📅 Meetings', count: meetingLeads, prevCount: totalLeads, color: '#10b981' },
+                                        { label: '🤝 Closed Won', count: closedLeads, prevCount: meetingLeads, color: '#16a34a' },
+                                        { label: '👻 Ghosted', count: ghostedLeads, prevCount: totalLeads, color: '#6b7280' },
+                                        { label: '🚫 Not Converted', count: notConvertedMeetingLeads, prevCount: totalLeads, color: '#dc2626' },
+                                    ].map(row => {
+                                        const rate = row.prevCount && row.prevCount > 0 ? (row.count / row.prevCount * 100).toFixed(1) : null;
+                                        const pct = totalSent > 0 ? (row.count / totalSent * 100) : 0;
+                                        return (
+                                            <tr key={row.label}>
+                                                <td style={{ fontWeight: 700 }}>{row.label}</td>
+                                                <td style={{ fontWeight: 800, color: row.color, fontSize: '1.0625rem' }}>{row.count.toLocaleString()}</td>
+                                                <td style={{ color: rate ? (Number(rate) >= 5 ? 'var(--success)' : 'var(--text-secondary)') : 'var(--text-tertiary)', fontWeight: 600 }}>
+                                                    {rate ? `${rate}%` : '—'}
+                                                </td>
+                                                <td style={{ minWidth: 130 }}>
+                                                    <div style={{ background: 'var(--bg-secondary)', borderRadius: 99, height: 8, overflow: 'hidden' }}>
+                                                        <div style={{ height: '100%', borderRadius: 99, width: `${pct}%`, background: row.color, transition: 'width 1s ease' }} />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </>
             )}
