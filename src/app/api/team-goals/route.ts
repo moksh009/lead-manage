@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
 
         // --- Gamification Points ---
         const userRaw = data.user;
-        const user = userRaw === 'Moksh' || userRaw === 'MOKSH' ? 'MOKSH' : 'smit';
-        if (user === 'MOKSH' || user === 'smit') {
+        const user = userRaw === 'Moksh' || userRaw === 'Moksh' ? 'Moksh' : 'smit';
+        if (user === 'Moksh' || user === 'smit') {
             const { awardGamificationPoints } = await import('@/lib/gamification');
-            
+
             // 1. Early Check-in Reward
             // Ex: "09:20 AM"
             const match = data.timeJoinedOffice?.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
                 const ampm = match[3].toUpperCase();
                 if (ampm === 'PM' && hour < 12) hour += 12;
                 if (ampm === 'AM' && hour === 12) hour = 0;
-                
+
                 // Target: <= 9:30 AM
                 if ((hour < 9) || (hour === 9 && min <= 30)) {
                     await awardGamificationPoints(user, 'EARLY_CHECKIN', 10, `Checked in early at ${data.timeJoinedOffice}`);
@@ -81,8 +81,8 @@ export async function PATCH(request: NextRequest) {
 
         // --- Gamification Points ---
         const userRaw = request.headers.get('x-user') || existing.user;
-        const user = userRaw === 'Moksh' || userRaw === 'MOKSH' ? 'MOKSH' : 'smit';
-        if (newCompletions > 0 && (user === 'MOKSH' || user === 'smit')) {
+        const user = userRaw === 'Moksh' || userRaw === 'Moksh' ? 'Moksh' : 'smit';
+        if (newCompletions > 0 && (user === 'Moksh' || user === 'smit')) {
             const { awardGamificationPoints } = await import('@/lib/gamification');
             await awardGamificationPoints(user, 'COMPLETE_TASK', newCompletions * 2, `Completed ${newCompletions} task(s)`);
         }

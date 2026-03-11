@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
         if (existingEntry) {
             // Accumulate (add on top of existing)
             const sumAdded = (Number(data.dmsSent) || 0) + (Number(data.emailsSent) || 0) + (Number(data.whatsappSent) || 0) + (Number(data.callsMade) || 0);
-            
+
             existingEntry.dmsSent += Number(data.dmsSent) || 0;
             existingEntry.emailsSent += Number(data.emailsSent) || 0;
             existingEntry.whatsappSent += Number(data.whatsappSent) || 0;
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
             // --- Gamification Points ---
             const user = request.headers.get('x-user');
-            if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+            if (sumAdded > 0 && (user === 'Moksh' || user === 'smit')) {
                 const pointsToAward = Math.floor(sumAdded / 10);
                 if (pointsToAward > 0) {
                     const { awardGamificationPoints } = await import('@/lib/gamification');
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
             // --- Gamification Points ---
             const user = request.headers.get('x-user');
-            if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+            if (sumAdded > 0 && (user === 'Moksh' || user === 'smit')) {
                 const pointsToAward = Math.floor(sumAdded / 10);
                 if (pointsToAward > 0) {
                     const { awardGamificationPoints } = await import('@/lib/gamification');
@@ -93,7 +93,7 @@ export async function PATCH(request: NextRequest) {
 
         // --- Gamification Points ---
         const user = request.headers.get('x-user');
-        if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+        if (sumAdded > 0 && (user === 'Moksh' || user === 'smit')) {
             const pointsToAward = Math.floor(sumAdded / 10);
             if (pointsToAward > 0) {
                 const Point = (await import('@/models/Point')).default;

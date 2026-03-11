@@ -78,10 +78,10 @@ export async function PATCH(
         }
 
         const updated = await Lead.findByIdAndUpdate(id, data, { new: true });
-        
+
         // --- Gamification Points (High-Stakes Bounties) ---
         const user = request.headers.get('x-user');
-        if ((meetingBounty !== 0 || closedBounty !== 0) && (user === 'MOKSH' || user === 'smit')) {
+        if ((meetingBounty !== 0 || closedBounty !== 0) && (user === 'Moksh' || user === 'smit')) {
             const { awardGamificationPoints } = await import('@/lib/gamification');
             if (meetingBounty !== 0) {
                 await awardGamificationPoints(user, meetingBounty > 0 ? 'BOUNTY_MEETING' : 'REVERT_MEETING', meetingBounty, meetingBounty > 0 ? `Bounty: Booked a meeting for ${existing.companyName}` : `Lost meeting status for ${existing.companyName}`);
