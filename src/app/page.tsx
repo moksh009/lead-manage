@@ -150,13 +150,13 @@ export default function DashboardPage() {
   };
 
   const statCards = [
-    { label: 'Outreach Sent', value: totalSent, icon: '📤', color: '#8b5cf6', bg: '#f3e8ff', change: 'All channels combined', dir: 'neutral' },
-    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#2563eb', bg: '#eff6ff', change: 'Total leads captured', dir: 'neutral' },
-    { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', color: '#10b981', bg: '#f0fdf9', change: `${meetingRate}% of leads`, dir: 'neutral' },
-    { label: 'Closed Won', value: closedLeads.length, icon: '🤝', color: '#16a34a', bg: '#f0fdf4', change: `${closeRate}% close rate`, dir: 'neutral' },
-    { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', color: '#d97706', bg: '#fffbeb', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, dir: 'neutral' },
-    { label: 'Ghosted', value: ghostedLeads.length, icon: '👻', color: '#6b7280', bg: '#f9fafb', change: `${ghostRate}% ghost rate`, dir: 'neutral' },
-    { label: 'Active Clients', value: activeClients.length, icon: '💼', color: '#7c3aed', bg: '#faf5ff', change: `${clients.length} total onboarded`, dir: 'up' },
+    { label: 'Outreach Sent', value: totalSent, icon: '📤', color: 'var(--text-primary)', bg: 'var(--surface)', change: 'All channels combined', dir: 'neutral' },
+    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: 'var(--text-primary)', bg: 'var(--surface)', change: 'Total leads captured', dir: 'neutral' },
+    { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', color: 'var(--success)', bg: 'var(--surface)', change: `${meetingRate}% of leads`, dir: 'neutral' },
+    { label: 'Closed Won', value: closedLeads.length, icon: '🤝', color: 'var(--accent)', bg: 'var(--surface)', change: `${closeRate}% close rate`, dir: 'neutral' },
+    { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', color: 'var(--warning)', bg: 'var(--surface)', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, dir: 'neutral' },
+    { label: 'Ghosted', value: ghostedLeads.length, icon: '👻', color: 'var(--text-tertiary)', bg: 'var(--surface)', change: `${ghostRate}% ghost rate`, dir: 'neutral' },
+    { label: 'Active Clients', value: activeClients.length, icon: '💼', color: 'var(--text-primary)', bg: 'var(--surface)', change: `${clients.length} total onboarded`, dir: 'up' },
   ];
 
   const recentLeads = [...leads].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 5);
@@ -184,23 +184,23 @@ export default function DashboardPage() {
 
   return (
     <div className="animate-in">
-      {/* HERO BANNER */}
-      <div className="page-hero" style={{ marginBottom: 28 }}>
-        <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* HERO BANNER - Sleek, minimal */}
+      <div className="page-hero" style={{ marginBottom: 32, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-            <span style={{ fontSize: 28 }}>🚀</span>
-            <span style={{ fontSize: '0.8125rem', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 12px', borderRadius: 99, backdropFilter: 'blur(8px)' }}>
+            <span style={{ fontSize: '1.25rem', padding: '6px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>🚀</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-secondary)' }}>
               Live Dashboard
             </span>
           </div>
-          <h1 className="page-hero-title">Dashboard</h1>
-          <p className="page-hero-sub">Here's your outreach overview — MOKSH & Smit</p>
-          <div className="page-hero-actions">
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Overview</h1>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Performance metrics for MOKSH & Smit</p>
+          <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
             <Link href="/outreach">
-              <button className="btn-hero">📋 Add Daily Log</button>
+              <button className="btn" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>📋 Add Daily Log</button>
             </Link>
             <Link href="/leads">
-              <button className="btn-hero btn-hero-primary">+ New Lead</button>
+              <button className="btn btn-primary" style={{ background: 'var(--text-primary)', color: 'white' }}>+ New Lead</button>
             </Link>
           </div>
         </div>
@@ -237,34 +237,35 @@ export default function DashboardPage() {
       )}
 
       {/* KPI Stats Grid */}
-      <div className="stats-grid stagger-children" style={{ marginBottom: 28 }}>
+      <div className="stats-grid stagger-children" style={{ marginBottom: 32 }}>
         {statCards.map((card) => (
-          <div key={card.label} className="stat-card card-hover" style={{ cursor: 'default' }}>
-            <div style={{
-              width: 44, height: 44, borderRadius: 12,
-              background: card.bg, border: `1.5px solid ${card.color}20`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20, marginBottom: 14
-            }}>{card.icon}</div>
-            <div className="stat-label">{card.label}</div>
-            <div className="stat-value" style={{ color: card.color }}>
-              <AnimatedNumber value={card.value} />
+          <div key={card.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                {card.icon}
+              </div>
             </div>
-            <div className="stat-change neutral" style={{ marginTop: 5 }}>
-              {card.dir === 'up' ? '↑ ' : '· '}{card.change}
+            <div>
+              <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>{card.label}</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: card.color, lineHeight: 1 }}>
+                <AnimatedNumber value={card.value} />
+              </div>
+            </div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 4 }}>
+              {card.dir === 'up' ? <span style={{ color: 'var(--success)' }}>↑</span> : <span style={{ opacity: 0.5 }}>·</span>} {card.change}
             </div>
           </div>
         ))}
       </div>
 
       {/* Charts row */}
-      <div className="grid-2" style={{ marginBottom: 24 }}>
+      <div className="grid-2" style={{ marginBottom: 32 }}>
         {/* Channel Donut */}
-        <div className="card card-p animate-in" style={{ animationDelay: '0.1s' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+        <div className="card animate-in" style={{ padding: '24px', animationDelay: '0.1s', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div>
-              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Channel Breakdown</h2>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{totalSent.toLocaleString()} total messages sent</p>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Channel Breakdown</h2>
+              <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>{totalSent.toLocaleString()} total messages sent</p>
             </div>
           </div>
           <div style={{ height: 200 }}>
@@ -305,10 +306,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Funnel */}
-        <div className="card card-p animate-in" style={{ animationDelay: '0.15s' }}>
-          <div style={{ marginBottom: 18 }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Sales Funnel</h2>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>Outreach → Conversion breakdown</p>
+        <div className="card animate-in" style={{ padding: '24px', animationDelay: '0.15s', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+          <div style={{ marginBottom: 24 }}>
+            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Sales Funnel</h2>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Outreach → Conversion breakdown</p>
           </div>
           <div style={{ height: 200 }}>
             <Bar data={funnelData} options={{
@@ -410,19 +411,20 @@ export default function DashboardPage() {
               const isNear = daysUntil > 1 && daysUntil <= 3;
               return (
                 <div key={lead._id} style={{
-                  padding: '14px 16px', borderRadius: 'var(--radius-xl)', border: '1px solid',
-                  background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--bg-secondary)',
+                  padding: '16px 20px', borderRadius: 'var(--radius-xl)', border: '1px solid',
+                  background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--surface)',
                   borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)',
-                  transition: 'transform var(--t-fast)', cursor: 'pointer'
+                  transition: 'transform var(--t-fast)', cursor: 'pointer',
+                  boxShadow: 'var(--shadow-xs)'
                 }} className="card-hover">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.875rem' }}>{lead.companyName}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
+                      <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{lead.companyName}</div>
+                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{
-                        fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: 99,
+                        fontSize: '0.6875rem', fontWeight: 800, padding: '4px 10px', borderRadius: 99,
                         background: isOverdue ? '#fee2e2' : isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
                         color: isOverdue ? 'var(--danger)' : isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
                         border: `1px solid ${isOverdue ? 'rgba(220,38,38,0.4)' : isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
@@ -432,12 +434,12 @@ export default function DashboardPage() {
                       </span>
                       <button
                         onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
-                        style={{ background: 'var(--success-light)', color: 'var(--success)', border: 'none', borderRadius: '50%', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.8rem' }}
+                        style={{ background: 'var(--success-light)', color: 'var(--success)', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.85rem' }}
                         title="Mark as Done"
                       >✓</button>
                     </div>
                   </div>
-                  {lead.notes && <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.4 }}>{lead.notes.slice(0, 80)}{lead.notes.length > 80 ? '…' : ''}</p>}
+                  {lead.notes && <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{lead.notes.slice(0, 100)}{lead.notes.length > 100 ? '…' : ''}</p>}
                 </div>
               );
             })}

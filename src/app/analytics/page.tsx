@@ -146,28 +146,39 @@ export default function AnalyticsPage() {
     return (
         <div className="animate-in">
             {/* Hero */}
-            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #2563eb 100%)', marginBottom: 28 }}>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>📈</div>
-                    <h1 className="page-hero-title">Analytics</h1>
-                    <p className="page-hero-sub">Deep-dive into your outreach performance across all channels</p>
+            <div className="page-hero" style={{ marginBottom: 32, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.25rem', padding: '6px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>📈</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-secondary)' }}>
+                            Performance Insights
+                        </span>
+                    </div>
+                    <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Analytics</h1>
+                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Deep-dive into your outreach performance across all channels</p>
                 </div>
             </div>
 
             {/* KPI strip */}
-            <div className="stats-grid stagger-children" style={{ marginBottom: 28 }}>
+            <div className="stats-grid stagger-children" style={{ marginBottom: 32 }}>
                 {[
-                    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: '#db2777', bg: '#fdf2f8' },
-                    { label: 'Meetings Booked', value: meetingLeads, icon: '📅', color: '#10b981', bg: '#f0fdf9' },
-                    { label: 'Closed Won', value: closedLeads, icon: '🤝', color: '#16a34a', bg: '#f0fdf4' },
-                    { label: 'Ghosted', value: ghostedLeads, icon: '👻', color: '#6b7280', bg: '#f9fafb' },
-                    { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', color: '#dc2626', bg: '#fef2f2' },
-                    { label: 'Total Sent', value: totalSent, icon: '📤', color: '#2563eb', bg: '#eff6ff' },
+                    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: 'var(--text-primary)' },
+                    { label: 'Meetings Booked', value: meetingLeads, icon: '📅', color: 'var(--success)' },
+                    { label: 'Closed Won', value: closedLeads, icon: '🤝', color: 'var(--accent)' },
+                    { label: 'Ghosted', value: ghostedLeads, icon: '👻', color: 'var(--text-tertiary)' },
+                    { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', color: 'var(--danger)' },
+                    { label: 'Total Sent', value: totalSent, icon: '📤', color: 'var(--text-primary)' },
                 ].map(s => (
-                    <div key={s.label} className="stat-card card-hover" style={{ borderRadius: 'var(--radius-xl)' }}>
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
-                        <div className="stat-label">{s.label}</div>
-                        <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.value.toLocaleString()}</div>
+                    <div key={s.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                                {s.icon}
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>{s.label}</div>
+                            <div style={{ fontSize: '2rem', fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value.toLocaleString()}</div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -184,27 +195,27 @@ export default function AnalyticsPage() {
             ) : (
                 <>
                     {/* Conversion rate highlights */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
                         {[
-                            { label: 'Meeting Rate', val: `${meetingRate}%`, sub: `${meetingLeads} meetings from ${totalLeads} leads`, color: '#10b981', bg: '#f0fdf9', border: 'rgba(16,185,129,0.2)' },
-                            { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, color: '#2563eb', bg: '#eff6ff', border: 'rgba(37,99,235,0.2)' },
-                            { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, color: '#16a34a', bg: '#f0fdf4', border: 'rgba(22,163,74,0.2)' },
+                            { label: 'Meeting Rate', val: `${meetingRate}%`, sub: `${meetingLeads} meetings from ${totalLeads} leads`, color: 'var(--success)' },
+                            { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, color: 'var(--accent)' },
+                            { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, color: 'var(--text-primary)' },
                         ].map(r => (
-                            <div key={r.label} className="card card-p card-hover" style={{ background: r.bg, border: `1px solid ${r.border}`, textAlign: 'center', borderRadius: 'var(--radius-xl)' }}>
-                                <div style={{ fontSize: '2rem', fontWeight: 800, color: r.color, letterSpacing: '-0.04em' }}>{r.val}</div>
-                                <div style={{ fontWeight: 700, fontSize: '0.875rem', marginTop: 4 }}>{r.label}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: 3 }}>{r.sub}</div>
+                            <div key={r.label} className="card card-hover" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', textAlign: 'center', borderRadius: 'var(--radius-2xl)' }}>
+                                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: r.color, letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 12 }}>{r.val}</div>
+                                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: 4 }}>{r.label}</div>
+                                <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{r.sub}</div>
                             </div>
                         ))}
                     </div>
 
                     {/* Channel Breakdown */}
-                    <div className="card card-p" style={{ marginBottom: 20 }}>
-                        <div style={{ marginBottom: 18 }}>
-                            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Channel Breakdown</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Sent vs Replies per channel</p>
+                    <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                        <div style={{ marginBottom: 24 }}>
+                            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Channel Breakdown</h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Sent vs Replies per channel</p>
                         </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                             {[
                                 { label: 'Instagram DMs', sent: sentByChannel.dms, replies: byChannel.dms, color: '#e1306c' },
                                 { label: 'Emails', sent: sentByChannel.emails, replies: byChannel.emails, color: '#2563eb' },
@@ -213,23 +224,23 @@ export default function AnalyticsPage() {
                             ].map(ch => {
                                 const rate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
                                 return (
-                                    <div key={ch.label} style={{ padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)' }} className="card-hover">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: ch.color }} />
-                                            <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600 }}>{ch.label}</span>
+                                    <div key={ch.label} style={{ padding: '16px 20px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)' }} className="card-hover">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                                            <div style={{ width: 10, height: 10, borderRadius: '50%', background: ch.color }} />
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 700 }}>{ch.label}</span>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, textAlign: 'center' }}>
                                             <div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Sent</div>
-                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>{ch.sent.toLocaleString()}</div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 800, textTransform: 'uppercase' }}>Sent</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--text-primary)' }}>{ch.sent.toLocaleString()}</div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Replies</div>
-                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>{ch.replies.toLocaleString()}</div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 800, textTransform: 'uppercase' }}>Replies</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1.125rem', color: 'var(--success)' }}>{ch.replies.toLocaleString()}</div>
                                             </div>
                                             <div>
-                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 700, textTransform: 'uppercase' }}>Rate</div>
-                                                <div style={{ fontWeight: 800, fontSize: '1rem', color: rate !== '0.0' ? 'var(--accent)' : 'var(--text-tertiary)' }}>{rate}%</div>
+                                                <div style={{ fontSize: '0.65rem', color: 'var(--text-tertiary)', fontWeight: 800, textTransform: 'uppercase' }}>Rate</div>
+                                                <div style={{ fontWeight: 800, fontSize: '1.125rem', color: rate !== '0.0' ? 'var(--accent)' : 'var(--text-tertiary)' }}>{rate}%</div>
                                             </div>
                                         </div>
                                     </div>
@@ -239,42 +250,42 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Channel Trend */}
-                    <div className="card card-p" style={{ marginBottom: 20 }}>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 4 }}>Channel Activity Over Time</h2>
-                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 20 }}>Daily outreach volume per channel</p>
-                        <div style={{ height: 280 }}>
+                    <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                        <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Channel Activity Over Time</h2>
+                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 24 }}>Daily outreach volume per channel</p>
+                        <div style={{ height: 300 }}>
                             <Line data={lineData} options={{ ...baseChartOpts, scales: scaleStyle } as any} />
                         </div>
                     </div>
 
-                    <div className="grid-2" style={{ marginBottom: 20 }}>
+                    <div className="grid-2" style={{ marginBottom: 24 }}>
                         {/* Replies & Meetings bar */}
-                        <div className="card card-p">
-                            <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 4 }}>Replies & Meetings</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 20 }}>Per day performance</p>
-                            <div style={{ height: 240 }}>
+                        <div className="card" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Replies & Meetings</h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 24 }}>Per day performance</p>
+                            <div style={{ height: 260 }}>
                                 <Bar data={repliesData} options={{ ...baseChartOpts, scales: scaleStyle } as any} />
                             </div>
                         </div>
 
                         {/* Lead Quality donut */}
-                        <div className="card card-p">
-                            <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 4 }}>Lead Quality</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 12 }}>Breakdown by lead type</p>
-                            <div style={{ height: 180 }}>
+                        <div className="card" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Lead Quality</h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 16 }}>Breakdown by lead type</p>
+                            <div style={{ height: 200 }}>
                                 <Doughnut data={leadTypeData} options={{ ...baseChartOpts, plugins: { ...baseChartOpts.plugins, legend: { ...baseChartOpts.plugins.legend, position: 'bottom' as const } } }} />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 24 }}>
                                 {[
                                     { label: 'Hot lead 🔥', count: leads.filter(l => l.leadType === 'Hot lead').length, color: '#dc2626' },
                                     { label: 'Qualified', count: leads.filter(l => l.leadType === 'Qualified').length, color: '#16a34a' },
                                     { label: 'Soft lead', count: leads.filter(l => l.leadType === 'Soft lead').length, color: '#2563eb' },
                                     { label: 'Unqualified', count: leads.filter(l => l.leadType === 'Unqualified Lead').length, color: '#d97706' },
                                 ].map(s => (
-                                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-                                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-                                        <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', flex: 1 }}>{s.label}</span>
-                                        <span style={{ fontWeight: 700, fontSize: '0.875rem', color: s.color }}>{s.count}</span>
+                                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border-light)' }}>
+                                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', flex: 1, fontWeight: 600 }}>{s.label}</span>
+                                        <span style={{ fontWeight: 800, fontSize: '0.95rem', color: s.color }}>{s.count}</span>
                                     </div>
                                 ))}
                             </div>
@@ -282,19 +293,19 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Cumulative Growth */}
-                    <div className="card card-p" style={{ marginBottom: 20 }}>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 4 }}>Cumulative Outreach Growth</h2>
-                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 20 }}>Total messages sent since day one</p>
-                        <div style={{ height: 220 }}>
+                    <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                        <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Cumulative Outreach Growth</h2>
+                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 24 }}>Total messages sent since day one</p>
+                        <div style={{ height: 240 }}>
                             <Line data={cumulativeData} options={{ ...baseChartOpts, scales: scaleStyle } as any} />
                         </div>
                     </div>
 
                     {/* Conversion Funnel Table */}
-                    <div className="card" style={{ marginBottom: 20 }}>
-                        <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--border)' }}>
-                            <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Conversion Funnel</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Step-by-step conversion rates</p>
+                    <div className="card" style={{ marginBottom: 24, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)', overflow: 'hidden' }}>
+                        <div style={{ padding: '24px', borderBottom: '1px solid var(--border)' }}>
+                            <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Conversion Funnel</h2>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Step-by-step conversion rates</p>
                         </div>
                         <table className="data-table">
                             <thead>

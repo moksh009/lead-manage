@@ -581,47 +581,62 @@ export default function LeadsPage() {
                 </div>
             </div>
 
-            {/* Status filter pills */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-                {(['All', ...LEAD_TYPES] as string[]).map(t => (
-                    <button
-                        key={t}
-                        onClick={() => setFilterType(t)}
-                        style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s ease', background: filterType === t ? 'var(--accent)' : 'var(--surface)', color: filterType === t ? 'white' : 'var(--text-secondary)', borderColor: filterType === t ? 'transparent' : 'var(--border)' }}
-                    >
-                        {t} <span style={{ opacity: 0.7, marginLeft: 4 }}>({counts[t as keyof typeof counts]})</span>
-                    </button>
-                ))}
-            </div>
-
-            {/* Channel filter pills */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Channel:</span>
-                <button
-                    onClick={() => setFilterChannel('all')}
-                    style={{ padding: '5px 12px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s', background: filterChannel === 'all' ? 'var(--text-primary)' : 'var(--surface)', color: filterChannel === 'all' ? 'white' : 'var(--text-secondary)', borderColor: filterChannel === 'all' ? 'transparent' : 'var(--border)' }}
-                >
-                    All ({leads.length})
-                </button>
-                {CHANNELS.map(ch => {
-                    const count = leads.filter(l => l.channel === ch.key).length;
-                    const active = filterChannel === ch.key;
-                    return (
+            {/* Filter Toolbar Area */}
+            <div style={{
+                background: 'rgba(255, 255, 255, 0.70)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                padding: '16px 20px',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid var(--border)',
+                marginBottom: 24,
+                boxShadow: 'var(--shadow-sm)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16
+            }}>
+                {/* Status filter pills */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {(['All', ...LEAD_TYPES] as string[]).map(t => (
                         <button
-                            key={ch.key}
-                            onClick={() => setFilterChannel(active ? 'all' : ch.key)}
-                            style={{ padding: '5px 12px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: active ? ch.color : `${ch.color}15`, color: active ? 'white' : ch.color, boxShadow: active ? `0 2px 8px ${ch.color}40` : 'none' }}
+                            key={t}
+                            onClick={() => setFilterType(t)}
+                            style={{ padding: '8px 16px', borderRadius: 99, fontSize: '0.85rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)', background: filterType === t ? 'var(--text-primary)' : 'transparent', color: filterType === t ? 'white' : 'var(--text-secondary)', borderColor: filterType === t ? 'transparent' : 'var(--border)' }}
                         >
-                            {ch.icon} {ch.label} ({count})
+                            {t} <span style={{ opacity: filterType === t ? 0.8 : 0.6, marginLeft: 4 }}>({counts[t as keyof typeof counts]})</span>
                         </button>
-                    );
-                })}
+                    ))}
+                </div>
+
+                {/* Channel filter pills */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Channel:</span>
+                    <button
+                        onClick={() => setFilterChannel('all')}
+                        style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s', background: filterChannel === 'all' ? 'var(--text-primary)' : 'transparent', color: filterChannel === 'all' ? 'white' : 'var(--text-secondary)', borderColor: filterChannel === 'all' ? 'transparent' : 'var(--border)' }}
+                    >
+                        All ({leads.length})
+                    </button>
+                    {CHANNELS.map(ch => {
+                        const count = leads.filter(l => l.channel === ch.key).length;
+                        const active = filterChannel === ch.key;
+                        return (
+                            <button
+                                key={ch.key}
+                                onClick={() => setFilterChannel(active ? 'all' : ch.key)}
+                                style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: active ? ch.color : `${ch.color}10`, color: active ? 'white' : ch.color, boxShadow: active ? `0 4px 12px ${ch.color}40` : 'none' }}
+                            >
+                                {ch.icon} {ch.label} ({count})
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* View Tabs */}
-            <div className="tab-bar">
-                <div className={`tab ${activeTab === 'table' ? 'active' : ''}`} onClick={() => setActiveTab('table')}>📋 All Leads</div>
-                <div className={`tab ${activeTab === 'followups' ? 'active' : ''}`} onClick={() => setActiveTab('followups')}>📅 Follow-ups</div>
+            <div className="tab-bar" style={{ borderRadius: 99, padding: 6 }}>
+                <div className={`tab ${activeTab === 'table' ? 'active' : ''}`} style={{ borderRadius: 99 }} onClick={() => setActiveTab('table')}>📋 All Leads</div>
+                <div className={`tab ${activeTab === 'followups' ? 'active' : ''}`} style={{ borderRadius: 99 }} onClick={() => setActiveTab('followups')}>📅 Follow-ups</div>
             </div>
 
             {/* Search + Sort */}
@@ -953,36 +968,57 @@ export default function LeadsPage() {
             )}
 
             {activeTab === 'followups' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 20 }}>
                     {followUps.length === 0 ? (
-                        <div className="card card-p"><div className="empty-state"><div className="empty-icon">📅</div><div className="empty-title">No follow-ups scheduled</div><div className="empty-desc">Add follow-up dates when creating leads</div></div></div>
+                        <div style={{ gridColumn: '1 / -1' }} className="card card-p"><div className="empty-state"><div className="empty-icon">📅</div><div className="empty-title">No follow-ups scheduled</div><div className="empty-desc">Add follow-up dates when creating leads</div></div></div>
                     ) : followUps.map(lead => {
                         const days = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / 86400000);
+                        const isOverdue = days < 0;
+                        const isUrgent = days >= 0 && days <= 1;
+                        const isNear = days > 1 && days <= 3;
                         return (
-                            <div key={lead._id} className="card card-p" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', border: days <= 1 ? '1px solid rgba(255,59,48,0.3)' : days <= 3 ? '1px solid rgba(255,149,0,0.3)' : '1px solid var(--border)' }} onClick={() => setSelectedLead(lead)}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                    <div className="avatar avatar-md avatar-gradient-1">{lead.companyName?.[0]}</div>
-                                    <div>
-                                        <div style={{ fontWeight: 700 }}>{lead.companyName}</div>
-                                        <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{lead.prospectName}</div>
-                                        {lead.notes && <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: 4 }}>{lead.notes.slice(0, 100)}</div>}
+                            <div key={lead._id} className="card card-p card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--surface)', borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)' }} onClick={() => setSelectedLead(lead)}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div style={{ display: 'flex', gap: 14 }}>
+                                        <div className="avatar avatar-md avatar-gradient-1">{lead.companyName?.[0]}</div>
+                                        <div>
+                                            <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{lead.companyName}</div>
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <span style={{
+                                            fontSize: '0.75rem', fontWeight: 800, padding: '4px 10px', borderRadius: 99,
+                                            background: isOverdue ? '#fee2e2' : isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
+                                            color: isOverdue ? 'var(--danger)' : isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
+                                            border: `1px solid ${isOverdue ? 'rgba(220,38,38,0.4)' : isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                                            whiteSpace: 'nowrap', display: 'inline-block', marginBottom: 6
+                                        }}>
+                                            {isOverdue ? `🚨 ${Math.abs(days)}d overdue` : days === 0 ? '🔥 Today!' : days === 1 ? '⚡ Tomorrow' : `${days} days`}
+                                        </span>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{format(new Date(lead.followUpDate), 'MMM dd, yyyy')}</div>
                                     </div>
                                 </div>
-                                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'flex-end', marginBottom: 2 }}>
-                                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: days <= 0 ? 'var(--danger)' : days <= 3 ? 'var(--warning)' : 'var(--text-primary)' }}>
-                                            {days < 0 ? `🚨 ${Math.abs(days)}d overdue` : days === 0 ? '🔥 Today!' : days === 1 ? '⚡ Tomorrow' : `${days} days`}
+                                {lead.notes && (
+                                    <div style={{ padding: '12px 14px', background: 'rgba(0,0,0,0.03)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.04)' }}>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                            {lead.notes.length > 120 ? `${lead.notes.slice(0, 120)}...` : lead.notes}
                                         </div>
-                                        <button
-                                            onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
-                                            style={{ background: 'rgba(52,211,153,0.15)', color: '#10b981', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 8, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, transition: 'all 0.15s' }}
-                                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,211,153,0.25)'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(52,211,153,0.15)'}
-                                        >
-                                            ✓ Done
-                                        </button>
                                     </div>
-                                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{format(new Date(lead.followUpDate), 'MMM dd, yyyy')}</div>
+                                )}
+                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', gap: 8 }}>
+                                        {lead.phoneNumber && <a href={`tel:${lead.phoneNumber}`} className="btn-icon-sm" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>📞</a>}
+                                        {lead.phoneNumber && <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="btn-icon-sm" style={{ background: '#25d36615', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>💬</a>}
+                                    </div>
+                                    <button
+                                        onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
+                                        style={{ background: 'rgba(52,211,153,0.15)', color: '#10b981', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 99, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, transition: 'all 0.15s' }}
+                                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,211,153,0.25)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(52,211,153,0.15)'}
+                                    >
+                                        ✓ Mark Done
+                                    </button>
                                 </div>
                             </div>
                         );

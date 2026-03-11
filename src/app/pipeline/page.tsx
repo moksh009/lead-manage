@@ -82,11 +82,16 @@ export default function PipelinePage() {
     return (
         <div className="animate-in">
             {/* Premium hero banner */}
-            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%)', marginBottom: 24 }}>
+            <div className="page-hero" style={{ background: 'var(--accent-gradient)', marginBottom: 24 }}>
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>🔄</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.875rem' }}>🔄</span>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 12px', borderRadius: 99, backdropFilter: 'blur(8px)' }}>
+                            {leads.length} Leads Tracked
+                        </span>
+                    </div>
                     <h1 className="page-hero-title">Pipeline Board</h1>
-                    <p className="page-hero-sub">{leads.length} leads tracked &middot; {totalValue} closed &middot; Drag cards to update stage</p>
+                    <p className="page-hero-sub">{totalValue} closed · Drag cards to update stage</p>
                     <div className="page-hero-actions">
                         <a href="/leads"><button className="btn-hero btn-hero-primary">+ Add Lead</button></a>
                     </div>
@@ -94,25 +99,30 @@ export default function PipelinePage() {
             </div>
 
             {/* Summary Bar */}
-            <div className="card card-p" style={{ marginBottom: 24 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
+            <div className="card" style={{ marginBottom: 24, padding: '20px 24px', background: 'var(--surface)', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 16 }}>
                     {STAGES.filter(s => s.id !== 'new' && s.id !== 'followup' && s.id !== 'meeting' && s.id !== 'proposal' && s.id !== 'closed').map((stage, idx) => {
                         const count = groupedLeads[stage.id]?.length || 0;
                         const pct = leads.length > 0 ? (count / leads.length * 100) : 0;
                         return (
-                            <div key={stage.id} style={{ textAlign: 'center', padding: '12px 8px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)' }} className="card-hover">
-                                <div className="form-label-premium" style={{ marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage.label}</div>
-                                <div style={{ fontWeight: 800, fontSize: '1.25rem', color: stage.color }}>{count}</div>
-                                <div style={{ fontSize: '0.6875rem', color: 'var(--text-tertiary)' }}>{pct.toFixed(0)}%</div>
+                            <div key={stage.id} style={{ padding: '16px 12px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                                    <span style={{ fontSize: '1rem' }}>{stage.emoji}</span>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stage.label}</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8 }}>
+                                    <div style={{ fontWeight: 800, fontSize: '1.75rem', lineHeight: 1, color: stage.color }}>{count}</div>
+                                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', fontWeight: 600, paddingBottom: 2 }}>{pct.toFixed(0)}%</div>
+                                </div>
                             </div>
                         );
                     })}
                 </div>
-                <div style={{ display: 'flex', marginTop: 14, borderRadius: 99, overflow: 'hidden', height: 5, background: 'var(--bg-secondary)' }}>
+                <div style={{ display: 'flex', marginTop: 24, borderRadius: 99, overflow: 'hidden', height: 8, background: 'var(--bg-secondary)', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
                     {STAGES.map(stage => {
                         const count = groupedLeads[stage.id]?.length || 0;
                         const pct = leads.length > 0 ? (count / leads.length * 100) : 0;
-                        return pct > 0 ? <div key={stage.id} style={{ flex: count, background: stage.color, transition: 'flex 0.5s ease' }} /> : null;
+                        return pct > 0 ? <div key={stage.id} style={{ width: `${pct}%`, background: stage.color, transition: 'width 0.5s cubic-bezier(0.25, 1, 0.5, 1)' }} title={`${stage.label}: ${count}`} /> : null;
                     })}
                     {leads.length === 0 && <div style={{ flex: 1, background: 'var(--border)' }} />}
                 </div>
@@ -150,38 +160,51 @@ export default function PipelinePage() {
 
                             <div className="kanban-cards">
                                 {!groupedLeads[stage.id]?.length ? (
-                                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.8125rem', border: '1px dashed var(--border-medium)', borderRadius: 8, background: 'var(--bg)' }}>
+                                    <div style={{ padding: '24px 20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem', fontWeight: 600, border: '1.5px dashed var(--border-medium)', borderRadius: 12, background: 'var(--bg-secondary)' }}>
                                         Drop leads here
                                     </div>
                                 ) : (
                                     groupedLeads[stage.id].map(lead => (
                                         <div
                                             key={lead._id}
-                                            className="kanban-card"
+                                            className="card card-hover"
                                             draggable
                                             onDragStart={() => setDragging(lead._id)}
                                             onDragEnd={() => setDragging(null)}
-                                            style={{ opacity: dragging === lead._id ? 0.5 : 1, padding: '12px 14px' }}
+                                            style={{
+                                                opacity: dragging === lead._id ? 0.4 : 1,
+                                                padding: '16px',
+                                                cursor: 'grab',
+                                                background: 'var(--surface)',
+                                                border: '1px solid var(--border)',
+                                                borderRadius: 16,
+                                                marginBottom: 12,
+                                                transform: dragging === lead._id ? 'scale(0.98)' : 'scale(1)',
+                                                transition: 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)'
+                                            }}
                                         >
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                                                <div className="kanban-card-title" style={{ fontSize: '0.9375rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 0 }}>{lead.companyName}</div>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.2 }}>{lead.companyName}</div>
                                                 {lead.channel && CHANNELS[lead.channel] && (
-                                                    <span style={{ fontSize: '1rem' }} title={CHANNELS[lead.channel].label}>
+                                                    <span style={{ fontSize: '1rem', background: CHANNELS[lead.channel].bg, padding: 4, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={CHANNELS[lead.channel].label}>
                                                         {CHANNELS[lead.channel].icon}
                                                     </span>
                                                 )}
                                             </div>
 
-                                            <div className="kanban-card-sub" style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                <span style={{ fontWeight: 600 }}>{lead.prospectName || '—'}</span>
+                                            <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                                                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                                    <span className="avatar avatar-sm avatar-gradient-1" style={{ width: 20, height: 20, fontSize: '0.6rem' }}>{lead.prospectName?.[0] || '?'}</span>
+                                                    {lead.prospectName || '—'}
+                                                </span>
                                                 {lead.leadType && STATUS_COLORS[lead.leadType] && (
                                                     <span style={{
-                                                        fontSize: '0.625rem',
-                                                        fontWeight: 900,
-                                                        textTransform: 'lowercase',
-                                                        letterSpacing: '0.02em',
-                                                        padding: '1px 6px',
-                                                        borderRadius: 4,
+                                                        fontSize: '0.65rem',
+                                                        fontWeight: 800,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.04em',
+                                                        padding: '3px 8px',
+                                                        borderRadius: 99,
                                                         background: STATUS_COLORS[lead.leadType].bg,
                                                         color: STATUS_COLORS[lead.leadType].text,
                                                         border: `1px solid ${STATUS_COLORS[lead.leadType].border}`
@@ -192,60 +215,63 @@ export default function PipelinePage() {
                                             </div>
 
                                             {(lead.phoneNumber || lead.email) && (
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 10 }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
                                                     {lead.phoneNumber && (
-                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                            <span style={{ opacity: 0.6 }}>📞</span> {lead.phoneNumber}
+                                                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                            <span style={{ opacity: 0.7 }}>📞</span> {lead.phoneNumber}
                                                         </div>
                                                     )}
                                                     {lead.email && (
-                                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                            <span style={{ opacity: 0.6 }}>📧</span> {lead.email}
+                                                        <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                            <span style={{ opacity: 0.7 }}>📧</span> {lead.email}
                                                         </div>
                                                     )}
                                                 </div>
                                             )}
 
                                             {lead.notes && (
-                                                <p style={{
-                                                    fontSize: '0.75rem',
-                                                    color: 'var(--text-tertiary)',
+                                                <div style={{
+                                                    fontSize: '0.8125rem',
+                                                    color: 'var(--text-secondary)',
                                                     lineHeight: 1.5,
-                                                    marginBottom: 12,
+                                                    marginBottom: 16,
                                                     overflow: 'hidden',
                                                     display: '-webkit-box',
                                                     WebkitLineClamp: 2,
                                                     WebkitBoxOrient: 'vertical',
                                                     background: 'var(--bg-secondary)',
-                                                    padding: '6px 8px',
-                                                    borderRadius: 6
+                                                    padding: '8px 12px',
+                                                    borderRadius: 8,
+                                                    border: '1px solid var(--border)'
                                                 }}>
                                                     {lead.notes}
-                                                </p>
+                                                </div>
                                             )}
 
-                                            <div className="kanban-card-footer" style={{ marginTop: 'auto', paddingTop: 10, borderTop: '1px solid var(--border-light)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: '1px solid var(--border)' }}>
                                                 <div style={{ display: 'flex', gap: 6 }}>
                                                     {STAGES.filter(s => s.id !== stage.id && s.id !== 'new' && s.id !== 'followup' && s.id !== 'meeting' && s.id !== 'proposal' && s.id !== 'closed').slice(0, 3).map(s => (
                                                         <button
                                                             key={s.id}
                                                             onClick={() => handleMoveStage(lead._id, s.id)}
                                                             style={{
-                                                                fontSize: '0.6875rem',
-                                                                padding: '4px 8px',
+                                                                fontSize: '0.75rem',
+                                                                padding: '6px',
                                                                 background: 'var(--bg-secondary)',
                                                                 border: '1px solid var(--border)',
-                                                                borderRadius: 6,
+                                                                borderRadius: 8,
                                                                 cursor: 'pointer',
                                                                 color: 'var(--text-secondary)',
                                                                 fontWeight: 600,
                                                                 transition: 'all 0.15s',
                                                                 display: 'flex',
                                                                 alignItems: 'center',
-                                                                gap: 4
+                                                                justifyContent: 'center',
+                                                                width: 28,
+                                                                height: 28
                                                             }}
-                                                            onMouseEnter={e => e.currentTarget.style.borderColor = s.color}
-                                                            onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+                                                            onMouseEnter={e => { e.currentTarget.style.borderColor = s.color; e.currentTarget.style.background = 'var(--surface)'; }}
+                                                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg-secondary)'; }}
                                                             title={`Move to ${s.label}`}
                                                         >
                                                             {s.emoji}
@@ -254,12 +280,13 @@ export default function PipelinePage() {
                                                 </div>
                                                 {lead.followUpDate && (
                                                     <span style={{
-                                                        fontSize: '0.6875rem',
-                                                        fontWeight: 700,
-                                                        color: new Date(lead.followUpDate) < new Date() ? 'var(--danger)' : 'var(--text-tertiary)',
-                                                        background: 'var(--bg-secondary)',
-                                                        padding: '2px 6px',
-                                                        borderRadius: 4
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 800,
+                                                        color: new Date(lead.followUpDate) < new Date() ? 'var(--danger)' : 'var(--text-secondary)',
+                                                        background: new Date(lead.followUpDate) < new Date() ? '#fef2f2' : 'var(--bg-tertiary)',
+                                                        border: `1px solid ${new Date(lead.followUpDate) < new Date() ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                                                        padding: '4px 10px',
+                                                        borderRadius: 99
                                                     }}>
                                                         📅 {new Date(lead.followUpDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
                                                     </span>
