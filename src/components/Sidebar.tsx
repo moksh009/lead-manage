@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useSidebar } from './SidebarContext';
+import { useUser } from './UserContext';
 
 const navItems = [
     { href: '/', icon: '⊞', label: 'Dashboard' },
@@ -14,11 +15,13 @@ const navItems = [
     { href: '/clients', icon: '💼', label: 'Clients & Billing' },
     { href: '/team-goals', icon: '🏆', label: 'Team Goals' },
     { href: '/analytics', icon: '📈', label: 'Analytics' },
+    { href: '/rewards', icon: '👑', label: 'Rewards & Points' },
 ];
 
 export default function Sidebar() {
     const pathname = usePathname();
     const { collapsed, toggle, mobileOpen, setMobileOpen, isMobile } = useSidebar();
+    const { currentUser, setCurrentUser } = useUser();
 
     // Close drawer when route changes
     useEffect(() => { setMobileOpen(false); }, [pathname]);
@@ -135,13 +138,18 @@ export default function Sidebar() {
                     })}
                 </nav>
 
-                {/* Footer */}
-                <div className="sidebar-footer">
-                    <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>T</div>
+                {/* Footer User Switcher */}
+                <div className="sidebar-footer" style={{ cursor: 'pointer', transition: 'background var(--t-fast)', borderTop: '1px solid var(--border)' }} onClick={() => setCurrentUser(currentUser === 'Moksh' ? 'smit' : 'Moksh')} title="Click to switch identity">
+                    <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0, background: currentUser === 'Moksh' ? 'var(--accent)' : 'var(--info)' }}>
+                        {currentUser.charAt(0).toUpperCase()}
+                    </div>
                     {!(collapsed && !isMobile) && (
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <div className="sidebar-user-name">Top Edge AI</div>
-                            <div className="sidebar-user-role">Admin Panel</div>
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <div className="sidebar-user-name" style={{ textTransform: 'uppercase' }}>{currentUser}</div>
+                                <div className="sidebar-user-role">Founder</div>
+                            </div>
+                            <div style={{ color: 'var(--text-tertiary)', fontSize: '0.9rem' }}>⇄</div>
                         </div>
                     )}
                 </div>

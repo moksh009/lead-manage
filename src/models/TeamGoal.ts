@@ -6,7 +6,7 @@ export interface ITeamGoalTask {
 }
 
 export interface ITeamGoal extends Document {
-    user: 'MOKSH' | 'smit';
+    user: 'Moksh' | 'smit';
     date: Date;
     timeJoinedOffice: string;
     // Legacy fields
@@ -22,7 +22,7 @@ const TaskSchema = new Schema({
 }, { _id: true }); // Give tasks IDs so we can toggle them easily
 
 const TeamGoalSchema: Schema = new Schema({
-    user: { type: String, enum: ['MOKSH', 'smit'], required: true },
+    user: { type: String, enum: ['Moksh', 'smit'], required: true },
     date: { type: Date, required: true },
     timeJoinedOffice: { type: String, required: true }, // E.g. '09:00 AM'
     dailyGoals: { type: String, default: '' },

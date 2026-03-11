@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/components/UserContext';
 
 const CHANNELS = [
     { sentKey: 'dmsSent', leadChannel: 'dm', label: 'Instagram DMs', icon: '📸', color: '#e1306c', bg: '#fff1f5', desc: 'Direct messages via Instagram' },
@@ -14,6 +15,7 @@ type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
 export default function OutreachPage() {
     const router = useRouter();
+    const { currentUser } = useUser();
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
     // Per-channel numbers (sent counts only — user enters these)
@@ -92,14 +94,14 @@ export default function OutreachPage() {
                 // PATCH = set exact values (overwrite)
                 await fetch('/api/outreach', {
                     method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
                     body: JSON.stringify(payload)
                 });
             } else {
                 // POST = create new
                 await fetch('/api/outreach', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
                     body: JSON.stringify(payload)
                 });
             }

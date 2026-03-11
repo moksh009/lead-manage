@@ -55,6 +55,13 @@ export async function POST(request: NextRequest) {
             await upsertOutreachField(leadDate, replyField, 1);
         }
 
+        // --- Gamification Points ---
+        const user = request.headers.get('x-user');
+        if (user === 'Moksh' || user === 'smit') {
+            const { awardGamificationPoints } = await import('@/lib/gamification');
+            await awardGamificationPoints(user, 'ADD_LEAD', 5, `Added a new lead: ${data.companyName}`);
+        }
+
         return NextResponse.json({ success: true, data: lead }, { status: 201 });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 400 });

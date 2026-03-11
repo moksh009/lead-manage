@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { useUser } from '@/components/UserContext';
 
-const USERS = ['MOKSH', 'smit'] as const;
+const USERS = ['Moksh', 'smit'] as const;
 type User = typeof USERS[number];
 
 export default function TeamGoalsPage() {
+    const { currentUser } = useUser();
     const [goals, setGoals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -21,7 +23,7 @@ export default function TeamGoalsPage() {
 
     // New form state supporting dynamic tasks
     const [form, setForm] = useState({
-        user: 'MOKSH' as User,
+        user: 'Moksh' as User,
         date: new Date().toISOString().split('T')[0],
         timeJoinedOffice: '',
         tasks: [{ text: '', isCompleted: false }]
@@ -63,7 +65,7 @@ export default function TeamGoalsPage() {
         });
 
         setShowModal(false);
-        setForm({ user: 'MOKSH', date: new Date().toISOString().split('T')[0], timeJoinedOffice: '', tasks: [{ text: '', isCompleted: false }] });
+        setForm({ user: 'Moksh', date: new Date().toISOString().split('T')[0], timeJoinedOffice: '', tasks: [{ text: '', isCompleted: false }] });
         fetchGoals();
     };
 
@@ -82,7 +84,7 @@ export default function TeamGoalsPage() {
 
         await fetch('/api/team-goals', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
             body: JSON.stringify({ id: goalId, tasks: validTasks })
         });
     };
@@ -105,7 +107,7 @@ export default function TeamGoalsPage() {
         // API call
         await fetch('/api/team-goals', {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
             body: JSON.stringify({ id: goalId, tasks: updatedTasks })
         });
     };
@@ -148,7 +150,7 @@ export default function TeamGoalsPage() {
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ fontSize: '2rem', marginBottom: 8 }}>🏆</div>
                     <h1 className="page-hero-title">Team Goals</h1>
-                    <p className="page-hero-sub">Daily office tracking for MOKSH &amp; Smit &middot; {overallCompletionRate}% overall completion</p>
+                    <p className="page-hero-sub">Daily office tracking for Moksh &amp; Smit &middot; {overallCompletionRate}% overall completion</p>
                     <div className="page-hero-actions">
                         <button className="btn-hero btn-hero-primary" onClick={() => setShowModal(true)}>+ Log Today</button>
                     </div>
@@ -160,7 +162,7 @@ export default function TeamGoalsPage() {
                 {[
                     { label: 'Total Days', value: totalDays, icon: '📅', color: '#2563eb', bg: '#eff6ff' },
                     { label: 'Completion Rate', value: `${overallCompletionRate}%`, icon: '✅', color: overallCompletionRate >= 70 ? '#16a34a' : '#d97706', bg: overallCompletionRate >= 70 ? '#f0fdf4' : '#fffbeb' },
-                    { label: 'MOKSH Logs', value: goals.filter(g => g.user === 'MOKSH').length, icon: '👤', color: '#7c3aed', bg: '#faf5ff' },
+                    { label: 'Moksh Logs', value: goals.filter(g => g.user === 'Moksh').length, icon: '👤', color: '#7c3aed', bg: '#faf5ff' },
                     { label: 'Smit Logs', value: goals.filter(g => g.user === 'smit').length, icon: '👤', color: '#0284c7', bg: '#f0f9ff' },
                 ].map(s => (
                     <div key={s.label} className="stat-card card-hover" style={{ borderRadius: 'var(--radius-xl)' }}>
@@ -179,7 +181,7 @@ export default function TeamGoalsPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                     {USERS.map(user => {
                         const entry = todayGoals.find(g => g.user === user);
-                        const gradClass = user === 'MOKSH' ? 'avatar-gradient-1' : 'avatar-gradient-2';
+                        const gradClass = user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2';
 
                         let progress = 0;
                         let allDone = false;
@@ -336,7 +338,7 @@ export default function TeamGoalsPage() {
                                         <tr key={g._id}>
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                    <div className={`avatar avatar-sm ${g.user === 'MOKSH' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
+                                                    <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
                                                     <span style={{ fontWeight: 700 }}>{g.user}</span>
                                                 </div>
                                             </td>

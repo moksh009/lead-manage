@@ -35,6 +35,10 @@ export async function PATCH(
         const leadDate = existing.leadDate || existing.createdAt || new Date();
 
         // Handle meeting auto-tracking
+        // Handle meeting auto-tracking
+        let meetingBounty = 0;
+        let closedBounty = 0;
+
         if (newStage !== undefined && newStage !== existing.pipelineStage) {
             const isNowMeeting = ['meeting', 'meeting booked', 'meeting booked not convert', 'upcoming call', 'upcoming google-meet', 'no show up'].includes(newStage);
             const wasMeeting = existing.countedAsMeeting;
@@ -43,10 +47,12 @@ export async function PATCH(
                 // Just moved to meeting — increment meetings
                 await upsertOutreachField(leadDate, 'meetings', 1);
                 data.countedAsMeeting = true;
+                meetingBounty = 100;
             } else if (!isNowMeeting && wasMeeting) {
                 // Moved away from meeting — decrement meetings
                 await upsertOutreachField(leadDate, 'meetings', -1);
                 data.countedAsMeeting = false;
+                meetingBounty = -100;
             }
 
             const isNowClosed = ['closed', 'closed won', 'client'].includes(newStage);
@@ -56,19 +62,35 @@ export async function PATCH(
                 // Just moved to closed — increment clientsClosed
                 await upsertOutreachField(leadDate, 'clientsClosed', 1);
                 data.countedAsClosed = true;
+                closedBounty = 500;
                 // If wasn't already counted as meeting, count it as meeting too
                 if (!existing.countedAsMeeting && !data.countedAsMeeting) {
                     await upsertOutreachField(leadDate, 'meetings', 1);
                     data.countedAsMeeting = true;
+                    meetingBounty += 100;
                 }
             } else if (!isNowClosed && wasClosed) {
                 // Moved away from closed — decrement clientsClosed
                 await upsertOutreachField(leadDate, 'clientsClosed', -1);
                 data.countedAsClosed = false;
+                closedBounty = -500;
             }
         }
 
         const updated = await Lead.findByIdAndUpdate(id, data, { new: true });
+        
+        // --- Gamification Points (High-Stakes Bounties) ---
+        const user = request.headers.get('x-user');
+        if ((meetingBounty !== 0 || closedBounty !== 0) && (user === 'MOKSH' || user === 'smit')) {
+            const { awardGamificationPoints } = await import('@/lib/gamification');
+            if (meetingBounty !== 0) {
+                await awardGamificationPoints(user, meetingBounty > 0 ? 'BOUNTY_MEETING' : 'REVERT_MEETING', meetingBounty, meetingBounty > 0 ? `Bounty: Booked a meeting for ${existing.companyName}` : `Lost meeting status for ${existing.companyName}`);
+            }
+            if (closedBounty !== 0) {
+                await awardGamificationPoints(user, closedBounty > 0 ? 'BOUNTY_CLOSED' : 'REVERT_CLOSED', closedBounty, closedBounty > 0 ? `Mega-Bounty: Secured new Client 🎉 (${existing.companyName})` : `Lost client status for ${existing.companyName}`);
+            }
+        }
+
         return NextResponse.json({ success: true, data: updated });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 400 });

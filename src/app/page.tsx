@@ -194,7 +194,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Overview</h1>
-          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Performance metrics for MOKSH & Smit</p>
+          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Performance metrics for Moksh & Smit</p>
           <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
             <Link href="/outreach">
               <button className="btn" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>📋 Add Daily Log</button>
@@ -220,7 +220,7 @@ export default function DashboardPage() {
             {todayGoals.map(g => (
               <div key={g._id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius-xl)', padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', transition: 'transform var(--t-fast)' }} className="card-hover">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div className={`avatar avatar-sm ${g.user === 'MOKSH' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
+                  <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
                   <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user}</span>
                   <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: 99 }}>🕐 {g.timeJoinedOffice}</span>
                 </div>

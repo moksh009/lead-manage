@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Sidebar from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/SidebarContext';
+import { UserProvider } from '@/components/UserContext';
 import MainContentWrapper from '@/components/MainContentWrapper';
 
 export const metadata: Metadata = {
@@ -16,14 +17,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <SidebarProvider>
-          <div className="app-layout">
-            <Sidebar />
-            <MainContentWrapper>
-              {children}
-            </MainContentWrapper>
-          </div>
-        </SidebarProvider>
+        <UserProvider>
+          <SidebarProvider>
+            <div className="app-layout">
+              <Sidebar />
+              <MainContentWrapper>
+                {children}
+              </MainContentWrapper>
+            </div>
+          </SidebarProvider>
+        </UserProvider>
       </body>
     </html>
   );

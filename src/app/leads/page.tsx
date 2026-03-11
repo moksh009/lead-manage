@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { format } from 'date-fns';
+import { useUser } from '@/components/UserContext';
 
 type LeadType = 'Unqualified Lead' | 'Soft lead' | 'Qualified' | 'Hot lead';
 type Channel = 'dm' | 'email' | 'whatsapp' | 'call';
@@ -237,6 +238,7 @@ const STATUS_CONFIG: Record<string, { color: string; bg: string; emoji: string }
 
 
 export default function LeadsPage() {
+    const { currentUser } = useUser();
     const [leads, setLeads] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -333,7 +335,7 @@ export default function LeadsPage() {
         try {
             await fetch('/api/leads', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
                 body: JSON.stringify({
                     ...form,
                     leadDate: form.leadDate ? new Date(form.leadDate) : new Date(),
@@ -399,7 +401,7 @@ export default function LeadsPage() {
         try {
             await fetch('/api/leads', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-user': currentUser },
                 body: JSON.stringify({
                     ...inlineForm,
                     leadDate: inlineForm.leadDate ? new Date(inlineForm.leadDate) : new Date(),

@@ -12,13 +12,27 @@ export async function POST(request: NextRequest) {
 
         if (existingEntry) {
             // Accumulate (add on top of existing)
+            const sumAdded = (Number(data.dmsSent) || 0) + (Number(data.emailsSent) || 0) + (Number(data.whatsappSent) || 0) + (Number(data.callsMade) || 0);
+            
             existingEntry.dmsSent += Number(data.dmsSent) || 0;
             existingEntry.emailsSent += Number(data.emailsSent) || 0;
             existingEntry.whatsappSent += Number(data.whatsappSent) || 0;
             existingEntry.callsMade += Number(data.callsMade) || 0;
             await existingEntry.save();
+
+            // --- Gamification Points ---
+            const user = request.headers.get('x-user');
+            if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+                const pointsToAward = Math.floor(sumAdded / 10);
+                if (pointsToAward > 0) {
+                    const { awardGamificationPoints } = await import('@/lib/gamification');
+                    await awardGamificationPoints(user, 'ADD_OUTREACH', pointsToAward, `Sent +${sumAdded} new outreach messages`);
+                }
+            }
+
             return NextResponse.json({ success: true, data: existingEntry });
         } else {
+            const sumAdded = (Number(data.dmsSent) || 0) + (Number(data.emailsSent) || 0) + (Number(data.whatsappSent) || 0) + (Number(data.callsMade) || 0);
             const newEntry = await Outreach.create({
                 date: new Date(data.date),
                 dmsSent: Number(data.dmsSent) || 0,
@@ -32,6 +46,17 @@ export async function POST(request: NextRequest) {
                 meetings: 0,
                 clientsClosed: 0,
             });
+
+            // --- Gamification Points ---
+            const user = request.headers.get('x-user');
+            if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+                const pointsToAward = Math.floor(sumAdded / 10);
+                if (pointsToAward > 0) {
+                    const { awardGamificationPoints } = await import('@/lib/gamification');
+                    await awardGamificationPoints(user, 'ADD_OUTREACH', pointsToAward, `Sent ${sumAdded} outreach messages`);
+                }
+            }
+
             return NextResponse.json({ success: true, data: newEntry }, { status: 201 });
         }
     } catch (error: any) {
@@ -51,11 +76,34 @@ export async function PATCH(request: NextRequest) {
         }
 
         // Only update fields that were sent in the request
-        const fields = ['dmsSent', 'emailsSent', 'whatsappSent', 'callsMade'];
+        const fields: Array<keyof typeof existing> = ['dmsSent', 'emailsSent', 'whatsappSent', 'callsMade'];
+        let sumAdded = 0;
+
         for (const f of fields) {
-            if (data[f] !== undefined) existing[f] = Number(data[f]) || 0;
+            if (data[f] !== undefined) {
+                const newVal = Number(data[f]) || 0;
+                const oldVal = existing[f] as number;
+                if (newVal > oldVal) {
+                    sumAdded += (newVal - oldVal);
+                }
+                existing[f] = newVal;
+            }
         }
         await existing.save();
+
+        // --- Gamification Points ---
+        const user = request.headers.get('x-user');
+        if (sumAdded > 0 && (user === 'MOKSH' || user === 'smit')) {
+            const pointsToAward = Math.floor(sumAdded / 10);
+            if (pointsToAward > 0) {
+                const Point = (await import('@/models/Point')).default;
+                await Point.create({
+                    user, action: 'ADD_OUTREACH', points: pointsToAward,
+                    description: `Updated log: +${sumAdded} outreach messages`, date: new Date()
+                });
+            }
+        }
+
         return NextResponse.json({ success: true, data: existing });
     } catch (error: any) {
         return NextResponse.json({ success: false, error: error.message }, { status: 400 });
