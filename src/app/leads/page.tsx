@@ -248,6 +248,10 @@ export default function LeadsPage() {
     const [activeTab, setActiveTab] = useState<'table' | 'followups'>('table');
     const [saving, setSaving] = useState(false);
 
+    // Selected Leads State
+    const [selectedLeadsList, setSelectedLeadsList] = useState<any[]>([]);
+    const [leadSearchStr, setLeadSearchStr] = useState('');
+
     // Edit mode state for existing leads
     const [isEditingExisting, setIsEditingExisting] = useState(false);
     const [editForm, setEditForm] = useState<any>(null);
@@ -428,10 +432,44 @@ export default function LeadsPage() {
         try {
             await fetch(`/api/leads/${id}`, { method: 'DELETE' });
             setLeads(leads.filter(l => l._id !== id));
+            setSelectedLeadsList(prev => prev.filter(sl => sl._id !== id));
             if (selectedLead?._id === id) setShowModal(false);
         } catch (err) {
             console.error('Failed to delete lead', err);
         }
+    };
+
+    const handleDownloadCSV = () => {
+        if (selectedLeadsList.length === 0) return;
+        
+        const headers = ['Company Name', 'Prospect Name', 'Phone Number', 'Link', 'Lead Type', 'Channel', 'Pipeline Stage', 'Follow-up Date', 'Notes', 'Added On'];
+        const csvContent = [
+            headers.join(','),
+            ...selectedLeadsList.map(lead => {
+                return [
+                    `"${(lead.companyName || '').replace(/"/g, '""')}"`,
+                    `"${(lead.prospectName || '').replace(/"/g, '""')}"`,
+                    `"${String(lead.phoneNumber || '').replace(/"/g, '""')}"`,
+                    `"${(lead.link || '').replace(/"/g, '""')}"`,
+                    `"${(lead.leadType || '').replace(/"/g, '""')}"`,
+                    `"${(lead.channel || '').replace(/"/g, '""')}"`,
+                    `"${(lead.pipelineStage || '').replace(/"/g, '""')}"`,
+                    `"${lead.followUpDate ? new Date(lead.followUpDate).toLocaleDateString('en-IN') : ''}"`,
+                    `"${(lead.notes || '').replace(/"/g, '""')}"`,
+                    `"${new Date(lead.createdAt).toLocaleDateString('en-IN')}"`
+                ].join(',');
+            })
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `selected_leads_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const counts = {
@@ -579,6 +617,115 @@ export default function LeadsPage() {
                         <button className="btn-hero btn-hero-primary" onClick={() => setShowModal(true)}>+ New Lead</button>
                     </div>
                 </div>
+            </div>
+
+            {/* Selected Leads Section */}
+            <div style={{
+                background: 'var(--surface)',
+                padding: '20px',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid var(--border)',
+                marginBottom: 24,
+                boxShadow: 'var(--shadow-sm)',
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0 }}>Selected Leads Export</h2>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: '4px 0 0 0' }}>{selectedLeadsList.length} leads selected</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        {selectedLeadsList.length > 0 && (
+                            <>
+                                <button className="btn btn-secondary btn-sm" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => setSelectedLeadsList([])}>
+                                    Clear All
+                                </button>
+                                <button className="btn btn-premium btn-sm" onClick={handleDownloadCSV}>
+                                    ⬇️ Download CSV
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Dropdown / Search to add leads manually */}
+                <div style={{ position: 'relative', marginBottom: selectedLeadsList.length > 0 ? 16 : 0, maxWidth: 400 }}>
+                    <input
+                        type="search"
+                        className="form-input"
+                        placeholder="Search leads to add to selection..."
+                        value={leadSearchStr}
+                        onChange={e => setLeadSearchStr(e.target.value)}
+                        style={{ padding: '8px 12px', fontSize: '0.9rem', width: '100%', border: '1px solid var(--border-medium)' }}
+                    />
+                    {leadSearchStr.length > 0 && (
+                        <div style={{
+                            position: 'absolute', top: '100%', left: 0, right: 0,
+                            background: 'var(--surface)', border: '1px solid var(--border)',
+                            borderRadius: 8, marginTop: 4, maxHeight: 250, overflowY: 'auto',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 99
+                        }}>
+                            {leads.filter(l => 
+                                !selectedLeadsList.find(sl => sl._id === l._id) &&
+                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) || 
+                                 l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
+                            ).slice(0, 50).map(l => (
+                                <div
+                                    key={l._id}
+                                    style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                                    onClick={() => {
+                                        setSelectedLeadsList([...selectedLeadsList, l]);
+                                        setLeadSearchStr('');
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{l.companyName}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{l.prospectName || 'No prospect name'}</div>
+                                    </div>
+                                    <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>+</span>
+                                </div>
+                            ))}
+                            {leads.filter(l => 
+                                !selectedLeadsList.find(sl => sl._id === l._id) &&
+                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) || 
+                                 l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
+                            ).length === 0 && (
+                                <div style={{ padding: '12px 14px', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                                    No unfound leads matching "{leadSearchStr}"
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Selected Leads List */}
+                {selectedLeadsList.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 280, overflowY: 'auto', paddingRight: 4, marginTop: 12 }}>
+                        {selectedLeadsList.map(l => (
+                            <div key={l._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: 12, border: '1px solid var(--border)' }}>
+                                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                                    <div className="avatar avatar-sm avatar-gradient-1">{l.companyName?.[0] || '?'}</div>
+                                    <div>
+                                        <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{l.companyName}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: 2 }}>
+                                            {l.phoneNumber && <span style={{ marginRight: 12 }}>📞 {l.phoneNumber}</span>}
+                                            {l.leadType && <span>🏷️ {l.leadType}</span>}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button 
+                                    className="btn-icon-sm" 
+                                    style={{ color: 'var(--danger)', background: 'rgba(239,68,68,0.1)', cursor: 'pointer' }}
+                                    onClick={() => setSelectedLeadsList(selectedLeadsList.filter(sl => sl._id !== l._id))}
+                                    title="Remove from selection"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* Filter Toolbar Area */}
@@ -833,6 +980,21 @@ export default function LeadsPage() {
                                         </td>
                                         <td>
                                             <div style={{ display: 'flex', gap: 6 }}>
+                                                <button 
+                                                    className="btn btn-ghost btn-sm" 
+                                                    style={{ padding: '0 8px', color: 'var(--text-primary)', background: selectedLeadsList.find(sl => sl._id === lead._id) ? 'var(--success-light, #dcfce7)' : 'var(--bg-secondary)', border: '1px solid var(--border)' }} 
+                                                    onClick={e => { 
+                                                        e.stopPropagation(); 
+                                                        if(!selectedLeadsList.find(sl => sl._id === lead._id)) {
+                                                            setSelectedLeadsList([...selectedLeadsList, lead]); 
+                                                        } else {
+                                                            setSelectedLeadsList(selectedLeadsList.filter(sl => sl._id !== lead._id));
+                                                        }
+                                                    }} 
+                                                    title={selectedLeadsList.find(sl => sl._id === lead._id) ? "Remove from Export List" : "Add to Export List"}
+                                                >
+                                                    {selectedLeadsList.find(sl => sl._id === lead._id) ? '✓ Added' : '+ Add'}
+                                                </button>
                                                 <button className="btn btn-ghost btn-sm" onClick={e => { e.stopPropagation(); setSelectedLead(lead); setShowModal(true); }}>Details →</button>
                                                 <button className="btn btn-ghost btn-sm" style={{ padding: '0 8px', color: 'var(--danger)', background: 'rgba(239,68,68,0.05)' }} onClick={e => handleDeleteLead(lead._id, e)} title="Delete Lead">🗑️</button>
                                             </div>
