@@ -17,6 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+        <div className="global-glow-top" />
+        <div className="global-glow-bottom" />
         <UserProvider>
           <SidebarProvider>
             <div className="app-layout">

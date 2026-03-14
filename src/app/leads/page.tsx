@@ -604,19 +604,21 @@ export default function LeadsPage() {
                 }
             `}</style>
 
-            {/* Premium hero */}
-            <div className="page-hero" style={{ marginBottom: 20 }}>
+            {/* Premium hero - dark glassmorphism */}
+            <div className="card" style={{ padding: '32px', marginBottom: 24, position: 'relative', overflow: 'hidden' }}>
+                {/* Decorative glow */}
+                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                        <span style={{ fontSize: '1.875rem' }}>🎯</span>
-                        <span style={{ fontSize: '0.8125rem', fontWeight: 600, background: 'rgba(255,255,255,0.2)', padding: '3px 12px', borderRadius: 99, backdropFilter: 'blur(8px)' }}>
+                        <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>🎯</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
                             {leads.length} Leads · {counts.Qualified} Qualified
                         </span>
                     </div>
-                    <h1 className="page-hero-title">Leads</h1>
-                    <p className="page-hero-sub">{leads.length} leads · {counts.Qualified} qualified · {followUps.length} with follow-ups</p>
-                    <div className="page-hero-actions">
-                        <button className="btn-hero btn-hero-primary" onClick={() => setShowModal(true)}>+ New Lead</button>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Leads</h1>
+                    <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', margin: '0 0 20px 0' }}>{leads.length} leads · {counts.Qualified} qualified · {followUps.length} with follow-ups</p>
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                        <button className="btn" style={{ background: 'var(--accent-gradient)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(168,85,247,0.35)', fontWeight: 700 }} onClick={() => setShowModal(true)}>+ New Lead</button>
                     </div>
                 </div>
             </div>
@@ -732,14 +734,14 @@ export default function LeadsPage() {
 
             {/* Filter Toolbar Area */}
             <div style={{
-                background: 'rgba(255, 255, 255, 0.70)',
+                background: 'rgba(255, 255, 255, 0.03)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
                 padding: '16px 20px',
                 borderRadius: 'var(--radius-xl)',
-                border: '1px solid var(--border)',
+                border: '1px solid rgba(255,255,255,0.08)',
                 marginBottom: 24,
-                boxShadow: 'var(--shadow-sm)',
+                boxShadow: '0 4px 24px -8px rgba(168, 85, 247, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 16
@@ -750,7 +752,7 @@ export default function LeadsPage() {
                         <button
                             key={t}
                             onClick={() => setFilterType(t)}
-                            style={{ padding: '8px 16px', borderRadius: 99, fontSize: '0.85rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)', background: filterType === t ? 'var(--text-primary)' : 'transparent', color: filterType === t ? 'white' : 'var(--text-secondary)', borderColor: filterType === t ? 'transparent' : 'var(--border)' }}
+                            style={{ padding: '8px 16px', borderRadius: 99, fontSize: '0.85rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.2s cubic-bezier(0.25, 1, 0.5, 1)', background: filterType === t ? 'var(--accent-gradient)' : 'rgba(255,255,255,0.04)', color: filterType === t ? 'white' : 'var(--text-secondary)', borderColor: filterType === t ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.08)', boxShadow: filterType === t ? '0 4px 14px rgba(168,85,247,0.3)' : 'none' }}
                         >
                             {t} <span style={{ opacity: filterType === t ? 0.8 : 0.6, marginLeft: 4 }}>({counts[t as keyof typeof counts]})</span>
                         </button>
@@ -762,7 +764,7 @@ export default function LeadsPage() {
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginRight: 4 }}>Channel:</span>
                     <button
                         onClick={() => setFilterChannel('all')}
-                        style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s', background: filterChannel === 'all' ? 'var(--text-primary)' : 'transparent', color: filterChannel === 'all' ? 'white' : 'var(--text-secondary)', borderColor: filterChannel === 'all' ? 'transparent' : 'var(--border)' }}
+                        style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 600, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s', background: filterChannel === 'all' ? 'var(--accent-gradient)' : 'rgba(255,255,255,0.04)', color: filterChannel === 'all' ? 'white' : 'var(--text-secondary)', borderColor: filterChannel === 'all' ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.08)' }}
                     >
                         All ({leads.length})
                     </button>
@@ -773,7 +775,7 @@ export default function LeadsPage() {
                             <button
                                 key={ch.key}
                                 onClick={() => setFilterChannel(active ? 'all' : ch.key)}
-                                style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: active ? ch.color : `${ch.color}10`, color: active ? 'white' : ch.color, boxShadow: active ? `0 4px 12px ${ch.color}40` : 'none' }}
+                                style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: active ? ch.color : `${ch.color}18`, color: active ? 'white' : ch.color, boxShadow: active ? `0 4px 12px ${ch.color}40` : 'none' }}
                             >
                                 {ch.icon} {ch.label} ({count})
                             </button>
@@ -1139,47 +1141,106 @@ export default function LeadsPage() {
                         const days = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / 86400000);
                         const isOverdue = days < 0;
                         const isUrgent = days >= 0 && days <= 1;
-                        const isNear = days > 1 && days <= 3;
+                        const cardBg = isOverdue ? 'rgba(239, 68, 68, 0.05)' : isUrgent ? 'rgba(245, 158, 11, 0.05)' : 'rgba(255, 255, 255, 0.02)';
+                        const cardBorder = isOverdue ? 'rgba(239, 68, 68, 0.25)' : isUrgent ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.06)';
+                        const accentColor = isOverdue ? '#ef4444' : isUrgent ? '#f59e0b' : '#10b981';
+
                         return (
-                            <div key={lead._id} className="card card-p card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--surface)', borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)' }} onClick={() => setSelectedLead(lead)}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                            <div key={lead._id} className="card card-hover" style={{ 
+                                display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', 
+                                padding: '24px',
+                                background: cardBg, 
+                                borderColor: cardBorder,
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }} onClick={() => setSelectedLead(lead)}>
+                                {/* Urgency glow at top */}
+                                <div style={{ 
+                                    position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                                    width: '60%', height: '40px',
+                                    background: `radial-gradient(ellipse at top, ${accentColor}20 0%, transparent 70%)`,
+                                    pointerEvents: 'none'
+                                }} />
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start', position: 'relative' }}>
                                     <div style={{ display: 'flex', gap: 14 }}>
-                                        <div className="avatar avatar-md avatar-gradient-1">{lead.companyName?.[0]}</div>
+                                        <div className="avatar avatar-md avatar-gradient-1" style={{ width: 42, height: 42 }}>{lead.companyName?.[0]}</div>
                                         <div>
-                                            <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-primary)' }}>{lead.companyName}</div>
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
+                                            <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'white' }}>{lead.companyName}</div>
+                                            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{lead.prospectName}</div>
                                         </div>
                                     </div>
                                     <div style={{ textAlign: 'right' }}>
                                         <span style={{
-                                            fontSize: '0.75rem', fontWeight: 800, padding: '4px 10px', borderRadius: 99,
-                                            background: isOverdue ? '#fee2e2' : isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
-                                            color: isOverdue ? 'var(--danger)' : isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
-                                            border: `1px solid ${isOverdue ? 'rgba(220,38,38,0.4)' : isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                                            fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: 99,
+                                            background: `${accentColor}15`,
+                                            color: accentColor,
+                                            border: `1px solid ${accentColor}30`,
+                                            textTransform: 'uppercase', letterSpacing: '0.05em',
                                             whiteSpace: 'nowrap', display: 'inline-block', marginBottom: 6
                                         }}>
                                             {isOverdue ? `🚨 ${Math.abs(days)}d overdue` : days === 0 ? '🔥 Today!' : days === 1 ? '⚡ Tomorrow' : `${days} days`}
                                         </span>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>{format(new Date(lead.followUpDate), 'MMM dd, yyyy')}</div>
+                                        <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{format(new Date(lead.followUpDate), 'MMM dd, yyyy')}</div>
                                     </div>
                                 </div>
+
                                 {lead.notes && (
-                                    <div style={{ padding: '12px 14px', background: 'rgba(0,0,0,0.03)', borderRadius: 12, border: '1px solid rgba(0,0,0,0.04)' }}>
-                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                    <div style={{ 
+                                        padding: '12px 14px', 
+                                        background: 'rgba(0,0,0,0.2)', 
+                                        borderRadius: 12, 
+                                        border: '1px solid rgba(255,255,255,0.03)' 
+                                    }}>
+                                        <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
                                             {lead.notes.length > 120 ? `${lead.notes.slice(0, 120)}...` : lead.notes}
                                         </div>
                                     </div>
                                 )}
-                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
+
+                                <div style={{ 
+                                    borderTop: '1px solid rgba(255,255,255,0.05)', 
+                                    paddingTop: 16, 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    flexWrap: 'wrap', 
+                                    alignItems: 'center' 
+                                }}>
                                     <div style={{ display: 'flex', gap: 8 }}>
-                                        {lead.phoneNumber && <a href={`tel:${lead.phoneNumber}`} className="btn-icon-sm" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>📞</a>}
-                                        {lead.phoneNumber && <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="btn-icon-sm" style={{ background: '#25d36615', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>💬</a>}
+                                        {lead.phoneNumber && (
+                                            <a href={`tel:${lead.phoneNumber}`} 
+                                               style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', transition: 'all 0.2s' }} 
+                                               onClick={e => e.stopPropagation()}
+                                            >📞</a>
+                                        )}
+                                        {lead.phoneNumber && (
+                                            <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} 
+                                               target="_blank" rel="noreferrer" 
+                                               style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(37,211,102,0.1)', border: '1px solid rgba(37,211,102,0.2)', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', transition: 'all 0.2s' }} 
+                                               onClick={e => e.stopPropagation()}
+                                            >💬</a>
+                                        )}
                                     </div>
                                     <button
                                         onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
-                                        style={{ background: 'rgba(52,211,153,0.15)', color: '#10b981', border: '1px solid rgba(52,211,153,0.3)', borderRadius: 99, padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: '0.85rem', fontWeight: 700, transition: 'all 0.15s' }}
-                                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(52,211,153,0.25)'}
-                                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(52,211,153,0.15)'}
+                                        style={{ 
+                                            background: 'rgba(16, 185, 129, 0.1)', 
+                                            color: '#10b981', 
+                                            border: '1px solid rgba(16, 185, 129, 0.25)', 
+                                            borderRadius: 12, 
+                                            padding: '8px 18px', 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: 6, 
+                                            cursor: 'pointer', 
+                                            fontSize: '0.82rem', 
+                                            fontWeight: 800, 
+                                            transition: 'all 0.2s',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.02em'
+                                        }}
+                                        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; e.currentTarget.style.transform = 'scale(1.02)'; }}
+                                        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'; e.currentTarget.style.transform = 'scale(1)'; }}
                                     >
                                         ✓ Mark Done
                                     </button>

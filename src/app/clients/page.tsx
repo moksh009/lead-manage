@@ -252,14 +252,20 @@ export default function ClientsPage() {
 
     return (
         <div className="animate-in">
-            {/* Premium hero */}
-            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)', marginBottom: 20 }}>
+            {/* Dark glassmorphic hero */}
+            <div className="card" style={{ padding: '32px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>💼</div>
-                    <h1 className="page-hero-title">Clients &amp; Billing</h1>
-                    <p className="page-hero-sub">{clients.filter(c => c.isActive).length} active clients &middot; ₹{totalMRR.toLocaleString()} monthly revenue</p>
-                    <div className="page-hero-actions">
-                        <button className="btn-hero btn-hero-primary" onClick={() => { setForm(EMPTY_FORM); setShowAddModal(true); }}>+ Add Client</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>💼</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
+                            {clients.filter(c => c.isActive).length} Active · ₹{totalMRR.toLocaleString()}/mo
+                        </span>
+                    </div>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Clients & Billing</h1>
+                    <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', margin: '0 0 20px 0' }}>{clients.filter(c => c.isActive).length} active clients · ₹{totalMRR.toLocaleString()} monthly revenue</p>
+                    <div style={{ display: 'flex', gap: 12 }}>
+                        <button className="btn" style={{ background: 'var(--accent-gradient)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(168,85,247,0.35)', fontWeight: 700 }} onClick={() => { setForm(EMPTY_FORM); setShowAddModal(true); }}>+ Add Client</button>
                     </div>
                 </div>
             </div>

@@ -139,12 +139,18 @@ export default function OutreachPage() {
     return (
         <div className="animate-in" style={{ maxWidth: 720, margin: '0 auto' }}>
 
-            {/* Hero */}
-            <div className="page-hero" style={{ marginBottom: 24 }}>
+            {/* Dark glassmorphic hero */}
+            <div className="card" style={{ marginBottom: 24, padding: '28px 32px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, background: 'radial-gradient(circle, rgba(168,85,247,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ fontSize: '2rem', marginBottom: 8 }}>📊</div>
-                    <h1 className="page-hero-title">Daily Outreach Log</h1>
-                    <p className="page-hero-sub">Track messages sent per channel — replies are auto-calculated from leads you add</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                        <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>📊</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
+                            Daily Tracking
+                        </span>
+                    </div>
+                    <h1 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Daily Outreach Log</h1>
+                    <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.5)', margin: 0 }}>Track messages sent per channel — replies are auto-calculated from leads you add</p>
                 </div>
             </div>
 

@@ -13,11 +13,11 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 const chartDefaults = {
   plugins: {
-    legend: { labels: { color: '#6b7280', font: { family: 'inherit', size: 12 }, usePointStyle: true, pointStyleWidth: 8 } },
+    legend: { labels: { color: '#94a3b8', font: { family: 'inherit', size: 12 }, usePointStyle: true, pointStyleWidth: 8 } },
     tooltip: {
-      backgroundColor: 'rgba(255,255,255,0.98)',
-      titleColor: '#111110', bodyColor: '#6b7280',
-      borderColor: 'rgba(0,0,0,0.08)', borderWidth: 1,
+      backgroundColor: 'rgba(15, 15, 19, 0.98)',
+      titleColor: '#ffffff', bodyColor: '#94a3b8',
+      borderColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1,
       padding: 12, cornerRadius: 10,
     }
   },
@@ -50,13 +50,17 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
 };
 
 export default function DashboardPage() {
-  const [leads, setLeads] = useState<any[]>([]);
-  const [clients, setClients] = useState<any[]>([]);
-  const [goals, setGoals] = useState<any[]>([]);
-  const [outreachStats, setOutreachStats] = useState<any>(null);
+  const [leads, setLeads] = useState<Record<string, unknown>[]>([]);
+  const [clients, setClients] = useState<Record<string, unknown>[]>([]);
+  const [goals, setGoals] = useState<Record<string, unknown>[]>([]);
+  const [outreachStats, setOutreachStats] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
+    // Only run on client-side
+    setNow(Date.now());
+    
     Promise.all([
       fetch('/api/outreach').then(r => r.json()),
       fetch('/api/leads').then(r => r.json()),
@@ -111,12 +115,12 @@ export default function DashboardPage() {
   const sentByChannel = outreachStats?.byChannel || { dms: 0, emails: 0, whatsapp: 0, calls: 0 };
 
   const todayGoals = goals.filter(g => {
-    const d = new Date(g.date);
+    const d = new Date(g.date as string | number);
     const today = new Date();
     return d.toDateString() === today.toDateString();
   });
 
-  const handleMarkFollowUpDone = async (e: any, leadId: string) => {
+  const handleMarkFollowUpDone = async (e: React.MouseEvent, leadId: string) => {
     e.stopPropagation();
     try {
       await fetch(`/api/leads/${leadId}`, {
@@ -124,7 +128,7 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ followUpDate: null })
       });
-      setLeads(prev => prev.map(l => l._id === leadId ? { ...l, followUpDate: null } : l));
+      setLeads(prev => prev.map(l => l._id === leadId ? { ...l, followUpDate: undefined } : l));
     } catch (err) {
       console.error(err);
     }
@@ -134,8 +138,8 @@ export default function DashboardPage() {
     labels: ['Total Leads', 'Meetings', 'Closed Won', 'Ghosted', 'No Show Up', 'Meeting Details (Not Converted)'],
     datasets: [{
       data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, leads.filter(l => getStage(l) === 'no show up').length, notConvertedMeetingLeads.length],
-      backgroundColor: ['#2563eb', '#10b981', '#16a34a', '#6b7280', '#ff3b30', '#f97316'],
-      borderColor: '#ffffff', borderWidth: 3, hoverOffset: 8,
+      backgroundColor: ['#a855f7', '#10b981', '#16a34a', '#6b7280', '#ef4444', '#f97316'],
+      borderColor: 'var(--bg)', borderWidth: 3, hoverOffset: 8,
     }],
   };
 
@@ -144,25 +148,27 @@ export default function DashboardPage() {
     datasets: [{
       label: 'Leads',
       data: [totalLeads, meetingLeads.length, closedLeads.length, ghostedLeads.length, leads.filter(l => getStage(l) === 'no show up').length, notConvertedMeetingLeads.length],
-      backgroundColor: ['rgba(37,99,235,0.18)', 'rgba(16,185,129,0.45)', 'rgba(22,163,74,0.85)', 'rgba(107,114,128,0.5)', 'rgba(255,59,48,0.5)', 'rgba(249,115,22,0.4)'],
+      backgroundColor: ['rgba(168,85,247,0.3)', 'rgba(16,185,129,0.5)', 'rgba(22,163,74,0.9)', 'rgba(107,114,128,0.3)', 'rgba(239,68,68,0.5)', 'rgba(249,115,22,0.4)'],
+      borderColor: ['rgba(168,85,247,1)', 'rgba(16,185,129,1)', 'rgba(22,163,74,1)', 'rgba(107,114,128,1)', 'rgba(239,68,68,1)', 'rgba(249,115,22,1)'],
+      borderWidth: 1,
       borderRadius: 7, indexAxis: 'y' as const,
     }],
   };
 
   const statCards = [
-    { label: 'Outreach Sent', value: totalSent, icon: '📤', color: 'var(--text-primary)', bg: 'var(--surface)', change: 'All channels combined', dir: 'neutral' },
-    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: 'var(--text-primary)', bg: 'var(--surface)', change: 'Total leads captured', dir: 'neutral' },
-    { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', color: 'var(--success)', bg: 'var(--surface)', change: `${meetingRate}% of leads`, dir: 'neutral' },
-    { label: 'Closed Won', value: closedLeads.length, icon: '🤝', color: 'var(--accent)', bg: 'var(--surface)', change: `${closeRate}% close rate`, dir: 'neutral' },
-    { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', color: 'var(--warning)', bg: 'var(--surface)', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, dir: 'neutral' },
-    { label: 'Ghosted', value: ghostedLeads.length, icon: '👻', color: 'var(--text-tertiary)', bg: 'var(--surface)', change: `${ghostRate}% ghost rate`, dir: 'neutral' },
-    { label: 'Active Clients', value: activeClients.length, icon: '💼', color: 'var(--text-primary)', bg: 'var(--surface)', change: `${clients.length} total onboarded`, dir: 'up' },
+    { label: 'Outreach Sent', value: totalSent, icon: '📤', iconBg: 'rgba(168,85,247,0.12)', iconBorder: 'rgba(168,85,247,0.25)', accentColor: '#a855f7', change: 'All channels combined', status: 'Online' },
+    { label: 'Total Leads', value: totalLeads, icon: '🎯', iconBg: 'rgba(59,130,246,0.12)', iconBorder: 'rgba(59,130,246,0.25)', accentColor: '#3b82f6', change: 'Total leads captured', status: 'Tracking' },
+    { label: 'Meetings Booked', value: meetingLeads.length, icon: '📅', iconBg: 'rgba(16,185,129,0.12)', iconBorder: 'rgba(16,185,129,0.25)', accentColor: '#10b981', change: `${meetingRate}% of leads`, status: `${meetingRate}%` },
+    { label: 'Closed Won', value: closedLeads.length, icon: '🤝', iconBg: 'rgba(168,85,247,0.15)', iconBorder: 'rgba(168,85,247,0.35)', accentColor: '#a855f7', change: `${closeRate}% close rate`, status: `${closeRate}%` },
+    { label: 'Hot + Qualified', value: hotQualified.length, icon: '🔥', iconBg: 'rgba(245,158,11,0.12)', iconBorder: 'rgba(245,158,11,0.25)', accentColor: '#f59e0b', change: `${leads.filter(l => l.leadType === 'Hot lead').length} hot leads`, status: 'Priority' },
+    { label: 'Ghosted', value: ghostedLeads.length, icon: '👻', iconBg: 'rgba(107,114,128,0.12)', iconBorder: 'rgba(107,114,128,0.2)', accentColor: '#6b7280', change: `${ghostRate}% ghost rate`, status: 'Review' },
+    { label: 'Active Clients', value: activeClients.length, icon: '💼', iconBg: 'rgba(20,184,166,0.12)', iconBorder: 'rgba(20,184,166,0.25)', accentColor: '#14b8a6', change: `${clients.length} total onboarded`, status: 'Live' },
   ];
 
-  const recentLeads = [...leads].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).slice(0, 5);
+  const recentLeads = [...leads].sort((a, b) => new Date((b.createdAt as string | number) || 0).getTime() - new Date((a.createdAt as string | number) || 0).getTime()).slice(0, 5);
   const upcomingFollowUps = leads
-    .filter(l => l.followUpDate)
-    .sort((a, b) => new Date(a.followUpDate).getTime() - new Date(b.followUpDate).getTime())
+    .filter(l => Boolean(l.followUpDate))
+    .sort((a, b) => new Date(a.followUpDate as string).getTime() - new Date(b.followUpDate as string).getTime())
     .slice(0, 5);
 
   if (loading) {
@@ -185,7 +191,7 @@ export default function DashboardPage() {
   return (
     <div className="animate-in">
       {/* HERO BANNER - Sleek, minimal */}
-      <div className="page-hero" style={{ marginBottom: 32, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+      <div className="card" style={{ padding: '32px', marginBottom: 32 }}>
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <span style={{ fontSize: '1.25rem', padding: '6px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>🚀</span>
@@ -193,14 +199,14 @@ export default function DashboardPage() {
               Live Dashboard
             </span>
           </div>
-          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Overview</h1>
-          <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Performance metrics for Moksh & Smit</p>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: 0, background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Overview</h1>
+          <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.6)', margin: 0 }}>Performance metrics for Moksh & Smit</p>
           <div style={{ display: 'flex', gap: 12, marginTop: 16, flexWrap: 'wrap' }}>
             <Link href="/outreach">
-              <button className="btn" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}>📋 Add Daily Log</button>
+              <button className="btn" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--text-primary)', backdropFilter: 'blur(8px)' }}>📋 Add Daily Log</button>
             </Link>
             <Link href="/leads">
-              <button className="btn btn-primary" style={{ background: 'var(--text-primary)', color: 'white' }}>+ New Lead</button>
+              <button className="btn" style={{ background: 'var(--accent-gradient)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(168,85,247,0.35)', fontWeight: 700 }}>+ New Lead</button>
             </Link>
           </div>
         </div>
@@ -211,23 +217,23 @@ export default function DashboardPage() {
         <div className="card card-accent card-p animate-in" style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 }}>
             <div>
-              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>👥 Today's Team Check-In</h2>
+              <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>👥 Today&apos;s Team Check-In</h2>
               <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>Monday, March 9</p>
             </div>
             <span className="badge badge-success" style={{ fontWeight: 600 }}>✓ Active</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-            {todayGoals.map(g => (
+            {todayGoals.map((g: any) => (
               <div key={g._id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius-xl)', padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', transition: 'transform var(--t-fast)' }} className="card-hover">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
-                  <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user}</span>
-                  <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: 99 }}>🕐 {g.timeJoinedOffice}</span>
+                  <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{(g.user as string)[0]}</div>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user as string}</span>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'var(--bg-secondary)', padding: '2px 8px', borderRadius: 99 }}>🕐 {(g.timeJoinedOffice as string) || ''}</span>
                 </div>
-                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{g.dailyGoals}</p>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{(g.dailyGoals as string) || ''}</p>
                 {g.completedGoals && (
                   <div style={{ marginTop: 8, padding: '6px 10px', background: 'var(--success-light)', borderRadius: 8, fontSize: '0.75rem', color: 'var(--success)', fontWeight: 600 }}>
-                    ✓ {g.completedGoals}
+                    ✓ {(g.completedGoals as string) || ''}
                   </div>
                 )}
               </div>
@@ -236,23 +242,50 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* KPI Stats Grid */}
+      {/* KPI Stats Grid — Premium glassmorphic */}
       <div className="stats-grid stagger-children" style={{ marginBottom: 32 }}>
         {statCards.map((card) => (
-          <div key={card.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+          <div
+            key={card.label}
+            className="stat-card"
+            style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+          >
+            {/* Top row: icon + status pill */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 14,
+                background: card.iconBg, border: `1px solid ${card.iconBorder}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.3rem', flexShrink: 0, transition: 'transform var(--t-spring)',
+              }}>
                 {card.icon}
               </div>
+              <span style={{
+                fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.05em',
+                padding: '3px 10px', borderRadius: 99,
+                background: `${card.accentColor}18`,
+                color: card.accentColor,
+                border: `1px solid ${card.accentColor}30`,
+              }}>{card.status}</span>
             </div>
+            {/* Value */}
             <div>
-              <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>{card.label}</div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: card.color, lineHeight: 1 }}>
-                <AnimatedNumber value={card.value} />
+              <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.45)', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                {card.label}
+              </div>
+              <div style={{ fontSize: '2.25rem', fontWeight: 900, letterSpacing: '-0.04em', color: 'white', lineHeight: 1 }}>
+                <AnimatedNumber value={Number(card.value)} />
               </div>
             </div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              {card.dir === 'up' ? <span style={{ color: 'var(--success)' }}>↑</span> : <span style={{ opacity: 0.5 }}>·</span>} {card.change}
+            {/* Bottom: colored accent bar + change text */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ height: 2, borderRadius: 99, background: `${card.accentColor}25`, overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min(100, Math.max(5, (Number(card.value) / (totalLeads || 1)) * 100))}%`, height: '100%', background: card.accentColor, borderRadius: 99, transition: 'width 1.2s cubic-bezier(0.22, 1, 0.36, 1)' }} />
+              </div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: card.accentColor, display: 'inline-block', flexShrink: 0 }} />
+                {card.change}
+              </div>
             </div>
           </div>
         ))}
@@ -273,10 +306,10 @@ export default function DashboardPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 16 }}>
             {[
-              { label: 'Instagram DMs', sent: sentByChannel?.dms || 0, replies: byChannel?.dms || 0, color: '#e1306c' },
-              { label: 'Emails', sent: sentByChannel?.emails || 0, replies: byChannel?.emails || 0, color: '#2563eb' },
-              { label: 'WhatsApp', sent: sentByChannel?.whatsapp || 0, replies: byChannel?.whatsapp || 0, color: '#25D366' },
-              { label: 'Cold Calls', sent: sentByChannel?.calls || 0, replies: byChannel?.calls || 0, color: '#7c3aed' },
+              { label: 'Instagram DMs', sent: Number((sentByChannel as Record<string, number>)?.dms || 0), replies: Number((byChannel as Record<string, number>)?.dms || 0), color: '#e1306c' },
+              { label: 'Emails', sent: Number((sentByChannel as Record<string, number>)?.emails || 0), replies: Number((byChannel as Record<string, number>)?.emails || 0), color: '#2563eb' },
+              { label: 'WhatsApp', sent: Number((sentByChannel as Record<string, number>)?.whatsapp || 0), replies: Number((byChannel as Record<string, number>)?.whatsapp || 0), color: '#25D366' },
+              { label: 'Cold Calls', sent: Number((sentByChannel as Record<string, number>)?.calls || 0), replies: Number((byChannel as Record<string, number>)?.calls || 0), color: '#7c3aed' },
             ].map(ch => {
               const replyRate = ch.sent > 0 ? ((ch.replies / ch.sent) * 100).toFixed(1) : '0.0';
               return (
@@ -315,13 +348,14 @@ export default function DashboardPage() {
             <Bar data={funnelData} options={{
               ...chartDefaults, indexAxis: 'y',
               scales: {
-                x: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(0,0,0,0.04)' } },
-                y: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
               },
               plugins: { ...chartDefaults.plugins, legend: { display: false } }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any} />
           </div>
-          <hr className="divider" style={{ margin: '14px 0' }} />
+          <hr className="divider" style={{ margin: '14px 0', borderColor: 'var(--border)' }} />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
             {[
               { label: 'Meeting Rate', val: `${meetingRate}%`, color: meetingRate === '0' ? 'var(--text-tertiary)' : 'var(--success)' },
@@ -372,16 +406,16 @@ export default function DashboardPage() {
                 <div className="empty-title">No leads yet</div>
                 <Link href="/leads"><button className="btn btn-primary btn-sm" style={{ marginTop: 10 }}>Add First Lead</button></Link>
               </div>
-            ) : recentLeads.map(lead => {
-              const sc = STATUS_COLORS[lead.leadType] || { bg: '#f9fafb', text: '#6b7280', border: 'rgba(0,0,0,0.1)' };
+            ) : recentLeads.map((lead: any) => {
+              const sc = STATUS_COLORS[lead.leadType] || { bg: 'rgba(255, 255, 255, 0.05)', text: '#94a3b8', border: 'rgba(255,255,255,0.1)' };
               return (
                 <div key={lead._id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)', transition: 'transform var(--t-fast)', cursor: 'pointer' }} className="card-hover">
-                  <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>{(lead.companyName || '?')[0].toUpperCase()}</div>
+                  <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0 }}>{((lead.companyName as string) || '?')[0].toUpperCase()}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.companyName}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{lead.prospectName}</div>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{(lead.companyName as string) || ''}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{(lead.prospectName as string) || ''}</div>
                   </div>
-                  <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, whiteSpace: 'nowrap' }}>{lead.leadType}</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 600, padding: '3px 8px', borderRadius: 99, background: sc.bg, color: sc.text, border: `1px solid ${sc.border}`, whiteSpace: 'nowrap' }}>{(lead.leadType as string) || ''}</span>
                 </div>
               );
             })}
@@ -405,41 +439,42 @@ export default function DashboardPage() {
                 <div className="empty-desc">Add follow-up dates to your leads</div>
               </div>
             ) : upcomingFollowUps.map(lead => {
-              const daysUntil = Math.ceil((new Date(lead.followUpDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+              const followUpTimestamp = lead.followUpDate ? new Date(lead.followUpDate as string | number).getTime() : 0;
+              const daysUntil = Math.ceil((followUpTimestamp - now) / (1000 * 60 * 60 * 24));
               const isOverdue = daysUntil < 0;
               const isUrgent = daysUntil >= 0 && daysUntil <= 1;
               const isNear = daysUntil > 1 && daysUntil <= 3;
               return (
-                <div key={lead._id} style={{
+                <div key={lead._id as string} style={{
                   padding: '16px 20px', borderRadius: 'var(--radius-xl)', border: '1px solid',
-                  background: isOverdue ? '#fef2f2' : isUrgent ? '#fffbeb' : 'var(--surface)',
-                  borderColor: isOverdue ? 'rgba(220,38,38,0.3)' : isUrgent ? 'rgba(217,119,6,0.25)' : 'var(--border)',
+                  background: isOverdue ? 'rgba(239, 68, 68, 0.05)' : isUrgent ? 'rgba(245, 158, 11, 0.05)' : 'var(--bg-secondary)',
+                  borderColor: isOverdue ? 'rgba(239, 68, 68, 0.2)' : isUrgent ? 'rgba(245, 158, 11, 0.2)' : 'var(--border)',
                   transition: 'transform var(--t-fast)', cursor: 'pointer',
                   boxShadow: 'var(--shadow-xs)'
                 }} className="card-hover">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10 }}>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{lead.companyName}</div>
-                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>{lead.prospectName}</div>
+                      <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>{(lead.companyName as string) || ''}</div>
+                      <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 2 }}>{(lead.prospectName as string) || ''}</div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{
                         fontSize: '0.6875rem', fontWeight: 800, padding: '4px 10px', borderRadius: 99,
-                        background: isOverdue ? '#fee2e2' : isUrgent ? '#fffbeb' : isNear ? '#fef2f2' : 'var(--bg-tertiary)',
+                        background: isOverdue ? 'rgba(239, 68, 68, 0.1)' : isUrgent ? 'rgba(245, 158, 11, 0.1)' : isNear ? 'rgba(239, 68, 68, 0.05)' : 'var(--surface)',
                         color: isOverdue ? 'var(--danger)' : isUrgent ? 'var(--warning)' : isNear ? 'var(--danger)' : 'var(--text-secondary)',
-                        border: `1px solid ${isOverdue ? 'rgba(220,38,38,0.4)' : isUrgent ? 'rgba(217,119,6,0.3)' : isNear ? 'rgba(220,38,38,0.2)' : 'var(--border)'}`,
+                        border: `1px solid ${isOverdue ? 'rgba(239, 68, 68, 0.3)' : isUrgent ? 'rgba(245, 158, 11, 0.3)' : isNear ? 'rgba(239, 68, 68, 0.2)' : 'var(--border)'}`,
                         whiteSpace: 'nowrap'
                       }}>
                         {isOverdue ? `🚨 ${Math.abs(daysUntil)}d Overdue` : daysUntil === 0 ? '🔥 Today!' : daysUntil === 1 ? '⚡ Tomorrow' : `📆 in ${daysUntil}d`}
                       </span>
                       <button
-                        onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
+                        onClick={(e) => handleMarkFollowUpDone(e, lead._id as string)}
                         style={{ background: 'var(--success-light)', color: 'var(--success)', border: 'none', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.85rem' }}
                         title="Mark as Done"
                       >✓</button>
                     </div>
                   </div>
-                  {lead.notes && <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{lead.notes.slice(0, 100)}{lead.notes.length > 100 ? '…' : ''}</p>}
+                  {Boolean(lead.notes) && <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 8, lineHeight: 1.5 }}>{String(lead.notes).slice(0, 100)}{(String(lead.notes).length > 100) ? '…' : ''}</p>}
                 </div>
               );
             })}

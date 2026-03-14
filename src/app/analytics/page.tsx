@@ -145,39 +145,64 @@ export default function AnalyticsPage() {
 
     return (
         <div className="animate-in">
-            {/* Hero */}
-            <div className="page-hero" style={{ marginBottom: 32, background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
+            {/* Dark glassmorphic hero */}
+            <div className="card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                        <span style={{ fontSize: '1.25rem', padding: '6px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>📈</span>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-secondary)' }}>
+                        <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>📈</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
                             Performance Insights
                         </span>
                     </div>
-                    <h1 style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', margin: 0 }}>Analytics</h1>
-                    <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0 }}>Deep-dive into your outreach performance across all channels</p>
+                    <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Analytics</h1>
+                    <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', margin: 0 }}>Deep-dive into your outreach performance across all channels</p>
                 </div>
             </div>
 
-            {/* KPI strip */}
+            {/* KPI strip — Premium glassmorphic */}
             <div className="stats-grid stagger-children" style={{ marginBottom: 32 }}>
                 {[
-                    { label: 'Total Leads', value: totalLeads, icon: '🎯', color: 'var(--text-primary)' },
-                    { label: 'Meetings Booked', value: meetingLeads, icon: '📅', color: 'var(--success)' },
-                    { label: 'Closed Won', value: closedLeads, icon: '🤝', color: 'var(--accent)' },
-                    { label: 'Ghosted', value: ghostedLeads, icon: '👻', color: 'var(--text-tertiary)' },
-                    { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', color: 'var(--danger)' },
-                    { label: 'Total Sent', value: totalSent, icon: '📤', color: 'var(--text-primary)' },
-                ].map(s => (
-                    <div key={s.label} className="card card-hover" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12, cursor: 'default', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-xl)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                            <div style={{ width: 40, height: 40, borderRadius: 12, background: 'var(--bg-secondary)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                    { label: 'Total Leads', value: totalLeads, icon: '🎯', iconBg: 'rgba(59,130,246,0.12)', iconBorder: 'rgba(59,130,246,0.25)', accentColor: '#3b82f6', status: 'Total' },
+                    { label: 'Meetings Booked', value: meetingLeads, icon: '📅', iconBg: 'rgba(16,185,129,0.12)', iconBorder: 'rgba(16,185,129,0.25)', accentColor: '#10b981', status: `${meetingRate}%` },
+                    { label: 'Closed Won', value: closedLeads, icon: '🤝', iconBg: 'rgba(168,85,247,0.15)', iconBorder: 'rgba(168,85,247,0.35)', accentColor: '#a855f7', status: `${closeRate}%` },
+                    { label: 'Ghosted', value: ghostedLeads, icon: '👻', iconBg: 'rgba(107,114,128,0.12)', iconBorder: 'rgba(107,114,128,0.2)', accentColor: '#6b7280', status: 'Review' },
+                    { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', iconBg: 'rgba(239,68,68,0.12)', iconBorder: 'rgba(239,68,68,0.25)', accentColor: '#ef4444', status: 'Lost' },
+                    { label: 'Total Sent', value: totalSent, icon: '📤', iconBg: 'rgba(168,85,247,0.12)', iconBorder: 'rgba(168,85,247,0.25)', accentColor: '#a855f7', status: 'Outreach' },
+                ].map((s) => (
+                    <div key={s.label} className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{
+                                width: 42, height: 42, borderRadius: 12,
+                                background: s.iconBg, border: `1px solid ${s.iconBorder}`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '1.2rem',
+                            }}>
                                 {s.icon}
                             </div>
+                            <span style={{
+                                fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.05em',
+                                padding: '3px 8px', borderRadius: 99,
+                                background: `${s.accentColor}18`,
+                                color: s.accentColor,
+                                border: `1px solid ${s.accentColor}30`,
+                                textTransform: 'uppercase'
+                            }}>{s.status}</span>
                         </div>
                         <div>
-                            <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 4 }}>{s.label}</div>
-                            <div style={{ fontSize: '2rem', fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value.toLocaleString()}</div>
+                            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                {s.label}
+                            </div>
+                            <div style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-0.04em', color: 'white', lineHeight: 1 }}>
+                                {s.value.toLocaleString()}
+                            </div>
+                        </div>
+                        <div style={{ height: 2, borderRadius: 99, background: `${s.accentColor}20`, overflow: 'hidden' }}>
+                            <div style={{
+                                width: `${Math.min(100, Math.max(5, (s.value / (totalLeads || 1)) * 100))}%`,
+                                height: '100%', background: s.accentColor, borderRadius: 99,
+                                transition: 'width 1.2s cubic-bezier(0.22, 1, 0.36, 1)'
+                            }} />
                         </div>
                     </div>
                 ))}
@@ -194,17 +219,35 @@ export default function AnalyticsPage() {
                 </div>
             ) : (
                 <>
-                    {/* Conversion rate highlights */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
+                    {/*                     {/* Conversion rate highlights — Premium Cards */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, marginBottom: 32 }}>
                         {[
-                            { label: 'Meeting Rate', val: `${meetingRate}%`, sub: `${meetingLeads} meetings from ${totalLeads} leads`, color: 'var(--success)' },
-                            { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, color: 'var(--accent)' },
-                            { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, color: 'var(--text-primary)' },
+                            { label: 'Meeting Rate', val: `${meetingRate}%`, sub: `${meetingLeads} meetings from ${totalLeads} leads`, accent: '#10b981', glow: 'rgba(16,185,129,0.2)' },
+                            { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, accent: '#a855f7', glow: 'rgba(168,85,247,0.2)' },
+                            { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, accent: '#ffffff', glow: 'rgba(255,255,255,0.1)' },
                         ].map(r => (
-                            <div key={r.label} className="card card-hover" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', textAlign: 'center', borderRadius: 'var(--radius-2xl)' }}>
-                                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: r.color, letterSpacing: '-0.04em', lineHeight: 1, marginBottom: 12 }}>{r.val}</div>
-                                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: 4 }}>{r.label}</div>
-                                <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{r.sub}</div>
+                            <div key={r.label} className="card card-hover" style={{
+                                padding: '32px 24px',
+                                textAlign: 'center',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                border: '1px solid rgba(255,255,255,0.1)'
+                            }}>
+                                <div style={{
+                                    position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                                    width: '80%', height: '100px',
+                                    background: `radial-gradient(ellipse at top, ${r.glow} 0%, transparent 70%)`,
+                                    pointerEvents: 'none', opacity: 0.5
+                                }} />
+                                <div style={{ fontSize: '3rem', fontWeight: 900, color: r.accent, letterSpacing: '-0.05em', lineHeight: 1, marginBottom: 8, position: 'relative' }}>
+                                    {r.val}
+                                </div>
+                                <div style={{ fontWeight: 800, fontSize: '1rem', color: 'white', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em', position: 'relative' }}>
+                                    {r.label}
+                                </div>
+                                <div style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.4)', position: 'relative' }}>
+                                    {r.sub}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -213,7 +256,7 @@ export default function AnalyticsPage() {
                     <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
                         <div style={{ marginBottom: 24 }}>
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Channel Breakdown</h2>
-                            <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Sent vs Replies per channel</p>
+                        <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Sent vs Replies per channel</p>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                             {[

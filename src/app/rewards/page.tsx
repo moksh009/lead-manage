@@ -63,19 +63,21 @@ export default function RewardsPage() {
 
     return (
         <div className="animate-in">
-            <div className="page-hero" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%)', marginBottom: 32, position: 'relative', overflow: 'hidden' }}>
+            {/* Dark glassmorphic hero */}
+            <div className="card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
                     <div>
-                        <div style={{ fontSize: '2rem', marginBottom: 8 }}>👑</div>
-                        <h1 className="page-hero-title">Founder Rewards</h1>
-                        <p className="page-hero-sub">Gamification scoreboard for Moksh vs Smit</p>
-                    </div>
-                    
-                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '16px 24px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.1)', textAlign: 'right' }}>
-                        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Time Until Month Reset</div>
-                        <div style={{ color: 'white', fontSize: '2rem', fontWeight: 900, fontFamily: 'monospace' }}>
-                            ⏳ {timeLeft} left
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                            <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>👑</span>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>Gamification Scoreboard</span>
                         </div>
+                        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Founder Rewards</h1>
+                        <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', margin: 0 }}>Gamification scoreboard for Moksh vs Smit</p>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.04)', padding: '16px 24px', borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', textAlign: 'right', backdropFilter: 'blur(10px)' }}>
+                        <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 4 }}>Time Until Month Reset</div>
+                        <div style={{ color: 'white', fontSize: '1.75rem', fontWeight: 900, fontFamily: 'monospace' }}>⏳ {timeLeft} left</div>
                     </div>
                 </div>
             </div>
@@ -88,27 +90,27 @@ export default function RewardsPage() {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
                     {/* Moksh Daily */}
-                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'MOKSH' ? 'linear-gradient(to right, #fdf4ff, #ffffff)' : 'white', border: dailyLeader === 'MOKSH' ? '2px solid var(--accent)' : '1px solid var(--border)' }}>
+                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'MOKSH' ? 'rgba(168,85,247,0.08)' : 'rgba(255,255,255,0.03)', border: dailyLeader === 'MOKSH' ? '2px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'MOKSH' ? '0 0 30px -8px rgba(168,85,247,0.25)' : 'none' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                             <div className="avatar avatar-md avatar-gradient-1">M</div>
                             <div>
-                                <div style={{ fontSize: '1.125rem', fontWeight: 800 }}>Moksh</div>
-                                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Today&apos;s Hustle</div>
+                                <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'rgba(255,255,255,0.9)' }}>Moksh</div>
+                                <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)' }}>Today&apos;s Hustle</div>
                             </div>
                         </div>
-                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: dailyLeader === 'MOKSH' ? 'var(--accent)' : 'var(--text-primary)' }}>{mokshDailyScore}</div>
+                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: dailyLeader === 'MOKSH' ? '#d8b4fe' : 'rgba(255,255,255,0.7)' }}>{mokshDailyScore}</div>
                     </div>
 
                     {/* Smit Daily */}
-                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'smit' ? 'linear-gradient(to right, #f0fdf4, #ffffff)' : 'white', border: dailyLeader === 'smit' ? '2px solid var(--success)' : '1px solid var(--border)' }}>
+                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'smit' ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.03)', border: dailyLeader === 'smit' ? '2px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'smit' ? '0 0 30px -8px rgba(16,185,129,0.25)' : 'none' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                             <div className="avatar avatar-md avatar-gradient-2">S</div>
                             <div>
-                                <div style={{ fontSize: '1.125rem', fontWeight: 800 }}>Smit</div>
-                                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Today&apos;s Hustle</div>
+                                <div style={{ fontSize: '1.125rem', fontWeight: 800, color: 'rgba(255,255,255,0.9)' }}>Smit</div>
+                                <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.4)' }}>Today&apos;s Hustle</div>
                             </div>
                         </div>
-                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: dailyLeader === 'smit' ? 'var(--success)' : 'var(--text-primary)' }}>{smitDailyScore}</div>
+                        <div style={{ fontSize: '2.5rem', fontWeight: 900, color: dailyLeader === 'smit' ? '#34d399' : 'rgba(255,255,255,0.7)' }}>{smitDailyScore}</div>
                     </div>
                 </div>
             </div>
@@ -120,33 +122,27 @@ export default function RewardsPage() {
                 </h2>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
                     {/* Moksh Scorecard */}
-                    <div className="card" style={{ padding: 32, textAlign: 'center', background: monthLeader === 'MOKSH' ? 'linear-gradient(to bottom, #fdf4ff, #ffffff)' : 'white', border: monthLeader === 'MOKSH' ? '2px solid var(--accent)' : '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
-                        {monthLeader === 'MOKSH' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'var(--accent)' }} />}
-                        
+                    <div className="card" style={{ padding: 32, textAlign: 'center', background: monthLeader === 'MOKSH' ? 'rgba(168,85,247,0.08)' : 'rgba(255,255,255,0.03)', border: monthLeader === 'MOKSH' ? '2px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.07)', position: 'relative', overflow: 'hidden', boxShadow: monthLeader === 'MOKSH' ? '0 0 40px -10px rgba(168,85,247,0.3)' : 'none' }}>
+                        {monthLeader === 'MOKSH' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'var(--accent-gradient)' }} />}
                         <div className="avatar avatar-lg avatar-gradient-1" style={{ margin: '0 auto 16px' }}>M</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Moksh</div>
-                        
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>Moksh</div>
                         <div style={{ margin: '8px auto 16px', display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: '0.8125rem', fontWeight: 800, ...getRankBadgeStyle(mokshMonthScore) }}>
                             {getRank(mokshMonthScore)}
                         </div>
-
-                        <div style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--accent)', lineHeight: 1 }}>{mokshMonthScore}</div>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 8 }}>Monthly Points</div>
+                        <div style={{ fontSize: '4rem', fontWeight: 900, color: '#d8b4fe', lineHeight: 1 }}>{mokshMonthScore}</div>
+                        <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.35)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 8 }}>Monthly Points</div>
                     </div>
 
                     {/* Smit Scorecard */}
-                    <div className="card" style={{ padding: 32, textAlign: 'center', background: monthLeader === 'smit' ? 'linear-gradient(to bottom, #eff6ff, #ffffff)' : 'white', border: monthLeader === 'smit' ? '2px solid var(--info)' : '1px solid var(--border)', position: 'relative', overflow: 'hidden' }}>
-                        {monthLeader === 'smit' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 6, background: 'var(--info)' }} />}
-                        
+                    <div className="card" style={{ padding: 32, textAlign: 'center', background: monthLeader === 'smit' ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.03)', border: monthLeader === 'smit' ? '2px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.07)', position: 'relative', overflow: 'hidden', boxShadow: monthLeader === 'smit' ? '0 0 40px -10px rgba(16,185,129,0.3)' : 'none' }}>
+                        {monthLeader === 'smit' && <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: 'linear-gradient(135deg, #10b981, #34d399)' }} />}
                         <div className="avatar avatar-lg avatar-gradient-2" style={{ margin: '0 auto 16px' }}>S</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4 }}>Smit</div>
-                        
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, textTransform: 'uppercase', marginBottom: 4, color: 'rgba(255,255,255,0.9)' }}>Smit</div>
                         <div style={{ margin: '8px auto 16px', display: 'inline-block', padding: '4px 12px', borderRadius: 20, fontSize: '0.8125rem', fontWeight: 800, ...getRankBadgeStyle(smitMonthScore) }}>
                             {getRank(smitMonthScore)}
                         </div>
-
-                        <div style={{ fontSize: '4rem', fontWeight: 900, color: 'var(--info)', lineHeight: 1 }}>{smitMonthScore}</div>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 8 }}>Monthly Points</div>
+                        <div style={{ fontSize: '4rem', fontWeight: 900, color: '#34d399', lineHeight: 1 }}>{smitMonthScore}</div>
+                        <div style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.35)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: 8 }}>Monthly Points</div>
                     </div>
                 </div>
             </div>

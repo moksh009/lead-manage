@@ -22,7 +22,20 @@ ChartJS.register(
     Title
 );
 
-export default function DashboardCharts({ stats }: { stats: any }) {
+interface OutreachStats {
+    totalSent: number;
+    replies: number;
+    meetings: number;
+    clients: number;
+    byChannel: {
+        dms: number;
+        emails: number;
+        whatsapp: number;
+        calls: number;
+    };
+}
+
+export default function DashboardCharts({ stats }: { stats: OutreachStats }) {
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -46,16 +59,16 @@ export default function DashboardCharts({ stats }: { stats: any }) {
             {
                 data: [stats.byChannel.dms, stats.byChannel.emails, stats.byChannel.whatsapp, stats.byChannel.calls],
                 backgroundColor: [
-                    'rgba(99, 102, 241, 0.8)',   // Indigo
-                    'rgba(239, 68, 68, 0.8)',    // Red
-                    'rgba(245, 158, 11, 0.8)',   // Amber
-                    'rgba(16, 185, 129, 0.8)'    // Emerald
+                    'rgba(249, 115, 22, 0.8)',   // Neon Orange
+                    'rgba(168, 85, 247, 0.8)',   // Neon Purple
+                    'rgba(16, 185, 129, 0.8)',   // Emerald
+                    'rgba(59, 130, 246, 0.8)'    // Blue
                 ],
                 borderColor: [
-                    'rgba(99, 102, 241, 1)',
-                    'rgba(239, 68, 68, 1)',
-                    'rgba(245, 158, 11, 1)',
-                    'rgba(16, 185, 129, 1)'
+                    'rgba(249, 115, 22, 1)',
+                    'rgba(168, 85, 247, 1)',
+                    'rgba(16, 185, 129, 1)',
+                    'rgba(59, 130, 246, 1)'
                 ],
                 borderWidth: 1,
             },
@@ -68,12 +81,12 @@ export default function DashboardCharts({ stats }: { stats: any }) {
             {
                 label: 'Total Sent',
                 data: [stats.byChannel.dms, stats.byChannel.emails, stats.byChannel.whatsapp, stats.byChannel.calls],
-                backgroundColor: 'rgba(59, 130, 246, 0.8)', // Blue
+                backgroundColor: 'rgba(168, 85, 247, 0.8)', // Neon Purple
             },
             {
                 label: 'Replies/Lead',
                 data: [0, 0, 0, 12], // Dummy mapping according to screenshot
-                backgroundColor: 'rgba(239, 68, 68, 0.8)', // Red
+                backgroundColor: 'rgba(249, 115, 22, 0.8)', // Neon Orange
             }
         ],
     };
@@ -84,7 +97,7 @@ export default function DashboardCharts({ stats }: { stats: any }) {
             {
                 label: 'Count',
                 data: [stats.totalSent, stats.replies, stats.meetings, stats.clients],
-                backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                backgroundColor: 'rgba(249, 115, 22, 0.8)', // Neon Orange
                 indexAxis: 'y' as const,
             }
         ]
@@ -109,21 +122,21 @@ export default function DashboardCharts({ stats }: { stats: any }) {
 
     return (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '1.5rem', height: '350px' }}>
+            <div className="card" style={{ padding: '1.5rem', height: '350px' }}>
                 <h3 style={{ marginBottom: '1rem', color: '#e2e8f0', fontSize: '1rem', fontWeight: 600 }}>Total Sent vs. Channel</h3>
                 <div style={{ height: '250px' }}>
                     <Doughnut data={doughnutData} options={chartOptions} />
                 </div>
             </div>
 
-            <div className="glass-panel" style={{ padding: '1.5rem', height: '350px' }}>
+            <div className="card" style={{ padding: '1.5rem', height: '350px' }}>
                 <h3 style={{ marginBottom: '1rem', color: '#e2e8f0', fontSize: '1rem', fontWeight: 600 }}>Total Sent and Replies</h3>
                 <div style={{ height: '250px' }}>
                     <Bar data={barData} options={barOptions} />
                 </div>
             </div>
 
-            <div className="glass-panel" style={{ padding: '1.5rem', height: '350px' }}>
+            <div className="card" style={{ padding: '1.5rem', height: '350px' }}>
                 <h3 style={{ marginBottom: '1rem', color: '#e2e8f0', fontSize: '1rem', fontWeight: 600 }}>Funnel: Sent → Clients</h3>
                 <div style={{ height: '250px' }}>
                     <Bar data={funnelData} options={funnelOptions} />

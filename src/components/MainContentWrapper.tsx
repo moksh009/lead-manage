@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { useSidebar } from './SidebarContext';
+import NotificationBell from './NotificationBell';
 
 export default function MainContentWrapper({ children }: { children: ReactNode }) {
     const { collapsed, isMobile } = useSidebar();
@@ -14,6 +15,7 @@ export default function MainContentWrapper({ children }: { children: ReactNode }
                 maxWidth: `calc(100vw - ${collapsed ? '64px' : 'var(--sidebar-width)'})`
             }}
         >
+            <NotificationBell />
             {children}
         </main>
     );
