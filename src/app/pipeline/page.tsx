@@ -168,18 +168,16 @@ export default function PipelinePage() {
                                             draggable
                                             onDragStart={() => setDragging(lead._id)}
                                             onDragEnd={() => setDragging(null)}
-                                            className="card card-hover"
+                                            className="premium-card premium-card-hover"
                                             style={{
                                                 opacity: dragging === lead._id ? 0.4 : 1,
                                                 padding: '16px',
                                                 cursor: 'grab',
                                                 marginBottom: 12,
-                                                background: 'rgba(255, 255, 255, 0.03)',
-                                                border: '1px solid rgba(255, 255, 255, 0.06)',
-                                                borderRadius: 20,
                                                 willChange: dragging === lead._id ? 'auto' : 'transform',
                                             }}
                                         >
+
                                             {/* Header: Company + Channel */}
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                                 <div style={{ fontSize: '1rem', fontWeight: 800, color: 'white', lineHeight: 1.2, letterSpacing: '-0.02em', flex: 1, marginRight: 8 }}>

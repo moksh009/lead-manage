@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { format } from 'date-fns';
 import { useUser } from '@/components/UserContext';
+import { useSearchParams } from 'next/navigation';
+
 
 type Channel = 'instagram' | 'whatsapp' | 'email' | 'call' | 'other';
 
@@ -24,12 +26,24 @@ const CHANNEL_CONFIG: Record<Channel, { icon: string; color: string; bg: string 
 };
 
 export default function ScriptInventoryPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ScriptInventoryContent />
+        </Suspense>
+    );
+}
+
+function ScriptInventoryContent() {
     const { currentUser } = useUser();
+    const searchParams = useSearchParams();
+    const highlightId = searchParams.get('highlight');
+    
     const [scripts, setScripts] = useState<IScript[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingScript, setEditingScript] = useState<IScript | null>(null);
     const [filterChannel, setFilterChannel] = useState<Channel | 'all'>('all');
+
 
     const [form, setForm] = useState({
         title: '',
@@ -278,33 +292,21 @@ export default function ScriptInventoryPage() {
                         {filteredScripts.map(script => (
                             <div 
                                 key={script._id} 
+                                className="premium-card premium-card-hover"
                                 style={{
-                                    background: 'rgba(255, 255, 255, 0.03)',
-                                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                                    backdropFilter: 'blur(20px)',
-                                    borderRadius: '20px',
                                     padding: '24px',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     height: '280px',
-                                    transition: 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                                     cursor: 'pointer',
                                     position: 'relative',
-                                    overflow: 'hidden'
+                                    overflow: 'hidden',
+                                    border: script._id === highlightId ? '2px solid #a855f7' : '1px solid rgba(255, 255, 255, 0.08)',
+                                    boxShadow: script._id === highlightId ? '0 0 30px rgba(168, 85, 247, 0.4)' : 'none'
                                 }}
-                                onMouseEnter={(e) => { 
-                                    e.currentTarget.style.transform = 'translateY(-4px)'; 
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.4)';
-                                    e.currentTarget.style.boxShadow = '0 10px 40px -10px rgba(168, 85, 247, 0.2)';
-                                }}
-                                onMouseLeave={(e) => { 
-                                    e.currentTarget.style.transform = 'translateY(0)'; 
-                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                }}
+
                             >
+
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                         <div style={{ 

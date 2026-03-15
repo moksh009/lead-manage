@@ -146,9 +146,9 @@ export default function AnalyticsPage() {
     return (
         <div className="animate-in">
             {/* Dark glassmorphic hero */}
-            <div className="card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div className="premium-card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                         <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>📈</span>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
@@ -170,7 +170,8 @@ export default function AnalyticsPage() {
                     { label: 'Not Converted', value: notConvertedMeetingLeads, icon: '🚫', iconBg: 'rgba(239,68,68,0.12)', iconBorder: 'rgba(239,68,68,0.25)', accentColor: '#ef4444', status: 'Lost' },
                     { label: 'Total Sent', value: totalSent, icon: '📤', iconBg: 'rgba(168,85,247,0.12)', iconBorder: 'rgba(168,85,247,0.25)', accentColor: '#a855f7', status: 'Outreach' },
                 ].map((s) => (
-                    <div key={s.label} className="stat-card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    <div key={s.label} className="premium-card premium-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '20px' }}>
+
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{
                                 width: 42, height: 42, borderRadius: 12,
@@ -226,13 +227,13 @@ export default function AnalyticsPage() {
                             { label: 'Meeting → Close', val: meetingLeads > 0 ? `${meetToClose}%` : '—', sub: `${closedLeads} closed from ${meetingLeads} meetings`, accent: '#a855f7', glow: 'rgba(168,85,247,0.2)' },
                             { label: 'Close Rate', val: `${closeRate}%`, sub: `${closedLeads} won from ${totalLeads} leads`, accent: '#ffffff', glow: 'rgba(255,255,255,0.1)' },
                         ].map(r => (
-                            <div key={r.label} className="card card-hover" style={{
+                            <div key={r.label} className="premium-card premium-card-hover" style={{
                                 padding: '32px 24px',
                                 textAlign: 'center',
                                 position: 'relative',
                                 overflow: 'hidden',
-                                border: '1px solid rgba(255,255,255,0.1)'
                             }}>
+
                                 <div style={{
                                     position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
                                     width: '80%', height: '100px',
@@ -253,7 +254,8 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Channel Breakdown */}
-                    <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                    <div className="premium-card" style={{ marginBottom: 24, padding: '24px' }}>
+
                         <div style={{ marginBottom: 24 }}>
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Channel Breakdown</h2>
                         <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Sent vs Replies per channel</p>
@@ -293,7 +295,8 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Channel Trend */}
-                    <div className="card" style={{ marginBottom: 24, padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                    <div className="premium-card" style={{ marginBottom: 24, padding: '24px' }}>
+
                         <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Channel Activity Over Time</h2>
                         <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 24 }}>Daily outreach volume per channel</p>
                         <div style={{ height: 300 }}>
@@ -303,7 +306,8 @@ export default function AnalyticsPage() {
 
                     <div className="grid-2" style={{ marginBottom: 24 }}>
                         {/* Replies & Meetings bar */}
-                        <div className="card" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                        <div className="premium-card" style={{ padding: '24px' }}>
+
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Replies & Meetings</h2>
                             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 24 }}>Per day performance</p>
                             <div style={{ height: 260 }}>
@@ -312,7 +316,8 @@ export default function AnalyticsPage() {
                         </div>
 
                         {/* Lead Quality donut */}
-                        <div className="card" style={{ padding: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)' }}>
+                        <div className="premium-card" style={{ padding: '24px' }}>
+
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>Lead Quality</h2>
                             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginBottom: 16 }}>Breakdown by lead type</p>
                             <div style={{ height: 200 }}>
@@ -345,7 +350,8 @@ export default function AnalyticsPage() {
                     </div>
 
                     {/* Conversion Funnel Table */}
-                    <div className="card" style={{ marginBottom: 24, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-2xl)', overflow: 'hidden' }}>
+                    <div className="premium-card" style={{ marginBottom: 24, overflow: 'hidden' }}>
+
                         <div style={{ padding: '24px', borderBottom: '1px solid var(--border)' }}>
                             <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--text-primary)' }}>Conversion Funnel</h2>
                             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', marginTop: 4 }}>Step-by-step conversion rates</p>

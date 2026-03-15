@@ -191,7 +191,8 @@ export default function DashboardPage() {
   return (
     <div className="animate-in">
       {/* HERO BANNER - Sleek, minimal */}
-      <div className="card" style={{ padding: '32px', marginBottom: 32 }}>
+      <div className="premium-card" style={{ padding: '32px', marginBottom: 32 }}>
+
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <span style={{ fontSize: '1.25rem', padding: '6px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px solid var(--border)' }}>🚀</span>
@@ -224,7 +225,8 @@ export default function DashboardPage() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
             {todayGoals.map((g: any) => (
-              <div key={g._id} style={{ background: 'var(--surface)', borderRadius: 'var(--radius-xl)', padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', transition: 'transform var(--t-fast)' }} className="card-hover">
+              <div key={g._id} className="premium-card premium-card-hover" style={{ borderRadius: 'var(--radius-xl)', padding: '14px 16px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)', transition: 'transform var(--t-fast)' }}>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                   <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{(g.user as string)[0]}</div>
                   <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{g.user as string}</span>
@@ -247,9 +249,10 @@ export default function DashboardPage() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="stat-card"
-            style={{ display: 'flex', flexDirection: 'column', gap: 14 }}
+            className="premium-card premium-card-hover"
+            style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '20px' }}
           >
+
             {/* Top row: icon + status pill */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{

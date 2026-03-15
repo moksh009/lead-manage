@@ -251,7 +251,8 @@ export default function ClientsPage() {
     // usage below inside main component...
 
     return (
-        <div className="animate-in">
+        <>
+            <div className="animate-in">
             {/* Dark glassmorphic hero */}
             <div className="card" style={{ padding: '32px', marginBottom: 20, position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
@@ -296,17 +297,18 @@ export default function ClientsPage() {
             {/* Summary Cards */}
             <div className="stats-grid" style={{ marginBottom: 24 }}>
                 {[
-                    { label: 'Total Clients', value: clients.length, icon: '👥', color: '#2563eb', bg: '#eff6ff' },
-                    { label: 'Active', value: clients.filter(c => c.isActive).length, icon: '✅', color: '#16a34a', bg: '#f0fdf4' },
-                    { label: 'Monthly Revenue', value: `₹${totalMRR.toLocaleString()}`, icon: '💰', color: '#7c3aed', bg: '#faf5ff', raw: true },
-                    { label: 'Due This Week', value: urgentClients.length, icon: '⏰', color: urgentClients.length > 0 ? '#d97706' : '#16a34a', bg: urgentClients.length > 0 ? '#fffbeb' : '#f0fdf4' },
+                    { label: 'Total Clients', value: clients.length, icon: '👥', color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.1)' },
+                    { label: 'Active', value: clients.filter(c => c.isActive).length, icon: '✅', color: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
+                    { label: 'Monthly Revenue', value: `₹${totalMRR.toLocaleString()}`, icon: '💰', color: '#a78bfa', bg: 'rgba(167, 139, 250, 0.1)', raw: true },
+                    { label: 'Due This Week', value: urgentClients.length, icon: '⏰', color: urgentClients.length > 0 ? '#fbbf24' : '#34d399', bg: urgentClients.length > 0 ? 'rgba(251, 191, 36, 0.1)' : 'rgba(52, 211, 153, 0.1)' },
                 ].map(s => (
-                    <div key={s.label} className="stat-card card-hover">
-                        <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1.5px solid ${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
+                    <div key={s.label} className="premium-card premium-card-hover" style={{ padding: '20px' }}>
+                        <div style={{ width: 44, height: 44, borderRadius: 12, background: s.bg, border: `1px solid ${s.color}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 14 }}>{s.icon}</div>
                         <div className="stat-label">{s.label}</div>
                         <div className="stat-value" style={{ fontSize: '1.75rem', color: s.color }}>{s.raw ? s.value : (s.value as number).toLocaleString()}</div>
                     </div>
                 ))}
+
             </div>
 
             {/* Search */}
@@ -333,10 +335,17 @@ export default function ClientsPage() {
                             : (typeof client.services === 'string' ? client.services : '');
 
                         return (
-                            <div key={client._id} className="card card-p" style={{ border: isUrgent ? '1.5px solid rgba(255,59,48,0.3)' : isWarning ? '1.5px solid rgba(255,149,0,0.3)' : '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                            <div key={client._id} className="premium-card premium-card-hover" style={{ 
+                                padding: '24px',
+                                border: isUrgent ? '1.5px solid rgba(255,59,48,0.3)' : isWarning ? '1.5px solid rgba(255,149,0,0.3)' : '1px solid rgba(255,255,255,0.08)', 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                gap: 0 
+                            }}>
                                 {/* Header */}
                                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 12 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', flex: 1 }} onClick={() => setSelectedClient(client)}>
+
                                         <div className="avatar avatar-md avatar-gradient-1">{client.name?.[0]}</div>
                                         <div>
                                             <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginBottom: 2 }}>{client.name}</div>
@@ -389,67 +398,67 @@ export default function ClientsPage() {
                 </div>
             )}
 
-            {/* ===== RECORD PAYMENT MODAL ===== */}
+            </div>
+
+            {/* ===== PREMIUM RECORD PAYMENT MODAL ===== */}
             {billingClient && (
                 <div className="modal-overlay" onClick={() => setBillingClient(null)}>
-                    <div className="modal modal-sm" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                    <div className="modal-premium" style={{ maxWidth: '480px' }} onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-premium">
                             <div>
-                                <div className="modal-title">💳 Record Payment</div>
-                                <div className="modal-subtitle">{billingClient.name}</div>
+                                <h1 className="modal-title-premium">💳 Record Payment</h1>
+                                <p className="modal-subtitle-premium">{billingClient.name}</p>
                             </div>
-                            <button type="button" className="modal-close" onClick={() => setBillingClient(null)}>
-                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
-                            </button>
+                            <button type="button" className="modal-close-premium" onClick={() => setBillingClient(null)}>×</button>
                         </div>
                         <form onSubmit={handleRecordPayment}>
-                            <div className="modal-body">
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-                                    <div style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Monthly Fee</div>
-                                        <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--success)' }}>₹{(billingClient.monthlyFee || 0).toLocaleString()}</div>
+                            <div className="modal-body-premium">
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: 4, fontWeight: 700, textTransform: 'uppercase' }}>Monthly Fee</div>
+                                        <div style={{ fontWeight: 800, fontSize: '1.2rem', color: '#22c55e' }}>₹{(billingClient.monthlyFee || 0).toLocaleString()}</div>
                                     </div>
-                                    <div style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
-                                        <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginBottom: 4 }}>Next Billing</div>
-                                        <div style={{ fontWeight: 700 }}>{billingClient.joiningDate ? format(getNextBillingDate(billingClient.joiningDate), 'MMM dd, yyyy') : '—'}</div>
+                                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginBottom: 4, fontWeight: 700, textTransform: 'uppercase' }}>Next Billing</div>
+                                        <div style={{ fontWeight: 700, fontSize: '1rem', color: 'white' }}>{billingClient.joiningDate ? format(getNextBillingDate(billingClient.joiningDate), 'MMM dd, yyyy') : '—'}</div>
                                     </div>
                                 </div>
 
-                                <div className="form-group" style={{ marginBottom: 14 }}>
-                                    <label className="form-label-premium">amount received (₹) *</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">Amount Received (₹)</label>
                                     <input
                                         type="number" required min="1"
-                                        className="form-input"
-                                        style={{ fontSize: '1.25rem', fontWeight: 700 }}
+                                        className="input-premium"
+                                        style={{ fontSize: '1.5rem', fontWeight: 800, color: '#22c55e' }}
                                         placeholder={String(billingClient.monthlyFee || 0)}
                                         value={billingForm.amount}
                                         onChange={e => setBillingForm({ ...billingForm, amount: e.target.value })}
                                     />
                                 </div>
-                                <div className="form-group" style={{ marginBottom: 14 }}>
-                                    <label className="form-label-premium">payment date *</label>
+                                <div className="form-group-premium">
+                                    <label className="label-premium">Payment Date</label>
                                     <input
                                         type="date" required
-                                        className="form-input"
+                                        className="input-premium"
                                         value={billingForm.date}
                                         onChange={e => setBillingForm({ ...billingForm, date: e.target.value })}
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label className="form-label-premium">note (optional)</label>
+                                <div className="form-group-premium" style={{ marginBottom: 0 }}>
+                                    <label className="label-premium">Note (Optional)</label>
                                     <input
                                         type="text"
-                                        className="form-input"
+                                        className="input-premium"
                                         placeholder="e.g. UPI, Bank Transfer, Cash..."
                                         value={billingForm.note}
                                         onChange={e => setBillingForm({ ...billingForm, note: e.target.value })}
                                     />
                                 </div>
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" onClick={() => setBillingClient(null)}>Cancel</button>
-                                <button type="submit" className="btn btn-premium" disabled={billingSaving} style={{ background: 'var(--success)', boxShadow: '0 2px 8px rgba(48,209,88,0.3)' }}>
-                                    {billingSaving ? '⏳ Saving...' : '✓ Confirm Payment'}
+                            <div className="modal-footer-premium">
+                                <button type="button" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 600 }} onClick={() => setBillingClient(null)}>Cancel</button>
+                                <button type="submit" className="btn btn-premium" disabled={billingSaving} style={{ background: '#22c55e', color: 'white', padding: '10px 24px', borderRadius: '12px', fontWeight: 700, border: 'none', boxShadow: '0 8px 20px -6px rgba(34, 197, 148, 0.4)' }}>
+                                    {billingSaving ? 'Saving...' : 'Confirm Payment'}
                                 </button>
                             </div>
                         </form>
@@ -481,53 +490,63 @@ export default function ClientsPage() {
             {/* ===== CLIENT DETAIL MODAL ===== */}
             {selectedClient && (
                 <div className="modal-overlay" onClick={() => setSelectedClient(null)}>
-                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                    <div className="modal-premium" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-premium">
                             <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-                                <div className="avatar avatar-lg avatar-gradient-1">{selectedClient.name?.[0]}</div>
+                                <div className="avatar avatar-md avatar-gradient-1">{selectedClient.name?.[0]}</div>
                                 <div>
-                                    <div className="modal-title">{selectedClient.name}</div>
-                                    <div className="modal-subtitle">{selectedClient.contactName || 'No contact person set'}</div>
+                                    <h1 className="modal-title-premium">{selectedClient.name}</h1>
+                                    <p className="modal-subtitle-premium">{selectedClient.contactName || 'No contact person set'}</p>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => openEdit(selectedClient)}>✏️ Edit</button>
-                                <button type="button" className="btn btn-secondary btn-sm" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteClient(selectedClient._id)}>🗑️ Delete</button>
-                                <button type="button" className="modal-close" onClick={() => setSelectedClient(null)}>
-                                    <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
-                                </button>
-                            </div>
+                            <button type="button" className="modal-close-premium" onClick={() => setSelectedClient(null)}>×</button>
                         </div>
-                        <div className="modal-body">
+                        <div className="modal-body-premium">
                             {/* Key info grid */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
                                 {[
-                                    { label: 'Monthly Fee', value: `₹${(selectedClient.monthlyFee || 0).toLocaleString()}`, icon: '💰', highlighted: true },
+                                    { label: 'Monthly Fee', value: `₹${(selectedClient.monthlyFee || 0).toLocaleString()}`, icon: '💰', highlight: true },
                                     { label: 'Status', value: selectedClient.isActive ? '✅ Active' : '❌ Inactive', icon: '📌' },
                                     { label: 'Joining Date', value: selectedClient.joiningDate ? format(new Date(selectedClient.joiningDate), 'MMM dd, yyyy') : '—', icon: '📅' },
                                     { label: 'Next Billing', value: selectedClient.joiningDate ? format(getNextBillingDate(selectedClient.joiningDate), 'MMM dd, yyyy') : '—', icon: '🔔' },
-                                    ...(selectedClient.email ? [{ label: 'Email', value: selectedClient.email, icon: '📧' }] : []),
-                                    ...(selectedClient.phone ? [{ label: 'Phone', value: selectedClient.phone, icon: '📞' }] : []),
                                 ].map(f => (
-                                    <div key={f.label} style={{ padding: '12px 14px', background: (f as any).highlighted ? 'rgba(48,209,88,0.08)' : 'var(--bg-secondary)', borderRadius: 12, border: (f as any).highlighted ? '1px solid rgba(48,209,88,0.2)' : '1px solid var(--border)' }}>
-                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>{f.icon} {f.label}</div>
-                                        <div style={{ fontWeight: 700, color: (f as any).highlighted ? 'var(--success)' : 'var(--text-primary)' }}>{f.value}</div>
+                                    <div key={f.label} style={{ padding: '16px', background: f.highlight ? 'rgba(34, 197, 94, 0.05)' : 'rgba(255,255,255,0.03)', borderRadius: '16px', border: f.highlight ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(255,255,255,0.08)' }}>
+                                        <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginBottom: 4, fontWeight: 700, textTransform: 'uppercase' }}>{f.icon} {f.label}</div>
+                                        <div style={{ fontWeight: 800, color: f.highlight ? '#22c55e' : 'white', fontSize: '1rem' }}>{f.value}</div>
                                     </div>
                                 ))}
                             </div>
 
+                            {/* Contact Details */}
+                            {(selectedClient.email || selectedClient.phone) && (
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                                    {selectedClient.email && (
+                                        <div>
+                                            <label className="label-premium" style={{ opacity: 0.5 }}>EMAIL</label>
+                                            <div style={{ fontWeight: 600 }}>{selectedClient.email}</div>
+                                        </div>
+                                    )}
+                                    {selectedClient.phone && (
+                                        <div>
+                                            <label className="label-premium" style={{ opacity: 0.5 }}>PHONE</label>
+                                            <div style={{ fontWeight: 600 }}>{selectedClient.phone}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Services */}
                             {Array.isArray(selectedClient.services) && selectedClient.services.length > 0 && (
-                                <div style={{ marginBottom: 16 }}>
-                                    <div style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: 8 }}>🛠️ Services</div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                <div style={{ marginBottom: '24px' }}>
+                                    <label className="label-premium">🛠️ Services</label>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                         {selectedClient.services.map((s: any, i: number) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '8px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                                                 <div>
-                                                    <span style={{ fontWeight: 600 }}>{s.name}</span>
-                                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginLeft: 6 }}>· {s.category || s.tier}</span>
+                                                    <div style={{ fontWeight: 700 }}>{s.name}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{s.category || s.tier}</div>
                                                 </div>
-                                                <span style={{ fontWeight: 700, color: 'var(--accent)' }}>₹{(s.price || 0).toLocaleString()}/mo</span>
+                                                <div style={{ fontWeight: 800, color: 'var(--accent)' }}>₹{(s.price || 0).toLocaleString()}</div>
                                             </div>
                                         ))}
                                     </div>
@@ -536,35 +555,40 @@ export default function ClientsPage() {
 
                             {/* Notes */}
                             {selectedClient.notes && (
-                                <div style={{ marginBottom: 16, padding: '12px 14px', background: 'var(--bg-secondary)', borderRadius: 12 }}>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: 4 }}>📝 Notes</div>
-                                    <div style={{ fontSize: '0.9rem', lineHeight: 1.5 }}>{selectedClient.notes}</div>
+                                <div style={{ marginBottom: '24px' }}>
+                                    <label className="label-premium">📝 Notes</label>
+                                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                                        {selectedClient.notes}
+                                    </div>
                                 </div>
                             )}
 
                             {/* Payment History */}
                             {selectedClient.payments?.length > 0 && (
-                                <div style={{ marginBottom: 16 }}>
-                                    <div style={{ fontSize: '0.875rem', fontWeight: 700, marginBottom: 8 }}>💳 Payment History</div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                        {[...selectedClient.payments].reverse().slice(0, 8).map((p: any, i: number) => (
-                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', padding: '9px 12px', background: 'var(--bg-secondary)', borderRadius: 10 }}>
+                                <div style={{ marginBottom: 0 }}>
+                                    <label className="label-premium">💳 Recent Payments</label>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                        {[...selectedClient.payments].reverse().slice(0, 5).map((p: any, i: number) => (
+                                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
                                                 <div>
-                                                    <span style={{ fontWeight: 700, color: 'var(--success)' }}>₹{p.amount?.toLocaleString()}</span>
-                                                    {p.note && <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: 8 }}>{p.note}</span>}
+                                                    <span style={{ fontWeight: 800, color: '#22c55e', marginRight: 10 }}>₹{p.amount?.toLocaleString()}</span>
+                                                    {p.note && <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>({p.note})</span>}
                                                 </div>
-                                                <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>{format(new Date(p.date), 'MMM dd, yyyy')}</span>
+                                                <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.3)' }}>{format(new Date(p.date), 'MMM dd, yyyy')}</span>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             )}
-
+                        </div>
+                        <div className="modal-footer-premium">
+                            <button type="button" className="btn btn-ghost" style={{ color: 'var(--danger)' }} onClick={() => handleDeleteClient(selectedClient._id)}>Delete Client</button>
+                            <button type="button" className="btn btn-primary" style={{ background: 'var(--accent-gradient)' }} onClick={() => openEdit(selectedClient)}>Edit Details</button>
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }
 
@@ -588,61 +612,53 @@ function ClientFormModal({
 }) {
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
-                <div className="modal-header">
+            <div className="modal-premium" onClick={e => e.stopPropagation()}>
+                <div className="modal-header-premium">
                     <div>
-                        <div className="modal-title">{isEdit ? '✏️ Edit Client' : '➕ Add New Client'}</div>
-                        <div className="modal-subtitle">{isEdit ? `Editing ${editClient?.name}` : 'Set up client profile and services'}</div>
+                        <h1 className="modal-title-premium">{isEdit ? '✏️ Edit Client' : '➕ Add Client'}</h1>
+                        <p className="modal-subtitle-premium">{isEdit ? `Editing ${editClient?.name}` : 'Set up client profile and services'}</p>
                     </div>
-                    <button type="button" className="modal-close" onClick={onClose}>
-                        <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
-                    </button>
+                    <button type="button" className="modal-close-premium" onClick={onClose}>×</button>
                 </div>
                 <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: '1 1 auto' }}>
-                    <div className="modal-body">
-
-                        {/* Client Info */}
-                        <div style={{ marginBottom: 20 }}>
-                            <div className="form-label-premium">client info</div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: 12, marginBottom: 12 }}>
-                                <div className="form-group">
-                                    <label className="form-label-premium">business name *</label>
-                                    <input className="form-input" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Choice Salon" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label-premium">contact person</label>
-                                    <input className="form-input" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} placeholder="Owner / Admin name" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label-premium">email</label>
-                                    <input className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="client@email.com" />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label-premium">phone</label>
-                                    <input className="form-input" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 900 000 0000" />
-                                </div>
+                    <div className="modal-body-premium">
+                        {/* Client Info Grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Business Name *</label>
+                                <input className="input-premium" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Choice Salon" />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                <div className="form-group">
-                                    <label className="form-label-premium">joining date</label>
-                                    <input className="form-input" type="date" value={form.joiningDate} onChange={e => setForm({ ...form, joiningDate: e.target.value })} />
-                                </div>
-                                <div className="form-group">
-                                    <label className="form-label-premium">status</label>
-                                    <select className="form-input" value={form.isActive ? 'active' : 'inactive'} onChange={e => setForm({ ...form, isActive: e.target.value === 'active' })}>
-                                        <option value="active">✅ Active</option>
-                                        <option value="inactive">❌ Inactive</option>
-                                    </select>
-                                </div>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Contact Person</label>
+                                <input className="input-premium" value={form.contactName} onChange={e => setForm({ ...form, contactName: e.target.value })} placeholder="Owner / Admin name" />
+                            </div>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Email Address</label>
+                                <input className="input-premium" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="client@email.com" />
+                            </div>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Phone Number</label>
+                                <input className="input-premium" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 900 000 0000" />
+                            </div>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Joining Date</label>
+                                <input className="input-premium" type="date" value={form.joiningDate} onChange={e => setForm({ ...form, joiningDate: e.target.value })} />
+                            </div>
+                            <div className="form-group-premium">
+                                <label className="label-premium">Status</label>
+                                <select className="input-premium" value={form.isActive ? 'active' : 'inactive'} onChange={e => setForm({ ...form, isActive: e.target.value === 'active' })}>
+                                    <option value="active">✅ Active</option>
+                                    <option value="inactive">❌ Inactive</option>
+                                </select>
                             </div>
                         </div>
 
                         {/* Services Catalog */}
-                        <div style={{ marginBottom: 20 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
-                                <div className="form-label-premium">services</div>
+                        <div style={{ marginBottom: '24px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <label className="label-premium" style={{ marginBottom: 0 }}>Services Catalog</label>
                                 {formMonthlyFee > 0 && (
-                                    <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--success)' }}>
+                                    <div style={{ background: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', padding: '6px 12px', borderRadius: '10px', fontWeight: 800, fontSize: '0.9rem', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
                                         Total: ₹{formMonthlyFee.toLocaleString()}/mo
                                     </div>
                                 )}
@@ -651,16 +667,16 @@ function ClientFormModal({
                         </div>
 
                         {/* Notes */}
-                        <div className="form-group">
-                            <label className="form-label-premium">notes (optional)</label>
-                            <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any special terms, agreements, or context..." />
+                        <div className="form-group-premium" style={{ marginBottom: 0 }}>
+                            <label className="label-premium">Notes (Optional)</label>
+                            <textarea className="input-premium" rows={3} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Any special terms or context..." style={{ minHeight: '80px' }} />
                         </div>
                     </div>
 
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn btn-premium">
-                            {isEdit ? '✓ Save Changes' : '✓ Add Client'}
+                    <div className="modal-footer-premium">
+                        <button type="button" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 600 }} onClick={onClose}>Cancel</button>
+                        <button type="submit" style={{ background: 'var(--accent-gradient)', border: 'none', color: 'white', padding: '10px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 8px 20px -6px rgba(168, 85, 247, 0.4)' }}>
+                            {isEdit ? 'Save Changes' : 'Add Client'}
                         </button>
                     </div>
                 </form>

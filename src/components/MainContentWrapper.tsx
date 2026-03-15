@@ -15,8 +15,13 @@ export default function MainContentWrapper({ children }: { children: ReactNode }
                 maxWidth: `calc(100vw - ${collapsed ? '64px' : 'var(--sidebar-width)'})`
             }}
         >
+            <div className="glow-background">
+                <div className="glow-blob glow-blob-1 animate-float" />
+                <div className="glow-blob glow-blob-2 animate-float" style={{ animationDelay: '-3s' }} />
+            </div>
             <NotificationBell />
             {children}
         </main>
     );
 }
+

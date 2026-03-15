@@ -64,9 +64,9 @@ export default function RewardsPage() {
     return (
         <div className="animate-in">
             {/* Dark glassmorphic hero */}
-            <div className="card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -60, right: -60, width: 200, height: 200, background: 'radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div className="premium-card" style={{ marginBottom: 32, padding: '32px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
+
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                             <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>👑</span>
@@ -90,7 +90,9 @@ export default function RewardsPage() {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
                     {/* Moksh Daily */}
-                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'MOKSH' ? 'rgba(168,85,247,0.08)' : 'rgba(255,255,255,0.03)', border: dailyLeader === 'MOKSH' ? '2px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'MOKSH' ? '0 0 30px -8px rgba(168,85,247,0.25)' : 'none' }}>
+                    <div className="premium-card premium-card-hover" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: dailyLeader === 'MOKSH' ? '2px solid rgba(168,85,247,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'MOKSH' ? '0 0 30px -8px rgba(168,85,247,0.25)' : 'none' }}>
+                       <div style={{ position: 'absolute', inset: 0, background: dailyLeader === 'MOKSH' ? 'rgba(168,85,247,0.08)' : 'transparent', pointerEvents: 'none', borderRadius: 'inherit' }} />
+
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                             <div className="avatar avatar-md avatar-gradient-1">M</div>
                             <div>
@@ -102,7 +104,9 @@ export default function RewardsPage() {
                     </div>
 
                     {/* Smit Daily */}
-                    <div className="card" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dailyLeader === 'smit' ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.03)', border: dailyLeader === 'smit' ? '2px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'smit' ? '0 0 30px -8px rgba(16,185,129,0.25)' : 'none' }}>
+                    <div className="premium-card premium-card-hover" style={{ padding: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: dailyLeader === 'smit' ? '2px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.07)', boxShadow: dailyLeader === 'smit' ? '0 0 30px -8px rgba(16,185,129,0.25)' : 'none' }}>
+                       <div style={{ position: 'absolute', inset: 0, background: dailyLeader === 'smit' ? 'rgba(16,185,129,0.08)' : 'transparent', pointerEvents: 'none', borderRadius: 'inherit' }} />
+
                         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                             <div className="avatar avatar-md avatar-gradient-2">S</div>
                             <div>

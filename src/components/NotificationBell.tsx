@@ -53,8 +53,9 @@ export default function NotificationBell() {
             fetchNotifications();
             setOpen(false);
             if (scriptId) {
-                router.push('/script-inventory');
+                router.push(`/script-inventory?highlight=${scriptId}`);
             }
+
         } catch (error) {
             console.error('Failed to mark notification active', error);
         }
@@ -73,50 +74,23 @@ export default function NotificationBell() {
     };
 
     return (
-        <div style={{ position: 'fixed', bottom: '28px', right: '28px', zIndex: 9999 }}>
+        <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 9999 }}>
             <div style={{ position: 'relative' }}>
                 <button
                     onClick={() => setOpen(!open)}
-                    style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        backdropFilter: 'blur(10px)',
-                        padding: '10px',
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        transition: 'all 0.3s ease',
-                        boxShadow: unreadCount > 0 ? '0 0 15px rgba(168, 85, 247, 0.4)' : 'none'
-                    }}
+                    className="notification-fab"
                 >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
                     {unreadCount > 0 && (
-                        <span style={{
-                            position: 'absolute',
-                            top: 0,
-                            right: 0,
-                            background: '#e11d48',
-                            color: 'white',
-                            fontSize: '0.65rem',
-                            fontWeight: 'bold',
-                            width: '18px',
-                            height: '18px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderRadius: '50%',
-                            border: '2px solid #05050A'
-                        }}>
+                        <span className="notification-badge">
                             {unreadCount}
                         </span>
                     )}
                 </button>
+
 
                 {open && (
                     <div style={{

@@ -249,6 +249,7 @@ export default function LeadsPage() {
     const [sortBy, setSortBy] = useState('createdAt');
     const [activeTab, setActiveTab] = useState<'table' | 'followups'>('table');
     const [saving, setSaving] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Selected Leads State
     const [selectedLeadsList, setSelectedLeadsList] = useState<any[]>([]);
@@ -443,7 +444,7 @@ export default function LeadsPage() {
 
     const handleDownloadCSV = () => {
         if (selectedLeadsList.length === 0) return;
-        
+
         const headers = ['Company Name', 'Prospect Name', 'Phone Number', 'Link', 'Lead Type', 'Channel', 'Pipeline Stage', 'Follow-up Date', 'Notes', 'Added On'];
         const csvContent = [
             headers.join(','),
@@ -483,7 +484,8 @@ export default function LeadsPage() {
     };
 
     return (
-        <div className="animate-in relative">
+        <>
+            <div className="animate-in relative">
             <style>{`
                 .glass-overlay {
                     position: fixed;
@@ -668,10 +670,10 @@ export default function LeadsPage() {
                             borderRadius: 8, marginTop: 4, maxHeight: 250, overflowY: 'auto',
                             boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 99
                         }}>
-                            {leads.filter(l => 
+                            {leads.filter(l =>
                                 !selectedLeadsList.find(sl => sl._id === l._id) &&
-                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) || 
-                                 l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
+                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) ||
+                                    l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
                             ).slice(0, 50).map(l => (
                                 <div
                                     key={l._id}
@@ -690,15 +692,15 @@ export default function LeadsPage() {
                                     <span style={{ fontSize: '1.2rem', fontWeight: 300 }}>+</span>
                                 </div>
                             ))}
-                            {leads.filter(l => 
+                            {leads.filter(l =>
                                 !selectedLeadsList.find(sl => sl._id === l._id) &&
-                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) || 
-                                 l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
+                                (l.companyName?.toLowerCase().includes(leadSearchStr.toLowerCase()) ||
+                                    l.prospectName?.toLowerCase().includes(leadSearchStr.toLowerCase()))
                             ).length === 0 && (
-                                <div style={{ padding: '12px 14px', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
-                                    No unfound leads matching "{leadSearchStr}"
-                                </div>
-                            )}
+                                    <div style={{ padding: '12px 14px', fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                                        No unfound leads matching "{leadSearchStr}"
+                                    </div>
+                                )}
                         </div>
                     )}
                 </div>
@@ -718,8 +720,8 @@ export default function LeadsPage() {
                                         </div>
                                     </div>
                                 </div>
-                                <button 
-                                    className="btn-icon-sm" 
+                                <button
+                                    className="btn-icon-sm"
                                     style={{ color: 'var(--danger)', background: 'rgba(239,68,68,0.1)', cursor: 'pointer' }}
                                     onClick={() => setSelectedLeadsList(selectedLeadsList.filter(sl => sl._id !== l._id))}
                                     title="Remove from selection"
@@ -984,17 +986,17 @@ export default function LeadsPage() {
                                         </td>
                                         <td>
                                             <div style={{ display: 'flex', gap: 6 }}>
-                                                <button 
-                                                    className="btn btn-ghost btn-sm" 
-                                                    style={{ padding: '0 8px', color: 'var(--text-primary)', background: selectedLeadsList.find(sl => sl._id === lead._id) ? 'var(--success-light, #dcfce7)' : 'var(--bg-secondary)', border: '1px solid var(--border)' }} 
-                                                    onClick={e => { 
-                                                        e.stopPropagation(); 
-                                                        if(!selectedLeadsList.find(sl => sl._id === lead._id)) {
-                                                            setSelectedLeadsList([...selectedLeadsList, lead]); 
+                                                <button
+                                                    className="btn btn-ghost btn-sm"
+                                                    style={{ padding: '0 8px', color: 'var(--text-primary)', background: selectedLeadsList.find(sl => sl._id === lead._id) ? 'var(--success-light, #dcfce7)' : 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        if (!selectedLeadsList.find(sl => sl._id === lead._id)) {
+                                                            setSelectedLeadsList([...selectedLeadsList, lead]);
                                                         } else {
                                                             setSelectedLeadsList(selectedLeadsList.filter(sl => sl._id !== lead._id));
                                                         }
-                                                    }} 
+                                                    }}
                                                     title={selectedLeadsList.find(sl => sl._id === lead._id) ? "Remove from Export List" : "Add to Export List"}
                                                 >
                                                     {selectedLeadsList.find(sl => sl._id === lead._id) ? '✓ Added' : '+ Add'}
@@ -1146,16 +1148,17 @@ export default function LeadsPage() {
                         const accentColor = isOverdue ? '#ef4444' : isUrgent ? '#f59e0b' : '#10b981';
 
                         return (
-                            <div key={lead._id} className="card card-hover" style={{ 
-                                display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer', 
+                            <div key={lead._id} className="premium-card premium-card-hover" style={{
+                                display: 'flex', flexDirection: 'column', gap: 16, cursor: 'pointer',
                                 padding: '24px',
-                                background: cardBg, 
-                                borderColor: cardBorder,
+                                border: isOverdue ? '2.5px solid rgba(239, 68, 68, 0.4)' : isUrgent ? '2.5px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(255, 255, 255, 0.08)',
+                                boxShadow: isOverdue ? '0 0 30px rgba(239, 68, 68, 0.2)' : isUrgent ? '0 0 30px rgba(245, 158, 11, 0.2)' : 'none',
                                 position: 'relative',
                                 overflow: 'hidden'
                             }} onClick={() => setSelectedLead(lead)}>
+
                                 {/* Urgency glow at top */}
-                                <div style={{ 
+                                <div style={{
                                     position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
                                     width: '60%', height: '40px',
                                     background: `radial-gradient(ellipse at top, ${accentColor}20 0%, transparent 70%)`,
@@ -1186,11 +1189,11 @@ export default function LeadsPage() {
                                 </div>
 
                                 {lead.notes && (
-                                    <div style={{ 
-                                        padding: '12px 14px', 
-                                        background: 'rgba(0,0,0,0.2)', 
-                                        borderRadius: 12, 
-                                        border: '1px solid rgba(255,255,255,0.03)' 
+                                    <div style={{
+                                        padding: '12px 14px',
+                                        background: 'rgba(0,0,0,0.2)',
+                                        borderRadius: 12,
+                                        border: '1px solid rgba(255,255,255,0.03)'
                                     }}>
                                         <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
                                             {lead.notes.length > 120 ? `${lead.notes.slice(0, 120)}...` : lead.notes}
@@ -1198,43 +1201,43 @@ export default function LeadsPage() {
                                     </div>
                                 )}
 
-                                <div style={{ 
-                                    borderTop: '1px solid rgba(255,255,255,0.05)', 
-                                    paddingTop: 16, 
-                                    display: 'flex', 
-                                    justifyContent: 'space-between', 
-                                    flexWrap: 'wrap', 
-                                    alignItems: 'center' 
+                                <div style={{
+                                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                                    paddingTop: 16,
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    flexWrap: 'wrap',
+                                    alignItems: 'center'
                                 }}>
                                     <div style={{ display: 'flex', gap: 8 }}>
                                         {lead.phoneNumber && (
-                                            <a href={`tel:${lead.phoneNumber}`} 
-                                               style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', transition: 'all 0.2s' }} 
-                                               onClick={e => e.stopPropagation()}
+                                            <a href={`tel:${lead.phoneNumber}`}
+                                                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', transition: 'all 0.2s' }}
+                                                onClick={e => e.stopPropagation()}
                                             >📞</a>
                                         )}
                                         {lead.phoneNumber && (
-                                            <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`} 
-                                               target="_blank" rel="noreferrer" 
-                                               style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(37,211,102,0.1)', border: '1px solid rgba(37,211,102,0.2)', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', transition: 'all 0.2s' }} 
-                                               onClick={e => e.stopPropagation()}
+                                            <a href={`https://wa.me/${lead.phoneNumber.replace(/\D/g, '')}`}
+                                                target="_blank" rel="noreferrer"
+                                                style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(37,211,102,0.1)', border: '1px solid rgba(37,211,102,0.2)', color: '#25d366', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem', transition: 'all 0.2s' }}
+                                                onClick={e => e.stopPropagation()}
                                             >💬</a>
                                         )}
                                     </div>
                                     <button
                                         onClick={(e) => handleMarkFollowUpDone(e, lead._id)}
-                                        style={{ 
-                                            background: 'rgba(16, 185, 129, 0.1)', 
-                                            color: '#10b981', 
-                                            border: '1px solid rgba(16, 185, 129, 0.25)', 
-                                            borderRadius: 12, 
-                                            padding: '8px 18px', 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            gap: 6, 
-                                            cursor: 'pointer', 
-                                            fontSize: '0.82rem', 
-                                            fontWeight: 800, 
+                                        style={{
+                                            background: 'rgba(16, 185, 129, 0.1)',
+                                            color: '#10b981',
+                                            border: '1px solid rgba(16, 185, 129, 0.25)',
+                                            borderRadius: 12,
+                                            padding: '8px 18px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 6,
+                                            cursor: 'pointer',
+                                            fontSize: '0.82rem',
+                                            fontWeight: 800,
                                             transition: 'all 0.2s',
                                             textTransform: 'uppercase',
                                             letterSpacing: '0.02em'
@@ -1251,122 +1254,89 @@ export default function LeadsPage() {
                 </div>
             )}
 
-            {/* ===== RESPONSIVE NEW LEAD MODAL ===== */}
+            </div>
+
+            {/* ===== PREMIUM NEW LEAD MODAL ===== */}
             {showModal && (
                 <div className="modal-overlay" onClick={() => setShowModal(false)}>
-                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                    <div className="modal-premium" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-premium">
                             <div>
-                                <h1 className="modal-title">✨ New Lead</h1>
-                                <p className="modal-subtitle">Click fields to edit — Company Name required</p>
+                                <h1 className="modal-title-premium">✨ New Lead</h1>
+                                <p className="modal-subtitle-premium">Fill in the details to tracked the prospect</p>
                             </div>
-                            <button type="button" className="modal-close" onClick={() => setShowModal(false)}>×</button>
+                            <button type="button" className="modal-close-premium" onClick={() => setShowModal(false)}>×</button>
                         </div>
 
-                        <div className="modal-body">
-                            <div style={{ borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden' }}>
-
-                                {/* Source Channel */}
-                                <div className="notion-row">
-                                    <div className="notion-label">
-                                        <span style={{ fontSize: 18 }}>📡</span>
-                                        <div>
-                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>source channel</span>
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--success)', fontWeight: 600 }}>Auto-logs a reply ✓</span>
-                                        </div>
-                                    </div>
-                                    <div className="notion-input-wrap">
-                                        {CHANNELS.map(ch => (
-                                            <button
-                                                key={ch.key}
-                                                type="button"
-                                                onClick={() => setForm({ ...form, channel: ch.key })}
-                                                style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: form.channel === ch.key ? ch.color : `${ch.color}15`, color: form.channel === ch.key ? 'white' : ch.color, boxShadow: form.channel === ch.key ? `0 2px 8px ${ch.color}40` : 'none' }}
-                                            >
-                                                {ch.icon} {ch.label}
-                                            </button>
-                                        ))}
-                                    </div>
+                        <div className="modal-body-premium">
+                            {/* Source Channel Select */}
+                            <div className="form-group-premium">
+                                <label className="label-premium">Source Channel</label>
+                                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                    {CHANNELS.map(ch => (
+                                        <button
+                                            key={ch.key}
+                                            type="button"
+                                            onClick={() => setForm({ ...form, channel: ch.key })}
+                                            style={{
+                                                padding: '8px 16px', borderRadius: '12px', fontSize: '0.8125rem', fontWeight: 700,
+                                                cursor: 'pointer', transition: 'all 0.2s', border: '1px solid',
+                                                background: form.channel === ch.key ? ch.color : 'rgba(255,255,255,0.03)',
+                                                color: form.channel === ch.key ? 'white' : 'rgba(255,255,255,0.4)',
+                                                borderColor: form.channel === ch.key ? ch.color : 'rgba(255,255,255,0.08)',
+                                                boxShadow: form.channel === ch.key ? `0 8px 16px ${ch.color}30` : 'none'
+                                            }}
+                                        >
+                                            {ch.icon} {ch.label}
+                                        </button>
+                                    ))}
                                 </div>
+                            </div>
 
-                                {/* Lead Date */}
-                                <div className="notion-row">
-                                    <div className="notion-label">
-                                        <span style={{ fontSize: 18 }}>🗓️</span>
-                                        <div>
-                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>lead date</span>
-                                            <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>When did this happen?</span>
-                                        </div>
-                                    </div>
-                                    <div className="notion-input-wrap">
-                                        <input
-                                            type="date"
-                                            value={form.leadDate}
-                                            onChange={e => setForm({ ...form, leadDate: e.target.value })}
-                                            className="notion-input"
-                                        />
-                                    </div>
-                                </div>
-
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                                 {/* Inputs */}
                                 {[
-                                    { icon: '🏢', label: 'Company Name', key: 'companyName', type: 'text', placeholder: 'e.g. Luxury Salon Pune', required: true },
-                                    { icon: '👤', label: 'Prospect / Contact', key: 'prospectName', type: 'text', placeholder: 'Owner or admin name' },
+                                    { icon: '🏢', label: 'Company Name', key: 'companyName', type: 'text', placeholder: 'e.g. Luxury Salon' },
+                                    { icon: '👤', label: 'Prospect Name', key: 'prospectName', type: 'text', placeholder: 'Owner or admin' },
                                     { icon: '📞', label: 'Phone Number', key: 'phoneNumber', type: 'tel', placeholder: '+91 900 000 0000' },
-                                    { icon: '🔗', label: 'Website / GBP Link', key: 'link', type: 'url', placeholder: 'https://...' },
+                                    { icon: '🔗', label: 'Website / GBP', key: 'link', type: 'url', placeholder: 'https://...' },
+                                    { icon: '🗓️', label: 'Lead Date', key: 'leadDate', type: 'date', placeholder: '' },
                                     { icon: '📅', label: 'Follow-up Date', key: 'followUpDate', type: 'date', placeholder: '' },
                                 ].map((field) => (
-                                    <div className="notion-row" key={field.key}>
-                                        <div className="notion-label">
-                                            <span style={{ fontSize: 18 }}>{field.icon}</span>
-                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>
-                                                {field.label.toLowerCase()}
-                                                {field.required && <span style={{ color: 'var(--danger)', marginLeft: 4 }}>*</span>}
-                                            </span>
-                                        </div>
-                                        <div className="notion-input-wrap">
-                                            <input
-                                                type={field.type}
-                                                placeholder={field.placeholder}
-                                                value={form[field.key as keyof typeof form]}
-                                                onChange={e => setForm({ ...form, [field.key]: e.target.value })}
-                                                className="notion-input"
-                                            />
-                                        </div>
+                                    <div className="form-group-premium" key={field.key}>
+                                        <label className="label-premium">{field.icon} {field.label}</label>
+                                        <input
+                                            type={field.type}
+                                            placeholder={field.placeholder}
+                                            value={form[field.key as keyof typeof form]}
+                                            onChange={e => setForm({ ...form, [field.key]: e.target.value })}
+                                            className="input-premium"
+                                        />
                                     </div>
                                 ))}
 
-                                {/* Pipeline Stage */}
-                                <div className="notion-row">
-                                    <div className="notion-label">
-                                        <span style={{ fontSize: 18 }}>📍</span>
-                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>pipeline stage</span>
-                                    </div>
-                                    <div className="notion-input-wrap">
-                                        <select
-                                            className="notion-input"
-                                            value={form.pipelineStage}
-                                            onChange={e => setForm({ ...form, pipelineStage: e.target.value })}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            {PIPELINE_STAGE_OPTIONS.map((group, i) => (
-                                                <optgroup key={i} label={group.label}>
-                                                    {group.options.map((opt: any) => (
-                                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                                    ))}
-                                                </optgroup>
-                                            ))}
-                                        </select>
-                                    </div>
+                                {/* Pipeline Stage Selection */}
+                                <div className="form-group-premium">
+                                    <label className="label-premium">📍 Pipeline Stage</label>
+                                    <select
+                                        className="input-premium"
+                                        value={form.pipelineStage}
+                                        onChange={e => setForm({ ...form, pipelineStage: e.target.value })}
+                                    >
+                                        {PIPELINE_STAGE_OPTIONS.map((group, i) => (
+                                            <optgroup key={i} label={group.label}>
+                                                {group.options.map((opt: any) => (
+                                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                ))}
+                                            </optgroup>
+                                        ))}
+                                    </select>
                                 </div>
 
-                                {/* Status */}
-                                <div className="notion-row">
-                                    <div className="notion-label">
-                                        <span style={{ fontSize: 18 }}>🏷️</span>
-                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>lead status</span>
-                                    </div>
-                                    <div className="notion-input-wrap">
+                                {/* Status Tagging */}
+                                <div className="form-group-premium">
+                                    <label className="label-premium">🏷️ Lead Status</label>
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                         {LEAD_TYPES.map(t => {
                                             const sc = STATUS_CONFIG[t];
                                             return (
@@ -1374,7 +1344,14 @@ export default function LeadsPage() {
                                                     key={t}
                                                     type="button"
                                                     onClick={() => setForm({ ...form, leadType: t })}
-                                                    style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: form.leadType === t ? sc.color : sc.bg, color: form.leadType === t ? 'white' : sc.color, boxShadow: form.leadType === t ? `0 2px 8px ${sc.color}40` : 'none' }}
+                                                    style={{
+                                                        padding: '8px 14px', borderRadius: '12px', fontSize: '0.8125rem', fontWeight: 700,
+                                                        cursor: 'pointer', transition: 'all 0.2s', border: '1px solid',
+                                                        background: form.leadType === t ? sc.color : 'rgba(255,255,255,0.03)',
+                                                        color: form.leadType === t ? 'white' : 'rgba(255,255,255,0.4)',
+                                                        borderColor: form.leadType === t ? sc.color : 'rgba(255,255,255,0.08)',
+                                                        boxShadow: form.leadType === t ? `0 8px 16px ${sc.color}30` : 'none'
+                                                    }}
                                                 >
                                                     {sc.emoji} {t}
                                                 </button>
@@ -1382,278 +1359,139 @@ export default function LeadsPage() {
                                         })}
                                     </div>
                                 </div>
+                            </div>
 
-                                {/* Notes */}
-                                <div className="notion-row" style={{ alignItems: 'flex-start' }}>
-                                    <div className="notion-label" style={{ minHeight: '100px' }}>
-                                        <span style={{ fontSize: 18, marginTop: 2 }}>📝</span>
-                                        <span className="form-label-premium" style={{ marginBottom: 0 }}>call notes</span>
-                                    </div>
-                                    <div className="notion-input-wrap" style={{ alignItems: 'flex-start' }}>
-                                        <textarea
-                                            rows={4}
-                                            placeholder="What was discussed on the call? Any promises made?"
-                                            value={form.notes}
-                                            onChange={e => setForm({ ...form, notes: e.target.value })}
-                                            className="notion-input"
-                                            style={{ resize: 'vertical', lineHeight: 1.5 }}
-                                        />
-                                    </div>
-                                </div>
+                            {/* Notes Field */}
+                            <div className="form-group-premium" style={{ marginBottom: 0 }}>
+                                <label className="label-premium">📝 Call Notes</label>
+                                <textarea
+                                    rows={4}
+                                    placeholder="Key discussion points..."
+                                    value={form.notes}
+                                    onChange={e => setForm({ ...form, notes: e.target.value })}
+                                    className="input-premium"
+                                    style={{ resize: 'vertical', lineHeight: 1.5, minHeight: '100px' }}
+                                />
                             </div>
                         </div>
 
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                        <div className="modal-footer-premium">
                             <button
                                 type="button"
-                                className="btn btn-premium"
+                                style={{
+                                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                                    color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer'
+                                }}
+                                onClick={() => setShowModal(false)}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                style={{
+                                    background: 'var(--accent-gradient)', border: 'none',
+                                    color: 'white', padding: '10px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer',
+                                    boxShadow: '0 8px 20px -6px rgba(168, 85, 247, 0.4)',
+                                    opacity: (!form.companyName.trim() || saving) ? 0.5 : 1
+                                }}
                                 disabled={!form.companyName.trim() || saving}
                                 onClick={handleSubmit}
                             >
-                                {saving ? '⏳ Saving...' : '✓ Save Lead'}
+                                {saving ? 'Saving...' : 'Save Lead'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* RESPONSIVE LEAD DETAIL MODAL */}
+            {/* PREMIUM LEAD DETAIL MODAL */}
             {selectedLead && (
                 <div className="modal-overlay" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
-                    <div className="modal modal-lg" onClick={e => e.stopPropagation()}>
-                        <div className="modal-header">
+                    <div className="modal-premium" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header-premium">
                             <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                <div className="avatar avatar-md avatar-gradient-1" style={{ fontSize: '1.2rem', width: 44, height: 44 }}>{selectedLead.companyName?.[0]}</div>
+                                <div className="avatar avatar-md avatar-gradient-1" style={{ fontSize: '1.2rem', width: 44, height: 44 }}>{selectedLead.companyName?.[0] || 'L'}</div>
                                 {isEditingExisting ? (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                        <input className="form-input" style={{ fontWeight: 800, fontSize: '1.1rem', padding: '4px 8px' }} value={editForm.companyName} onChange={e => setEditForm({ ...editForm, companyName: e.target.value })} placeholder="Company Name" />
-                                        <input className="form-input" style={{ fontSize: '0.85rem', padding: '4px 8px' }} value={editForm.prospectName} onChange={e => setEditForm({ ...editForm, prospectName: e.target.value })} placeholder="Prospect Name" />
+                                        <input className="input-premium" style={{ fontWeight: 800, fontSize: '1.1rem', padding: '4px 8px', height: 'auto' }} value={editForm.companyName} onChange={e => setEditForm({ ...editForm, companyName: e.target.value })} placeholder="Company Name" />
+                                        <input className="input-premium" style={{ fontSize: '0.85rem', padding: '4px 8px', height: 'auto' }} value={editForm.prospectName} onChange={e => setEditForm({ ...editForm, prospectName: e.target.value })} placeholder="Prospect Name" />
                                     </div>
                                 ) : (
                                     <div>
-                                        <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>{selectedLead.companyName}</div>
-                                        <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{selectedLead.prospectName}</div>
+                                        <h1 className="modal-title-premium">{selectedLead.companyName}</h1>
+                                        <p className="modal-subtitle-premium">{selectedLead.prospectName || 'No prospect name'}</p>
                                     </div>
                                 )}
                             </div>
-                            <button type="button" className="modal-close" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>
-                                <span style={{ fontSize: 24, lineHeight: 1 }}>×</span>
-                            </button>
+                            <button type="button" className="modal-close-premium" onClick={() => { setSelectedLead(null); setIsEditingExisting(false); }}>×</button>
                         </div>
-                        <div className="glass-modal-body">
-
-                            {isEditingExisting ? (
-                                <div style={{ borderRadius: 12, border: '1px solid var(--border)', overflow: 'hidden', marginBottom: 24 }}>
-                                    {/* Source Channel */}
-                                    <div className="notion-row">
-                                        <div className="notion-label">
-                                            <span style={{ fontSize: 18 }}>📡</span>
-                                            <div>
-                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>source channel</span>
-                                            </div>
+                        <div className="modal-body-premium">
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '24px' }}>
+                                {isEditingExisting ? (
+                                    <>
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">📞 Phone</label>
+                                            <input className="input-premium" value={editForm.phoneNumber} onChange={e => setEditForm({ ...editForm, phoneNumber: e.target.value })} />
                                         </div>
-                                        <div className="notion-input-wrap">
-                                            {CHANNELS.map(ch => (
-                                                <button
-                                                    key={ch.key}
-                                                    type="button"
-                                                    onClick={() => setEditForm({ ...editForm, channel: ch.key })}
-                                                    style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: editForm.channel === ch.key ? ch.color : `${ch.color}15`, color: editForm.channel === ch.key ? 'white' : ch.color, boxShadow: editForm.channel === ch.key ? `0 2px 8px ${ch.color}40` : 'none' }}
-                                                >
-                                                    {ch.icon} {ch.label}
-                                                </button>
-                                            ))}
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">🔗 Link</label>
+                                            <input className="input-premium" value={editForm.link} onChange={e => setEditForm({ ...editForm, link: e.target.value })} />
                                         </div>
+                                        <div className="form-group-premium">
+                                            <label className="label-premium">📍 Stage</label>
+                                            <select className="input-premium" value={editForm.pipelineStage} onChange={e => setEditForm({ ...editForm, pipelineStage: e.target.value })}>
+                                                {PIPELINE_STAGE_OPTIONS.map((g, i) => (
+                                                    <optgroup key={i} label={g.label}>
+                                                        {g.options.map((o: any) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <label className="label-premium" style={{ fontSize: '0.7rem', opacity: 0.5 }}>PHONE</label>
+                                            <div style={{ fontWeight: 600 }}>{selectedLead.phoneNumber || '—'}</div>
+                                        </div>
+                                        <div>
+                                            <label className="label-premium" style={{ fontSize: '0.7rem', opacity: 0.5 }}>STAGE</label>
+                                            <div style={{ fontWeight: 600, textTransform: 'capitalize' }}>{selectedLead.pipelineStage || 'New'}</div>
+                                        </div>
+                                        <div>
+                                            <label className="label-premium" style={{ fontSize: '0.7rem', opacity: 0.5 }}>STATUS</label>
+                                            <div style={{ fontWeight: 600 }}>{selectedLead.leadType || '—'}</div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="form-group-premium" style={{ marginBottom: 0 }}>
+                                <label className="label-premium">📝 Notes</label>
+                                {isEditingExisting ? (
+                                    <textarea className="input-premium" rows={5} value={editForm.notes} onChange={e => setEditForm({ ...editForm, notes: e.target.value })} />
+                                ) : (
+                                    <div style={{ padding: '16px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)', minHeight: '100px', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
+                                        {selectedLead.notes || 'No notes available.'}
                                     </div>
-
-                                    {/* Lead Date */}
-                                    <div className="notion-row">
-                                        <div className="notion-label">
-                                            <span style={{ fontSize: 18 }}>🗓️</span>
-                                            <div>
-                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>lead date</span>
-                                            </div>
-                                        </div>
-                                        <div className="notion-input-wrap">
-                                            <input
-                                                type="date"
-                                                value={editForm.leadDate ? editForm.leadDate.split('T')[0] : ''}
-                                                onChange={e => setEditForm({ ...editForm, leadDate: e.target.value })}
-                                                className="notion-input"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Inputs */}
-                                    {[
-                                        { icon: '📞', label: 'Phone Number', key: 'phoneNumber', type: 'tel', placeholder: '+91 900 000 0000' },
-                                        { icon: '🔗', label: 'Website / GBP Link', key: 'link', type: 'url', placeholder: 'https://...' },
-                                        { icon: '📅', label: 'Follow-up Date', key: 'followUpDate', type: 'date', placeholder: '' },
-                                    ].map((field) => (
-                                        <div className="notion-row" key={field.key}>
-                                            <div className="notion-label">
-                                                <span style={{ fontSize: 18 }}>{field.icon}</span>
-                                                <span className="form-label-premium" style={{ marginBottom: 0 }}>
-                                                    {field.label.toLowerCase()}
-                                                </span>
-                                            </div>
-                                            <div className="notion-input-wrap">
-                                                <input
-                                                    type={field.type}
-                                                    placeholder={field.placeholder}
-                                                    value={field.key === 'followUpDate' && editForm[field.key] ? editForm[field.key].split('T')[0] : (editForm[field.key] || '')}
-                                                    onChange={e => setEditForm({ ...editForm, [field.key]: e.target.value })}
-                                                    className="notion-input"
-                                                />
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Status */}
-                                    <div className="notion-row">
-                                        <div className="notion-label">
-                                            <span style={{ fontSize: 18 }}>🏷️</span>
-                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>lead status</span>
-                                        </div>
-                                        <div className="notion-input-wrap">
-                                            {LEAD_TYPES.map(t => {
-                                                const sc = STATUS_CONFIG[t];
-                                                return (
-                                                    <button
-                                                        key={t}
-                                                        type="button"
-                                                        onClick={() => setEditForm({ ...editForm, leadType: t })}
-                                                        style={{ padding: '6px 14px', borderRadius: 99, fontSize: '0.8125rem', fontWeight: 700, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: editForm.leadType === t ? sc.color : sc.bg, color: editForm.leadType === t ? 'white' : sc.color, boxShadow: editForm.leadType === t ? `0 2px 8px ${sc.color}40` : 'none' }}
-                                                    >
-                                                        {sc.emoji} {t}
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-
-                                    {/* Notes */}
-                                    <div className="notion-row" style={{ alignItems: 'flex-start' }}>
-                                        <div className="notion-label" style={{ minHeight: '100px' }}>
-                                            <span style={{ fontSize: 18, marginTop: 2 }}>📝</span>
-                                            <span className="form-label-premium" style={{ marginBottom: 0 }}>call notes</span>
-                                        </div>
-                                        <div className="notion-input-wrap" style={{ alignItems: 'flex-start' }}>
-                                            <textarea
-                                                rows={4}
-                                                placeholder="What was discussed on the call?"
-                                                value={editForm.notes || ''}
-                                                onChange={e => setEditForm({ ...editForm, notes: e.target.value })}
-                                                className="notion-input"
-                                                style={{ resize: 'vertical', lineHeight: 1.5 }}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                <>
-                                    <div className="detail-grid">
-                                        {[
-                                            { label: 'Phone', value: selectedLead.phoneNumber || '—', icon: '📞' },
-                                            { label: 'Status', value: selectedLead.leadType, icon: '🏷️' },
-                                            { label: 'Follow-up', value: selectedLead.followUpDate ? format(new Date(selectedLead.followUpDate), 'MMM dd, yyyy') : '—', icon: '📅' },
-                                            { label: 'Added On', value: format(new Date(selectedLead.createdAt), 'MMM dd, yyyy'), icon: '📋' },
-                                        ].map(f => (
-                                            <div key={f.label} style={{ padding: '14px 16px', background: 'var(--bg-secondary)', borderRadius: 16, border: '1px solid var(--border)' }}>
-                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 600 }}>{f.icon} {f.label}</div>
-                                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{f.value}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {selectedLead.link && (
-                                        <div style={{ marginBottom: 24 }}>
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>� Website / GBP Link</div>
-                                            <a href={selectedLead.link} target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', fontWeight: 600, wordBreak: 'break-all', fontSize: '0.95rem' }}>{selectedLead.link}</a>
-                                        </div>
-                                    )}
-
-                                    {selectedLead.notes && (
-                                        <div style={{ padding: '16px 20px', background: 'var(--bg-secondary)', borderRadius: 16, marginBottom: 24, border: '1px solid var(--border)' }}>
-                                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: 10, fontWeight: 700 }}>📝 Call Notes</div>
-                                            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--text-primary)', margin: 0, whiteSpace: 'pre-wrap' }}>{selectedLead.notes}</p>
-                                        </div>
-                                    )}
-
-                                    <div style={{ marginBottom: 16 }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                            <div>
-                                                <div className="form-label-premium">🔄 update status</div>
-                                                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                                                    {LEAD_TYPES.map(t => {
-                                                        const sc = STATUS_CONFIG[t];
-                                                        return (
-                                                            <button
-                                                                key={t}
-                                                                style={{
-                                                                    padding: '8px 16px', borderRadius: 99, fontSize: '0.85rem', fontWeight: 700, border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
-                                                                    background: selectedLead.leadType === t ? sc.color : 'var(--surface)',
-                                                                    color: selectedLead.leadType === t ? 'white' : 'var(--text-secondary)',
-                                                                    borderColor: selectedLead.leadType === t ? 'transparent' : 'var(--border)',
-                                                                    boxShadow: selectedLead.leadType === t ? `0 4px 12px ${sc.color}50` : 'none'
-                                                                }}
-                                                                onClick={() => handleUpdateStatus(selectedLead._id, t)}
-                                                            >
-                                                                {sc.emoji} {t}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                            <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: 16 }}>
-                                                <div className="form-label-premium">📍 pipeline stage</div>
-                                                <select
-                                                    className="filter-select"
-                                                    value={selectedLead.pipelineStage || 'new'}
-                                                    style={{ width: '100%', padding: '10px 14px', fontSize: '0.85rem', background: 'var(--surface)', color: 'var(--text-primary)', fontWeight: 600, border: '1px solid var(--border)', borderRadius: 10 }}
-                                                    onChange={e => handleUpdatePipelineStage(selectedLead._id, e.target.value)}
-                                                >
-                                                    {PIPELINE_STAGE_OPTIONS.map((group, i) => (
-                                                        <optgroup key={i} label={group.label}>
-                                                            {group.options.map((opt: any) => (
-                                                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                                            ))}
-                                                        </optgroup>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-
+                                )}
+                            </div>
                         </div>
-
-                        <div className="modal-footer">
+                        <div className="modal-footer-premium">
                             {isEditingExisting ? (
                                 <>
-                                    <button type="button" className="btn btn-secondary" onClick={() => setIsEditingExisting(false)}>Cancel Edit</button>
-                                    <button type="button" className="btn btn-premium" onClick={handleSaveExistingLead} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</button>
+                                    <button className="btn btn-ghost" onClick={() => setIsEditingExisting(false)}>Cancel</button>
+                                    <button className="btn btn-primary" style={{ background: 'var(--accent-gradient)' }} onClick={handleSaveExistingLead}>Update Details</button>
                                 </>
                             ) : (
                                 <>
-                                    <div style={{ display: 'flex', gap: 10 }}>
-                                        <button type="button" className="btn btn-secondary" onClick={() => { setEditForm(selectedLead); setIsEditingExisting(true); }}>✏️ Edit Lead Details</button>
-                                        <button type="button" className="btn" style={{ color: 'var(--danger)', borderColor: 'rgba(239,68,68,0.2)' }} onClick={() => handleDeleteLead(selectedLead._id)}>🗑️ Delete</button>
-                                    </div>
-                                    {selectedLead.phoneNumber && (
-                                        <div style={{ display: 'flex', gap: 10 }}>
-                                            <a href={`tel:${selectedLead.phoneNumber}`} className="btn btn-secondary">📞 Call</a>
-                                            <a href={`https://wa.me/${selectedLead.phoneNumber.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ color: '#25d366', borderColor: '#25d36630', background: '#25d36610' }}>💬 WhatsApp</a>
-                                        </div>
-                                    )}
+                                    <button className="btn btn-ghost" style={{ color: 'var(--danger)' }} onClick={() => handleDeleteLead(selectedLead._id)}>Delete Lead</button>
+                                    <button className="btn btn-primary" style={{ background: 'var(--accent-gradient)' }} onClick={() => setIsEditingExisting(true)}>Edit Details</button>
                                 </>
                             )}
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }

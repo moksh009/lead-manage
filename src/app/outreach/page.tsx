@@ -140,9 +140,9 @@ export default function OutreachPage() {
         <div className="animate-in" style={{ maxWidth: 720, margin: '0 auto' }}>
 
             {/* Dark glassmorphic hero */}
-            <div className="card" style={{ marginBottom: 24, padding: '28px 32px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: -60, right: -60, width: 180, height: 180, background: 'radial-gradient(circle, rgba(168,85,247,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div className="premium-card" style={{ marginBottom: 24, padding: '28px 32px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'relative', zIndex: 1 }}>
+
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                         <span style={{ fontSize: '1.5rem', padding: '6px', background: 'rgba(168,85,247,0.1)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>📊</span>
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)', padding: '3px 12px', borderRadius: 99, color: '#d8b4fe' }}>
@@ -270,14 +270,14 @@ export default function OutreachPage() {
                                     {isEditing || !existingRecord ? (
                                         <input
                                             type="number"
-                                            className="form-input"
+                                            className="input-premium"
                                             value={form[ch.sentKey as keyof typeof form]}
                                             onChange={e => setField(ch.sentKey, e.target.value)}
                                             placeholder="0"
-                                            style={{ width: '80px', textAlign: 'center', padding: '6px' }}
+                                            style={{ width: '100px', textAlign: 'center', fontWeight: 800, fontSize: '1.25rem', color: 'white', padding: '8px' }}
                                         />
                                     ) : (
-                                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: displaySent > 0 ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.5rem', color: displaySent > 0 ? 'white' : 'rgba(255,255,255,0.2)' }}>
                                             {displaySent.toLocaleString()}
                                         </div>
                                     )}
@@ -309,30 +309,33 @@ export default function OutreachPage() {
 
                 {/* Save row */}
                 {isEditing && (
-                    <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 14 }}>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
                         {existingRecord && (
-                            <button type="button" className="btn btn-secondary" onClick={() => {
-                                // Revert form to saved values
-                                setForm({
-                                    dmsSent: existingRecord.dmsSent > 0 ? String(existingRecord.dmsSent) : '',
-                                    emailsSent: existingRecord.emailsSent > 0 ? String(existingRecord.emailsSent) : '',
-                                    whatsappSent: existingRecord.whatsappSent > 0 ? String(existingRecord.whatsappSent) : '',
-                                    callsMade: existingRecord.callsMade > 0 ? String(existingRecord.callsMade) : '',
-                                });
-                                setIsEditing(false);
-                            }}>
+                            <button 
+                                type="button" 
+                                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer' }}
+                                onClick={() => {
+                                    setForm({
+                                        dmsSent: existingRecord.dmsSent > 0 ? String(existingRecord.dmsSent) : '',
+                                        emailsSent: existingRecord.emailsSent > 0 ? String(existingRecord.emailsSent) : '',
+                                        whatsappSent: existingRecord.whatsappSent > 0 ? String(existingRecord.whatsappSent) : '',
+                                        callsMade: existingRecord.callsMade > 0 ? String(existingRecord.callsMade) : '',
+                                    });
+                                    setIsEditing(false);
+                                }}
+                            >
                                 Cancel
                             </button>
                         )}
                         <button
                             type="submit"
-                            className="btn btn-premium btn-lg"
+                            className="btn btn-premium"
                             disabled={saveStatus === 'saving'}
-                            style={{ minWidth: 160 }}
+                            style={{ minWidth: '180px', padding: '12px 24px', borderRadius: '12px', fontSize: '0.95rem' }}
                         >
                             {saveStatus === 'saving' ? '⏳ Saving...' :
                                 saveStatus === 'saved' ? '✅ Saved!' :
-                                    existingRecord ? '💾 Update Log' : '✓ Save Log'}
+                                    existingRecord ? '💾 Update Daily Log' : '✓ Save Daily Log'}
                         </button>
                     </div>
                 )}
