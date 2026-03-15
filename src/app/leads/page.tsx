@@ -119,7 +119,8 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
     };
 
     return (
-        <div ref={dropdownRef} style={{ ...style, position: 'relative' }} onClick={e => e.stopPropagation()}>
+        <div ref={dropdownRef} style={{ ...style, position: 'relative', zIndex: isOpen ? 1000 : 1, borderRadius: 8 }} onClick={e => e.stopPropagation()}>
+
             <div
                 className="notion-select"
                 onClick={() => setIsOpen(!isOpen)}
@@ -140,12 +141,12 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
                         position: 'absolute',
                         top: 'calc(100% + 4px)',
                         left: 0,
-                        minWidth: '200px',
-                        background: '#1a1a24',
-                        border: '1px solid rgba(255,255,255,0.15)',
-                        borderRadius: 12,
-                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                        zIndex: 99999,
+                        minWidth: '220px',
+                        background: '#1a1b26',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: 10,
+                        boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+                        zIndex: 10001,
                         padding: 6,
                         display: 'flex',
                         flexDirection: 'column',
@@ -153,6 +154,7 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
                         overflowY: 'auto'
                     }}
                 >
+
 
                     {options.map((opt: any, i: number) => {
                         const isGroup = opt.options !== undefined;
@@ -902,7 +904,8 @@ export default function LeadsPage() {
                                                     value={lead.leadType}
                                                     options={LEAD_TYPES.includes(lead.leadType as any) ? LEAD_TYPE_OPTIONS : [...LEAD_TYPE_OPTIONS, { value: lead.leadType, label: lead.leadType }]}
                                                     onChange={(val: any) => handleUpdateStatus(lead._id, val as LeadType)}
-                                                    style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.color}40`, boxShadow: 'none' }}
+                                                    style={{ background: sc.bg, color: sc.color, border: 'none', boxShadow: 'none' }}
+
                                                 />
                                             </div>
                                         </td>
@@ -912,7 +915,8 @@ export default function LeadsPage() {
                                                     value={lead.pipelineStage || 'new'}
                                                     options={PIPELINE_STAGE_OPTIONS}
                                                     onChange={(val: any) => handleUpdatePipelineStage(lead._id, val)}
-                                                    style={{ background: 'var(--surface-hover)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+                                                    style={{ background: 'var(--surface-hover)', color: 'var(--text-primary)', border: 'none' }}
+
                                                 />
                                             </div>
                                         </td>
