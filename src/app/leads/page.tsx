@@ -75,8 +75,9 @@ const InlineEditableInput = ({ value, type = "text", placeholder, field, leadId,
                 outline: 'none',
                 transition: 'all 0.15s'
             }}
-            onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(0,0,0,0.08)'; e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+            onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
             onMouseLeave={e => { e.currentTarget.style.border = '1px solid transparent'; e.currentTarget.style.background = 'transparent'; }}
+
             onFocus={e => {
                 e.currentTarget.style.border = '1px solid var(--accent)';
                 e.currentTarget.style.background = 'var(--surface)';
@@ -133,22 +134,26 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
             </div>
 
             {isOpen && (
-                <div style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 4px)',
-                    left: 0,
-                    minWidth: '100%',
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 8,
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                    zIndex: 9999,
-                    padding: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    maxHeight: 250,
-                    overflowY: 'auto'
-                }}>
+                <div 
+                    onWheel={e => e.stopPropagation()}
+                    style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        minWidth: '200px',
+                        background: '#1a1a24',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        borderRadius: 12,
+                        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                        zIndex: 99999,
+                        padding: 6,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        maxHeight: 300,
+                        overflowY: 'auto'
+                    }}
+                >
+
                     {options.map((opt: any, i: number) => {
                         const isGroup = opt.options !== undefined;
                         if (isGroup) {
@@ -172,8 +177,9 @@ const CustomBadgeSelect = ({ value, options, onChange, style }: any) => {
                                                 background: value === subOpt.value ? 'var(--surface-hover)' : 'transparent',
                                                 color: value === subOpt.value ? 'var(--text-primary)' : 'var(--text-secondary)'
                                             }}
-                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
-                                            onMouseLeave={e => e.currentTarget.style.background = value === subOpt.value ? 'var(--surface-hover)' : 'transparent'}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = value === subOpt.value ? 'rgba(255,255,255,0.08)' : 'transparent'}
+
                                         >
                                             <span style={{ whiteSpace: 'nowrap' }}>{subOpt.label}</span>
                                             {value === subOpt.value && <span style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginLeft: 8 }}>✓</span>}
@@ -969,8 +975,9 @@ export default function LeadsPage() {
                                                         outline: 'none',
                                                         transition: 'all 0.15s'
                                                     }}
-                                                    onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(0,0,0,0.08)'; e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+                                                    onMouseEnter={e => { e.currentTarget.style.border = '1px solid rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
                                                     onMouseLeave={e => { e.currentTarget.style.border = '1px solid transparent'; e.currentTarget.style.background = 'transparent'; }}
+
                                                     onFocus={e => {
                                                         e.currentTarget.style.border = '1px solid var(--accent)';
                                                         e.currentTarget.style.background = 'var(--surface)';

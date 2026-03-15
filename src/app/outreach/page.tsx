@@ -355,7 +355,8 @@ export default function OutreachPage() {
 
             {/* All Logs History */}
             {allLogs.length > 0 && (
-                <div className="card" style={{ marginBottom: 20 }}>
+                <div className="premium-card" style={{ marginBottom: 20 }}>
+
                     <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center' }}>
                         <div>
                             <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>📅 Log History</h2>

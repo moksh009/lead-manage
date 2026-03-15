@@ -128,9 +128,11 @@ h5 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
+
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25);
@@ -1029,15 +1031,16 @@ h5 {
 }
 
 .data-table tr:hover {
-  transform: translateY(-2px) scale(1.002);
+  background: var(--surface-hover);
 }
 
+
 .data-table tr:hover td {
-  background: rgba(168, 85, 247, 0.05);
-  border-color: rgba(168, 85, 247, 0.2);
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.3);
   color: white;
-  box-shadow: 0 8px 32px -8px rgba(168, 85, 247, 0.15);
 }
+
 
 .data-table tr td:first-child {
   font-weight: 700;
