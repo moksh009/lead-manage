@@ -391,6 +391,16 @@ h5 {
   max-width: calc(100vw - var(--sidebar-width));
 }
 
+/* HQ Chat — full-height layout override: no padding, fixed height */
+.main-content.hq-layout {
+  padding: 0;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ================================
    PAGE HEADER
    ================================ */

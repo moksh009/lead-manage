@@ -10,7 +10,7 @@ interface INotification {
     recipient: string;
     sender: string;
     message: string;
-    scriptId?: string;
+    scriptId?: { _id: string, title: string };
     read: boolean;
     createdAt: string;
 }
@@ -43,7 +43,7 @@ export default function NotificationBell() {
         return () => clearInterval(interval);
     }, [currentUser]);
 
-    const handleMarkAsRead = async (id: string, scriptId?: string) => {
+    const handleMarkAsRead = async (id: string, scriptId?: { _id: string, title: string }) => {
         try {
             await fetch(`/api/notifications/${id}`, {
                 method: 'PATCH',
@@ -53,7 +53,7 @@ export default function NotificationBell() {
             fetchNotifications();
             setOpen(false);
             if (scriptId) {
-                router.push(`/script-inventory?highlight=${scriptId}`);
+                router.push(`/script-inventory?highlight=${scriptId._id}`);
             }
 
         } catch (error) {
@@ -148,7 +148,12 @@ export default function NotificationBell() {
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)', marginBottom: '4px', lineHeight: 1.4 }}>
-                                                    <span style={{ fontWeight: 600, color: 'white' }}>{notif.sender}</span> tagged you: 
+                                                    <span style={{ fontWeight: 600, color: 'white' }}>{notif.sender}</span> 
+                                                    {notif.scriptId ? (
+                                                        <> tagged you in &quot;{notif.scriptId.title}&quot;: </>
+                                                    ) : (
+                                                        <> tagged you: </>
+                                                    )}
                                                     <span style={{ fontStyle: 'italic', opacity: 0.8 }}> &quot;{notif.message}&quot;</span>
                                                 </div>
                                                 <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.4)' }}>

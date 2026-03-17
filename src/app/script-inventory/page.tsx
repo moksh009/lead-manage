@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { useUser } from '@/components/UserContext';
 import { useSearchParams } from 'next/navigation';
 
@@ -15,6 +15,15 @@ interface IScript {
     channel: Channel;
     createdAt: string;
     updatedAt: string;
+}
+
+interface IComment {
+    _id: string;
+    recipient: string;
+    sender: string;
+    message: string;
+    read: boolean;
+    createdAt: string;
 }
 
 const CHANNEL_CONFIG: Record<Channel, { icon: string; color: string; bg: string }> = {
@@ -43,6 +52,10 @@ function ScriptInventoryContent() {
     const [showModal, setShowModal] = useState(false);
     const [editingScript, setEditingScript] = useState<IScript | null>(null);
     const [filterChannel, setFilterChannel] = useState<Channel | 'all'>('all');
+
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [scriptComments, setScriptComments] = useState<{ [scriptId: string]: IComment[] }>({});
+    const [unreadScriptIds, setUnreadScriptIds] = useState<string[]>([]);
 
 
     const [form, setForm] = useState({
@@ -74,7 +87,51 @@ function ScriptInventoryContent() {
         }
     };
 
-    useEffect(() => { fetchScripts(); }, []);
+    const fetchUnreadNotifications = async () => {
+        if (!currentUser) return;
+        try {
+            const res = await fetch(`/api/notifications?recipient=${currentUser}`);
+            const data = await res.json();
+            if (data.success) {
+                const unreadNotifs = data.data.filter((n: any) => !n.read && n.scriptId);
+                const unreadIds = unreadNotifs.map((n: any) => n.scriptId._id || n.scriptId);
+                setUnreadScriptIds(unreadIds);
+            }
+        } catch (err) {
+            console.error('Failed to fetch unread notifications', err);
+        }
+    };
+
+    useEffect(() => { 
+        fetchScripts(); 
+        fetchUnreadNotifications();
+        const interval = setInterval(fetchUnreadNotifications, 10000);
+        return () => clearInterval(interval);
+    }, [currentUser]);
+
+    const handleCopy = (id: string, content: string) => {
+        navigator.clipboard.writeText(content);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const loadComments = async (scriptId: string) => {
+        try {
+            const res = await fetch(`/api/scripts/${scriptId}/comments`);
+            const data = await res.json();
+            if (data.success) {
+                setScriptComments(prev => ({ ...prev, [scriptId]: data.data }));
+            }
+        } catch (err) {
+            console.error('Failed to load comments', err);
+        }
+    };
+
+    useEffect(() => {
+        if (inlineTaggingId) {
+            loadComments(inlineTaggingId);
+        }
+    }, [inlineTaggingId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -136,9 +193,9 @@ function ScriptInventoryContent() {
                     scriptId: scriptId
                 })
             });
-            setInlineTaggingId(null);
+            // Reload comments
+            loadComments(scriptId);
             setInlineTagForm({ user: 'none', message: '' });
-            alert('Notification sent!');
         } catch (err) {
             console.error('Failed to send notification', err);
         }
@@ -318,6 +375,17 @@ function ScriptInventoryContent() {
                                         </div>
                                         <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'white', letterSpacing: '-0.01em' }}>
                                             {script.title}
+                                            {unreadScriptIds.includes(script._id) && (
+                                                <span style={{ 
+                                                    display: 'inline-block', 
+                                                    width: '10px', height: '10px', 
+                                                    background: '#ef4444', 
+                                                    borderRadius: '50%', 
+                                                    marginLeft: '8px',
+                                                    verticalAlign: 'middle',
+                                                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)'
+                                                }} />
+                                            )}
                                         </h3>
                                     </div>
                                     <div style={{ display: 'flex', gap: '4px' }}>
@@ -392,11 +460,11 @@ function ScriptInventoryContent() {
                                             @{inlineTaggingId === script._id ? 'Cancel' : 'Tag Team'}
                                         </button>
                                         <button 
-                                            onClick={() => { navigator.clipboard.writeText(script.content); alert('Copied to clipboard!'); }} 
+                                            onClick={() => handleCopy(script._id, script.content)} 
                                             style={{ 
-                                                background: 'rgba(168, 85, 247, 0.1)', 
-                                                border: '1px solid rgba(168, 85, 247, 0.2)', 
-                                                color: '#d8b4fe', 
+                                                background: copiedId === script._id ? 'rgba(34, 197, 94, 0.1)' : 'rgba(168, 85, 247, 0.1)', 
+                                                border: copiedId === script._id ? '1px solid rgba(34, 197, 94, 0.2)' : '1px solid rgba(168, 85, 247, 0.2)', 
+                                                color: copiedId === script._id ? '#86efac' : '#d8b4fe', 
                                                 padding: '6px 12px', 
                                                 borderRadius: '6px', 
                                                 fontSize: '0.75rem', 
@@ -404,10 +472,20 @@ function ScriptInventoryContent() {
                                                 cursor: 'pointer',
                                                 transition: 'all 0.2s'
                                             }}
-                                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(168, 85, 247, 0.2)'; e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.4)'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(168, 85, 247, 0.1)'; e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.2)'; }}
+                                            onMouseEnter={(e) => { 
+                                                if (copiedId !== script._id) {
+                                                    e.currentTarget.style.background = 'rgba(168, 85, 247, 0.2)'; 
+                                                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.4)'; 
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => { 
+                                                if (copiedId !== script._id) {
+                                                    e.currentTarget.style.background = 'rgba(168, 85, 247, 0.1)'; 
+                                                    e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.2)'; 
+                                                }
+                                            }}
                                         >
-                                            📋 Copy
+                                            {copiedId === script._id ? '✓ Copied!' : '📋 Copy'}
                                         </button>
                                     </div>
                                 </div>
@@ -420,8 +498,35 @@ function ScriptInventoryContent() {
                                         background: 'rgba(168, 85, 247, 0.05)', 
                                         border: '1px solid rgba(168, 85, 247, 0.15)', 
                                         borderRadius: '12px',
-                                        animation: 'fadeIn 0.2s ease-out'
+                                        animation: 'fadeIn 0.2s ease-out',
+                                        position: 'relative'
                                     }}>
+                                        <button 
+                                            onClick={() => setInlineTaggingId(null)}
+                                            style={{ 
+                                                position: 'absolute', top: '8px', right: '8px', 
+                                                background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', 
+                                                cursor: 'pointer', padding: '4px', borderRadius: '50%' 
+                                            }}
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                        </button>
+                                        
+                                        {/* Comments list */}
+                                        {scriptComments[script._id] && scriptComments[script._id].length > 0 && (
+                                            <div style={{ marginBottom: '16px', maxHeight: '120px', overflowY: 'auto' }}>
+                                                {scriptComments[script._id].map(comment => (
+                                                    <div key={comment._id} style={{ marginBottom: '8px', fontSize: '0.8rem' }}>
+                                                        <span style={{ fontWeight: 'bold', color: comment.sender === currentUser ? '#a855f7' : '#93c5fd' }}>{comment.sender}</span>
+                                                        <span style={{ color: 'rgba(255,255,255,0.5)', marginLeft: '6px', fontSize: '0.7rem' }}>{formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</span>
+                                                        <div style={{ color: 'rgba(255,255,255,0.9)', marginTop: '2px', padding: '6px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', display: 'inline-block' }}>
+                                                            {comment.message}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                                             <button 
                                                 onClick={() => setInlineTagForm({ ...inlineTagForm, user: 'Moksh' })}

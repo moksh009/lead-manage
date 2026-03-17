@@ -16,6 +16,7 @@ const navItems = [
     { href: '/team-goals', icon: '🏆', label: 'Team Goals' },
     { href: '/analytics', icon: '📈', label: 'Analytics' },
     { href: '/rewards', icon: '👑', label: 'Rewards & Points' },
+    { href: '/hq', icon: '🏢', label: 'TopEdge HQ' },
 ];
 
 export default function Sidebar() {

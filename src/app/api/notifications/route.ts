@@ -15,7 +15,8 @@ export async function GET(request: Request) {
 
         const notifications = await Notification.find({ recipient })
             .sort({ createdAt: -1 })
-            .limit(50); // Fetch top 50 recent notifications
+            .limit(50) // Fetch top 50 recent notifications
+            .populate('scriptId', 'title');
 
         return NextResponse.json({ success: true, data: notifications });
     } catch (error: unknown) {
