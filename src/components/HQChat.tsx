@@ -253,9 +253,15 @@ export default function HQChat({ channel }: { channel: string }) {
                                 style={{ display: 'flex', gap: '12px', marginTop: showHeader ? '16px' : '1px', position: 'relative' }}
                             >
                                 {showHeader ? (
-                                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0, background: msg.sender === 'Moksh' ? 'var(--accent)' : 'var(--info)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1rem', marginTop: '2px' }}>
-                                        {msg.sender.charAt(0).toUpperCase()}
-                                    </div>
+                                    <img 
+                                        src={msg.sender === 'Moksh' ? '/moksh.png' : '/smit.png'} 
+                                        alt={msg.sender}
+                                        style={{ 
+                                            width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0, 
+                                            objectFit: 'cover', marginTop: '2px',
+                                            border: `1.5px solid ${msg.sender === 'Moksh' ? 'var(--accent)' : 'var(--info)'}`
+                                        }} 
+                                    />
                                 ) : (
                                     <div style={{ width: '36px', flexShrink: 0 }} />
                                 )}

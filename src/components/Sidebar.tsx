@@ -44,17 +44,11 @@ export default function Sidebar() {
                     <span className="hamburger-line" style={mobileOpen ? { transform: 'translateY(-7px) rotate(-45deg)' } : {}} />
                 </button>
                 <div className="mobile-header-logo">
-                    <div style={{
-                        width: 30, height: 30, borderRadius: 8,
-                        background: 'var(--accent)', display: 'flex',
-                        alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 3px 8px rgba(0,113,227,0.3)', flexShrink: 0
-                    }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.9" />
-                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                        </svg>
-                    </div>
+                    <img 
+                        src="/logo.jpeg" 
+                        alt="TopEdge AI Logo" 
+                        style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover' }} 
+                    />
                     <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
                         TopEdge AI
                     </span>
@@ -84,14 +78,13 @@ export default function Sidebar() {
             >
                 {/* Logo */}
                 <div className="sidebar-logo">
-                    <div className="sidebar-logo-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z" fill="white" opacity="0.9" />
-                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-                        </svg>
-                    </div>
+                    <img 
+                        src="/logo.jpeg" 
+                        alt="Logo" 
+                        style={{ width: 34, height: 34, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} 
+                    />
                     {!(collapsed && !isMobile) && (
-                        <div className="sidebar-logo-text-wrap">
+                        <div className="sidebar-logo-text-wrap" style={{ marginLeft: 12 }}>
                             <div className="sidebar-logo-text">Top Edge AI</div>
                             <div className="sidebar-logo-sub">Lead Management</div>
                         </div>
@@ -141,10 +134,15 @@ export default function Sidebar() {
                 </nav>
 
                 {/* Footer User Switcher */}
-                <div className="sidebar-footer" style={{ cursor: 'pointer', transition: 'background var(--t-fast)', borderTop: '1px solid var(--border)' }} onClick={() => setCurrentUser(currentUser === 'Moksh' ? 'smit' : 'Moksh')} title="Click to switch identity">
-                    <div className="avatar avatar-sm avatar-gradient-1" style={{ flexShrink: 0, background: currentUser === 'Moksh' ? 'var(--accent)' : 'var(--info)' }}>
-                        {currentUser.charAt(0).toUpperCase()}
-                    </div>
+                <div className="sidebar-footer" style={{ cursor: 'pointer', transition: 'background var(--t-fast)', borderTop: '1px solid var(--border)', padding: '12px 16px' }} onClick={() => setCurrentUser(currentUser === 'Moksh' ? 'smit' : 'Moksh')} title="Click to switch identity">
+                    <img 
+                        src={currentUser.toLowerCase() === 'moksh' ? '/moksh.png' : '/smit.png'} 
+                        alt={currentUser}
+                        style={{ 
+                            width: 32, height: 32, borderRadius: 8, objectFit: 'cover', flexShrink: 0,
+                            border: `2px solid ${currentUser === 'Moksh' ? 'var(--accent)' : 'var(--info)'}`
+                        }} 
+                    />
                     {!(collapsed && !isMobile) && (
                         <div style={{ flex: 1, minWidth: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
