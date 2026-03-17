@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@/components/UserContext';
 
 const CHANNELS = [
-    { sentKey: 'dmsSent', leadChannel: 'dm', label: 'Instagram DMs', icon: '📸', color: '#e1306c', bg: '#fff1f5', desc: 'Direct messages via Instagram' },
-    { sentKey: 'emailsSent', leadChannel: 'email', label: 'Emails', icon: '📧', color: '#2563eb', bg: '#eff6ff', desc: 'Cold / warm emails sent' },
-    { sentKey: 'whatsappSent', leadChannel: 'whatsapp', label: 'WhatsApp', icon: '💬', color: '#25D366', bg: '#f0fdf4', desc: 'WhatsApp outreach messages' },
-    { sentKey: 'callsMade', leadChannel: 'call', label: 'Cold Calls', icon: '📞', color: '#7c3aed', bg: '#faf5ff', desc: 'Calls made to prospects' },
+    { sentKey: 'dmsSent', leadChannel: 'dm', label: 'Instagram DMs', icon: '📸', color: '#e1306c', bg: 'rgba(225, 48, 108, 0.1)', desc: 'Direct messages via Instagram' },
+    { sentKey: 'emailsSent', leadChannel: 'email', label: 'Emails', icon: '📧', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.1)', desc: 'Cold / warm emails sent' },
+    { sentKey: 'whatsappSent', leadChannel: 'whatsapp', label: 'WhatsApp', icon: '💬', color: '#25D366', bg: 'rgba(37, 211, 102, 0.1)', desc: 'WhatsApp outreach messages' },
+    { sentKey: 'callsMade', leadChannel: 'call', label: 'Cold Calls', icon: '📞', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.1)', desc: 'Calls made to prospects' },
 ];
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';

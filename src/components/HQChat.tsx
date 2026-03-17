@@ -108,9 +108,20 @@ export default function HQChat({ channel }: { channel: string }) {
         return () => clearInterval(interval);
     }, [channel]);
 
+    // Auto-scroll logic: only scroll if user is near bottom or just sent a message
+    const [shouldAutoScroll, setShouldAutoScroll] = useState(true);
+
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const target = e.currentTarget;
+        const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 100;
+        setShouldAutoScroll(isAtBottom);
+    };
+
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+        if (shouldAutoScroll) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages, shouldAutoScroll]);
 
     // Auto-resize textarea
     useEffect(() => {
@@ -151,6 +162,7 @@ export default function HQChat({ channel }: { channel: string }) {
         setAttachment(null);
         setReplyingTo(null);
         if (textareaRef.current) textareaRef.current.style.height = '40px';
+        setShouldAutoScroll(true); // Force scroll on send
 
         try {
             const res = await fetch('/api/hq/messages', {
@@ -216,7 +228,10 @@ export default function HQChat({ channel }: { channel: string }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
             {/* Messages Area */}
-            <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 32px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div 
+                onScroll={handleScroll}
+                style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 32px', display: 'flex', flexDirection: 'column', gap: '2px' }}
+            >
                 {loading ? (
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: 'rgba(255,255,255,0.5)' }}>Loading channel history...</div>
                 ) : messages.length === 0 ? (

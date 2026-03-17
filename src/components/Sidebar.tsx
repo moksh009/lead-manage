@@ -16,6 +16,7 @@ const navItems = [
     { href: '/team-goals', icon: '🏆', label: 'Team Goals' },
     { href: '/analytics', icon: '📈', label: 'Analytics' },
     { href: '/rewards', icon: '👑', label: 'Rewards & Points' },
+    { href: '/re-engagement', icon: '📣', label: 'Re-engagement' },
     { href: '/hq', icon: '🏢', label: 'TopEdge HQ' },
 ];
 

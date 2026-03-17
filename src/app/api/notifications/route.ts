@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Notification from '@/models/Notification';
+import '@/models/Script'; // Ensure Script model is registered for population
 
 export async function GET(request: Request) {
     try {
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
 
         return NextResponse.json({ success: true, data: notifications });
     } catch (error: unknown) {
+        console.error('Notifications GET error:', error);
         return NextResponse.json({ success: false, error: error instanceof Error ? error.message : "Internal Server Error" }, { status: 500 });
     }
 }

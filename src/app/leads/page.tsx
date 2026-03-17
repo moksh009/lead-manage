@@ -674,9 +674,10 @@ export default function LeadsPage() {
                     {leadSearchStr.length > 0 && (
                         <div style={{
                             position: 'absolute', top: '100%', left: 0, right: 0,
-                            background: 'var(--surface)', border: '1px solid var(--border)',
-                            borderRadius: 8, marginTop: 4, maxHeight: 250, overflowY: 'auto',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 99
+                            background: '#1a1b26', border: '1px solid rgba(255,255,255,0.15)',
+                            borderRadius: 12, marginTop: 8, maxHeight: 300, overflowY: 'auto',
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.5)', zIndex: 1000,
+                            backdropFilter: 'blur(10px)'
                         }}>
                             {leads.filter(l =>
                                 !selectedLeadsList.find(sl => sl._id === l._id) &&
