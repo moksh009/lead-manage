@@ -12,6 +12,7 @@ export default function TeamGoalsPage() {
     const [goals, setGoals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(new Date().toDateString());
 
     // Legacy support for older records without tasks array
     const [completingId, setCompletingId] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export default function TeamGoalsPage() {
     const [form, setForm] = useState({
         user: 'Moksh' as User,
         date: new Date().toISOString().split('T')[0],
-        timeJoinedOffice: '',
+        timeJoinedOffice: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
         tasks: [{ text: '', isCompleted: false }]
     });
 
@@ -65,7 +66,9 @@ export default function TeamGoalsPage() {
         });
 
         setShowModal(false);
-        setForm({ user: 'Moksh', date: new Date().toISOString().split('T')[0], timeJoinedOffice: '', tasks: [{ text: '', isCompleted: false }] });
+        const now = new Date();
+        const autoTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        setForm({ user: 'Moksh', date: now.toISOString().split('T')[0], timeJoinedOffice: autoTime, tasks: [{ text: '', isCompleted: false }] });
         fetchGoals();
     };
 
@@ -134,9 +137,11 @@ export default function TeamGoalsPage() {
         return dates;
     };
 
-    const activeDates = getActiveDates();
-    const activeGoals = goals.filter(g => activeDates.includes(new Date(g.date).toDateString()));
-    const history = goals.filter(g => !activeDates.includes(new Date(g.date).toDateString()));
+    const activeGoals = goals.filter(g => new Date(g.date).toDateString() === selectedDate);
+    const history = goals.filter(g => new Date(g.date).toDateString() !== selectedDate);
+
+    const isTodaySelected = selectedDate === new Date().toDateString();
+    const selectedDateLabel = isTodaySelected ? 'Today' : format(new Date(selectedDate), 'MMM dd, yyyy');
 
     // Calculate completion 
     const calculateTaskProgress = (entry: any) => {
@@ -169,7 +174,12 @@ export default function TeamGoalsPage() {
                         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.03em', margin: '0 0 4px 0', background: 'linear-gradient(to right, #ffffff, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Team Goals</h1>
                         <p style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.5)', margin: '0 0 20px 0' }}>Daily office tracking for Moksh & Smit</p>
                         <div style={{ display: 'flex', gap: 12 }}>
-                            <button className="btn" style={{ background: 'var(--accent-gradient)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(168,85,247,0.35)', fontWeight: 700 }} onClick={() => setShowModal(true)}>+ Log Today</button>
+                            <button className="btn" style={{ background: 'var(--accent-gradient)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(168,85,247,0.35)', fontWeight: 700 }} onClick={() => {
+                                const now = new Date();
+                                const autoTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                                setForm(f => ({ ...f, date: now.toISOString().split('T')[0], timeJoinedOffice: autoTime }));
+                                setShowModal(true);
+                            }}>+ Log Today</button>
                         </div>
                     </div>
                 </div>
@@ -193,7 +203,15 @@ export default function TeamGoalsPage() {
                 {/* Today's Cards */}
                 <div style={{ marginBottom: 28 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Active Logs (Recent 3 Days)</h2>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Logs for {selectedDateLabel}</h2>
+                        {!isTodaySelected && (
+                            <button 
+                                onClick={() => setSelectedDate(new Date().toDateString())}
+                                style={{ background: 'var(--surface-hover)', border: '1px solid var(--border)', padding: '4px 12px', borderRadius: 8, fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}
+                            >
+                                ↺ Back to Today
+                            </button>
+                        )}
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
                         {activeGoals.map(entry => {
@@ -320,9 +338,8 @@ export default function TeamGoalsPage() {
                             );
                         })}
 
-                        {/* Always show "Log Today" buttons if logs are missing for today */}
-                        {USERS.map(user => {
-                            const hasTodayLog = activeGoals.some(g => g.user === user && new Date(g.date).toDateString() === new Date().toDateString());
+                        {isTodaySelected && USERS.map(user => {
+                            const hasTodayLog = goals.some(g => g.user === user && new Date(g.date).toDateString() === new Date().toDateString());
                             if (hasTodayLog) return null;
                             const gradClass = user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2';
 
@@ -331,7 +348,12 @@ export default function TeamGoalsPage() {
                                     <div className={`avatar avatar-md ${gradClass}`} style={{ marginBottom: 12 }}>{user[0]}</div>
                                     <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>{user}</div>
                                     <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginBottom: 16 }}>No log for today yet</div>
-                                    <button className="btn btn-primary btn-sm" onClick={() => { setForm(f => ({ ...f, user, date: new Date().toISOString().split('T')[0] })); setShowModal(true); }}>Log Today's Check-In</button>
+                                    <button className="btn btn-primary btn-sm" onClick={() => { 
+                                        const now = new Date();
+                                        const autoTime = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                                        setForm(f => ({ ...f, user, date: now.toISOString().split('T')[0], timeJoinedOffice: autoTime })); 
+                                        setShowModal(true); 
+                                    }}>Log Today's Check-In</button>
                                 </div>
                             );
                         })}
@@ -362,7 +384,7 @@ export default function TeamGoalsPage() {
                                         }
 
                                         return (
-                                            <tr key={g._id}>
+                                            <tr key={g._id} onClick={() => { setSelectedDate(new Date(g.date).toDateString()); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ cursor: 'pointer' }} title="Click to edit this log">
                                                 <td>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                                         <div className={`avatar avatar-sm ${g.user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2'}`}>{g.user[0]}</div>
