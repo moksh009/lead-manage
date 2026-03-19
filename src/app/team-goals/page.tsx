@@ -124,9 +124,19 @@ export default function TeamGoalsPage() {
         fetchGoals();
     };
 
-    const todayStr = new Date().toDateString();
-    const todayGoals = goals.filter(g => new Date(g.date).toDateString() === todayStr);
-    const history = goals.filter(g => new Date(g.date).toDateString() !== todayStr);
+    const getActiveDates = () => {
+        const dates = [];
+        for (let i = 0; i < 3; i++) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            dates.push(d.toDateString());
+        }
+        return dates;
+    };
+
+    const activeDates = getActiveDates();
+    const activeGoals = goals.filter(g => activeDates.includes(new Date(g.date).toDateString()));
+    const history = goals.filter(g => !activeDates.includes(new Date(g.date).toDateString()));
 
     // Calculate completion 
     const calculateTaskProgress = (entry: any) => {
@@ -183,12 +193,15 @@ export default function TeamGoalsPage() {
                 {/* Today's Cards */}
                 <div style={{ marginBottom: 28 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', alignItems: 'center', marginBottom: 14 }}>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Today — {format(new Date(), 'EEEE, MMMM d')}</h2>
+                        <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Active Logs (Recent 3 Days)</h2>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-                        {USERS.map(user => {
-                            const entry = todayGoals.find(g => g.user === user);
+                        {activeGoals.map(entry => {
+                            const user = entry.user;
                             const gradClass = user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2';
+                            const entryDate = new Date(entry.date);
+                            const isToday = entryDate.toDateString() === new Date().toDateString();
+                            const dateLabel = isToday ? 'Today' : format(entryDate, 'MMM dd');
 
                             let progress = 0;
                             let allDone = false;
@@ -198,120 +211,127 @@ export default function TeamGoalsPage() {
                             }
 
                             return (
-                                <div key={user} className="card card-p card-hover" style={{ border: entry ? '1.5px solid rgba(0,113,227,0.15)' : '1px solid var(--border)', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)' }}>
+                                <div key={entry._id} className="card card-p card-hover" style={{ border: '1.5px solid rgba(0,113,227,0.15)', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', position: 'relative' }}>
+                                    <div style={{ position: 'absolute', top: 12, right: 12, fontSize: '0.7rem', fontWeight: 700, opacity: 0.5, color: 'var(--text-secondary)' }}>{dateLabel}</div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                                         <div className={`avatar avatar-md ${gradClass}`}>{user[0]}</div>
                                         <div style={{ flex: 1 }}>
                                             <div style={{ fontWeight: 700, fontSize: '1rem' }}>{user}</div>
                                             {entry && <div style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>🕐 Joined at {entry.timeJoinedOffice}</div>}
                                         </div>
-                                        {entry && (
-                                            <div style={{ textAlign: 'right' }}>
-                                                <span className={`badge ${allDone ? 'badge-success' : 'badge-warning'}`}>
-                                                    {allDone ? '✓ All Done' : `${progress}% Done`}
-                                                </span>
-                                            </div>
-                                        )}
+                                        <div style={{ textAlign: 'right' }}>
+                                            <span className={`badge ${allDone ? 'badge-success' : 'badge-warning'}`}>
+                                                {allDone ? '✓ All Done' : `${progress}% Done`}
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    {!entry ? (
-                                        <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-tertiary)' }}>
-                                            <div style={{ fontSize: 28, marginBottom: 8 }}>☀️</div>
-                                            <div style={{ fontSize: '0.875rem', marginBottom: 12 }}>No log for today yet</div>
-                                            <button className="btn btn-primary btn-sm" onClick={() => { setForm(f => ({ ...f, user })); setShowModal(true); }}>Log Check-In</button>
-                                        </div>
-                                    ) : (
-                                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 10 }}>
-                                                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Daily Tasks</div>
-                                                {(entry.tasks && entry.tasks.length > 0 && editingGoalId !== entry._id) && (
-                                                    <button onClick={() => startEditingTasks(entry)} style={{ background: 'none', border: 'none', fontSize: '0.75rem', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>✏️ Edit</button>
-                                                )}
-                                            </div>
-
-                                            {editingGoalId === entry._id ? (
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'var(--surface-hover)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                                                    {editTasks.map((task, idx) => (
-                                                        <div key={idx} style={{ display: 'flex', gap: 6 }}>
-                                                            <input
-                                                                className="form-input"
-                                                                style={{ padding: '6px 10px', fontSize: '0.875rem' }}
-                                                                placeholder="Task description..."
-                                                                value={task.text}
-                                                                onChange={e => {
-                                                                    const newTasks = [...editTasks];
-                                                                    newTasks[idx].text = e.target.value;
-                                                                    setEditTasks(newTasks);
-                                                                }}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setEditTasks(editTasks.filter((_, i) => i !== idx))}
-                                                                style={{ width: 34, height: 34, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', cursor: 'pointer', color: 'var(--danger)', fontSize: '1.2rem', paddingBottom: 2 }}
-                                                            >×</button>
-                                                        </div>
-                                                    ))}
-                                                    <button type="button" onClick={() => setEditTasks([...editTasks, { text: '', isCompleted: false }])} style={{ margin: '4px 0', padding: '6px', background: 'transparent', border: '1px dashed var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, cursor: 'pointer' }}>+ Add task</button>
-                                                    <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                                                        <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => saveEditedTasks(entry._id)}>Save Changes</button>
-                                                        <button className="btn btn-secondary btn-sm" onClick={() => setEditingGoalId(null)}>Cancel</button>
-                                                    </div>
-                                                </div>
-                                            ) : entry.tasks && entry.tasks.length > 0 ? (
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                                    {entry.tasks.map((task: any) => (
-                                                        <label
-                                                            key={task._id}
-                                                            style={{
-                                                                display: 'flex', alignItems: 'flex-start', gap: 10,
-                                                                padding: '10px 12px', borderRadius: 8,
-                                                                background: task.isCompleted ? 'var(--success-light)' : 'var(--surface-hover)',
-                                                                border: task.isCompleted ? '1px solid rgba(48,209,88,0.2)' : '1px solid transparent',
-                                                                cursor: 'pointer',
-                                                                transition: 'all 0.15s'
-                                                            }}
-                                                        >
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={task.isCompleted}
-                                                                onChange={(e) => toggleTaskComplete(entry._id, task._id, e.target.checked)}
-                                                                style={{ width: 18, height: 18, marginTop: 2, accentColor: 'var(--success)' }}
-                                                            />
-                                                            <span style={{
-                                                                fontSize: '0.9rem',
-                                                                color: task.isCompleted ? '#1a8240' : 'var(--text-primary)',
-                                                                textDecoration: task.isCompleted ? 'line-through' : 'none',
-                                                                opacity: task.isCompleted ? 0.8 : 1
-                                                            }}>
-                                                                {task.text}
-                                                            </span>
-                                                        </label>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                /* Legacy purely text-based support */
-                                                <>
-                                                    <p style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', marginBottom: 16 }}>{entry.dailyGoals}</p>
-                                                    {entry.completedGoals ? (
-                                                        <div style={{ padding: '12px 14px', background: 'var(--success-light)', borderRadius: 10, border: '1px solid rgba(48,209,88,0.2)' }}>
-                                                            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a8240', marginBottom: 6 }}>✓ COMPLETED</div>
-                                                            <p style={{ fontSize: '0.875rem', color: '#1a8240', whiteSpace: 'pre-wrap' }}>{entry.completedGoals}</p>
-                                                        </div>
-                                                    ) : completingId === entry._id ? (
-                                                        <div style={{ marginTop: 'auto' }}>
-                                                            <textarea className="form-input" rows={3} placeholder="What goals did you complete today?" value={completedText} onChange={e => setCompletedText(e.target.value)} style={{ marginBottom: 10 }} />
-                                                            <div style={{ display: 'flex', gap: 8 }}>
-                                                                <button className="btn btn-success btn-sm" onClick={() => markCompleteLegacy(entry._id)}>Save Complete</button>
-                                                                <button className="btn btn-secondary btn-sm" onClick={() => setCompletingId(null)}>Cancel</button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <button className="btn btn-secondary" style={{ width: '100%', fontSize: '0.875rem', marginTop: 'auto' }} onClick={() => setCompletingId(entry._id)}>✅ Mark Complete</button>
-                                                    )}
-                                                </>
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: 10 }}>
+                                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Daily Tasks</div>
+                                            {(entry.tasks && entry.tasks.length > 0 && editingGoalId !== entry._id) && (
+                                                <button onClick={() => startEditingTasks(entry)} style={{ background: 'none', border: 'none', fontSize: '0.75rem', color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>✏️ Edit</button>
                                             )}
                                         </div>
-                                    )}
+
+                                        {editingGoalId === entry._id ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, background: 'var(--surface-hover)', padding: '12px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                                {editTasks.map((task, idx) => (
+                                                    <div key={idx} style={{ display: 'flex', gap: 6 }}>
+                                                        <input
+                                                            className="form-input"
+                                                            style={{ padding: '6px 10px', fontSize: '0.875rem' }}
+                                                            placeholder="Task description..."
+                                                            value={task.text}
+                                                            onChange={e => {
+                                                                const newTasks = [...editTasks];
+                                                                newTasks[idx].text = e.target.value;
+                                                                setEditTasks(newTasks);
+                                                            }}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setEditTasks(editTasks.filter((_, i) => i !== idx))}
+                                                            style={{ width: 34, height: 34, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', cursor: 'pointer', color: 'var(--danger)', fontSize: '1.2rem', paddingBottom: 2 }}
+                                                        >×</button>
+                                                    </div>
+                                                ))}
+                                                <button type="button" onClick={() => setEditTasks([...editTasks, { text: '', isCompleted: false }])} style={{ margin: '4px 0', padding: '6px', background: 'transparent', border: '1px dashed var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', fontSize: '0.8125rem', fontWeight: 600, cursor: 'pointer' }}>+ Add task</button>
+                                                <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                                                    <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => saveEditedTasks(entry._id)}>Save Changes</button>
+                                                    <button className="btn btn-secondary btn-sm" onClick={() => setEditingGoalId(null)}>Cancel</button>
+                                                </div>
+                                            </div>
+                                        ) : entry.tasks && entry.tasks.length > 0 ? (
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                                {entry.tasks.map((task: any) => (
+                                                    <label
+                                                        key={task._id}
+                                                        style={{
+                                                            display: 'flex', alignItems: 'flex-start', gap: 10,
+                                                            padding: '10px 12px', borderRadius: 8,
+                                                            background: task.isCompleted ? 'var(--success-light)' : 'var(--surface-hover)',
+                                                            border: task.isCompleted ? '1px solid rgba(48,209,88,0.2)' : '1px solid transparent',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.15s'
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={task.isCompleted}
+                                                            onChange={(e) => toggleTaskComplete(entry._id, task._id, e.target.checked)}
+                                                            style={{ width: 18, height: 18, marginTop: 2, accentColor: 'var(--success)' }}
+                                                        />
+                                                        <span style={{
+                                                            fontSize: '0.9rem',
+                                                            color: task.isCompleted ? '#1a8240' : 'var(--text-primary)',
+                                                            textDecoration: task.isCompleted ? 'line-through' : 'none',
+                                                            opacity: task.isCompleted ? 0.8 : 1
+                                                        }}>
+                                                            {task.text}
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            /* Legacy purely text-based support */
+                                            <>
+                                                <p style={{ fontSize: '0.9375rem', lineHeight: 1.5, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', marginBottom: 16 }}>{entry.dailyGoals}</p>
+                                                {entry.completedGoals ? (
+                                                    <div style={{ padding: '12px 14px', background: 'var(--success-light)', borderRadius: 10, border: '1px solid rgba(48,209,88,0.2)' }}>
+                                                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a8240', marginBottom: 6 }}>✓ COMPLETED</div>
+                                                        <p style={{ fontSize: '0.875rem', color: '#1a8240', whiteSpace: 'pre-wrap' }}>{entry.completedGoals}</p>
+                                                    </div>
+                                                ) : completingId === entry._id ? (
+                                                    <div style={{ marginTop: 'auto' }}>
+                                                        <textarea className="form-input" rows={3} placeholder="What goals did you complete today?" value={completedText} onChange={e => setCompletedText(e.target.value)} style={{ marginBottom: 10 }} />
+                                                        <div style={{ display: 'flex', gap: 8 }}>
+                                                            <button className="btn btn-success btn-sm" onClick={() => markCompleteLegacy(entry._id)}>Save Complete</button>
+                                                            <button className="btn btn-secondary btn-sm" onClick={() => setCompletingId(null)}>Cancel</button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <button className="btn btn-secondary" style={{ width: '100%', fontSize: '0.875rem', marginTop: 'auto' }} onClick={() => setCompletingId(entry._id)}>✅ Mark Complete</button>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* Always show "Log Today" buttons if logs are missing for today */}
+                        {USERS.map(user => {
+                            const hasTodayLog = activeGoals.some(g => g.user === user && new Date(g.date).toDateString() === new Date().toDateString());
+                            if (hasTodayLog) return null;
+                            const gradClass = user === 'Moksh' ? 'avatar-gradient-1' : 'avatar-gradient-2';
+
+                            return (
+                                <div key={`new-${user}`} className="card card-p" style={{ border: '1px dashed var(--border)', background: 'transparent', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', justifyContent: 'center', alignItems: 'center', padding: '30px 20px', minHeight: 180 }}>
+                                    <div className={`avatar avatar-md ${gradClass}`} style={{ marginBottom: 12 }}>{user[0]}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>{user}</div>
+                                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginBottom: 16 }}>No log for today yet</div>
+                                    <button className="btn btn-primary btn-sm" onClick={() => { setForm(f => ({ ...f, user, date: new Date().toISOString().split('T')[0] })); setShowModal(true); }}>Log Today's Check-In</button>
                                 </div>
                             );
                         })}
@@ -427,12 +447,12 @@ export default function TeamGoalsPage() {
                                                     type="button"
                                                     tabIndex={-1}
                                                     onClick={() => removeTask(idx)}
-                                                    style={{ 
-                                                        width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                                                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', 
-                                                        borderRadius: '12px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', 
+                                                    style={{
+                                                        width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                                                        borderRadius: '12px', cursor: 'pointer', color: 'rgba(255,255,255,0.4)',
                                                         transition: 'all 0.2s',
-                                                        opacity: form.tasks.length <= 1 ? 0.3 : 1 
+                                                        opacity: form.tasks.length <= 1 ? 0.3 : 1
                                                     }}
                                                     onMouseEnter={e => { if (form.tasks.length > 1) e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
                                                     onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
@@ -447,11 +467,11 @@ export default function TeamGoalsPage() {
                                     <button
                                         type="button"
                                         onClick={addTask}
-                                        style={{ 
-                                            width: '100%', padding: '12px', background: 'rgba(255,255,255,0.02)', 
-                                            border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '12px', 
-                                            color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 600, 
-                                            cursor: 'pointer', transition: 'all 0.2s' 
+                                        style={{
+                                            width: '100%', padding: '12px', background: 'rgba(255,255,255,0.02)',
+                                            border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '12px',
+                                            color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 600,
+                                            cursor: 'pointer', transition: 'all 0.2s'
                                         }}
                                         onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; }}
                                         onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; }}
@@ -461,9 +481,9 @@ export default function TeamGoalsPage() {
                                 </div>
                             </div>
                             <div className="modal-footer-premium">
-                                <button 
-                                    type="button" 
-                                    style={{ 
+                                <button
+                                    type="button"
+                                    style={{
                                         background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
                                         color: 'white', padding: '10px 20px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer'
                                     }}
@@ -471,9 +491,9 @@ export default function TeamGoalsPage() {
                                 >
                                     Cancel
                                 </button>
-                                <button 
-                                    type="submit" 
-                                    style={{ 
+                                <button
+                                    type="submit"
+                                    style={{
                                         background: 'var(--accent-gradient)', border: 'none',
                                         color: 'white', padding: '10px 24px', borderRadius: '12px', fontWeight: 700, cursor: 'pointer',
                                         boxShadow: '0 8px 20px -6px rgba(168, 85, 247, 0.4)'

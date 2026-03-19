@@ -156,9 +156,44 @@ export default function OutreachPage() {
 
             {/* Date Picker */}
             <div className="card card-p" style={{ marginBottom: 16 }}>
-                <label className="form-label-premium">
-                    📅 select date
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <label className="form-label-premium" style={{ marginBottom: 0 }}>
+                        📅 select date
+                    </label>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                        {[
+                            { label: 'Today', days: 0 },
+                            { label: 'Yesterday', days: 1 },
+                            { label: '2 Days Ago', days: 2 }
+                        ].map(s => {
+                            const d = new Date();
+                            d.setDate(d.getDate() - s.days);
+                            const dStr = d.toISOString().split('T')[0];
+                            const isActive = date === dStr;
+                            return (
+                                <button
+                                    key={s.label}
+                                    type="button"
+                                    onClick={() => setDate(dStr)}
+                                    style={{
+                                        padding: '4px 10px',
+                                        fontSize: '0.75rem',
+                                        fontWeight: 700,
+                                        borderRadius: '8px',
+                                        border: '1px solid',
+                                        borderColor: isActive ? 'var(--accent)' : 'var(--border)',
+                                        background: isActive ? 'var(--accent-gradient)' : 'var(--bg-secondary)',
+                                        color: isActive ? 'white' : 'var(--text-secondary)',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {s.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
                     <input
                         type="date"
@@ -202,8 +237,13 @@ export default function OutreachPage() {
                                 </div>
                             )}
                             {existingRecord && !isEditing && (
-                                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setIsEditing(true)}>
-                                    ✏️ Edit
+                                <button 
+                                    type="button" 
+                                    className="btn btn-premium btn-sm" 
+                                    onClick={() => setIsEditing(true)}
+                                    style={{ boxShadow: '0 4px 12px rgba(168,85,247,0.4)', border: 'none' }}
+                                >
+                                    ✏️ Edit Numbers
                                 </button>
                             )}
                         </div>
